@@ -180,9 +180,27 @@ executa esbuild, e a politica de supply chain do PRD 13.7 segue restritiva.
 
 ## Seed
 
-O `db:seed` nao roda automaticamente. Para popular os dados de referencia,
-uma vez, pelo shell do Railway no servico `api`:
+O seed roda automaticamente no `preDeploy`, junto das migrations
+(`pnpm db:deploy && pnpm db:seed`). Nao ha etapa manual.
+
+Ele nao e conveniencia de desenvolvimento: sem o processo `DEMO-2026` e a
+versao da regra de grupamento, a API recusa toda inscricao e a aplicacao fica
+inutilizavel, com esta mensagem no formulario:
 
 ```
-pnpm --filter @match/database run db:seed
+Processo seletivo nao disponivel nesta demonstracao.
+```
+
+Um banco recem-criado sobe exatamente assim - com schema e vazio -, entao o
+primeiro deploy de qualquer ambiente novo caía nisso.
+
+Rodar a cada release e seguro porque o seed e idempotente por construcao:
+`upsert` no processo, e recusa sobrescrever uma regra ja publicada (PRD 8.7).
+Ele tambem nao cria nenhum dado pessoal (PRD 1.2) - apenas o processo de
+demonstracao e a regra de grupamento etario.
+
+Para rodar sob demanda, sem esperar um release:
+
+```
+railway ssh --service api pnpm --filter @match/database run db:seed
 ```

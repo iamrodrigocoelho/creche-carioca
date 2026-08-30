@@ -44,8 +44,22 @@ export default defineRailway(() => {
       watchPatterns: ['apps/api/**', ...SHARED_WATCH],
     },
     start: 'pnpm --filter @match/api start',
-    /** Aplica as migrations antes de cada release. */
-    preDeploy: 'pnpm db:deploy',
+    /**
+     * Aplica as migrations e semeia os dados de referencia antes de cada
+     * release.
+     *
+     * O seed nao e conveniencia de desenvolvimento: sem o processo
+     * `DEMO-2026` e a versao da regra de grupamento, a API recusa toda
+     * inscricao com "Processo seletivo nao disponivel nesta demonstracao" e a
+     * aplicacao fica inutilizavel. Um banco recem-criado sobe exatamente
+     * assim - com schema e vazio.
+     *
+     * Rodar a cada release e seguro: o seed e idempotente por construcao
+     * (`upsert` no processo, e recusa sobrescrever regra ja publicada, PRD
+     * 8.7) e nao cria nenhum dado pessoal (PRD 1.2) - so o processo de
+     * demonstracao e a regra.
+     */
+    preDeploy: 'pnpm db:deploy && pnpm db:seed',
     /**
      * `/health/ready` responde 503 enquanto o PostgreSQL estiver inacessivel,
      * entao uma `DATABASE_URL` errada reprova o deploy em vez de publicar uma
