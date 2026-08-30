@@ -11,7 +11,7 @@
  * PRD 13.4: nenhum segredo aqui. `DATABASE_URL` e uma referencia resolvida pelo
  * Railway, nao um valor.
  */
-import { defineRailway, github, postgres, project, service } from 'railway/iac';
+import { defineRailway, github, postgres, preserve, project, service } from 'railway/iac';
 
 const REPO = 'iamrodrigocoelho/creche-carioca';
 const BRANCH = 'main';
@@ -89,6 +89,22 @@ export default defineRailway(() => {
        * dominio publico do `web`, que precisa existir - ver docs/DEPLOY.md.
        */
       API_CORS_ORIGINS: 'https://${{web.RAILWAY_PUBLIC_DOMAIN}}',
+      /**
+       * Chave do indice cego de contatos (ADR-0028), obrigatoria no schema de
+       * `apps/api/src/common/config/env.ts`: sem ela `loadEnv()` lanca e a API
+       * nem chega a escutar na porta. O deploy entao reprova no healthcheck e o
+       * Railway mantem a versao anterior no ar - que, sendo anterior a Fase 5,
+       * nao registra as rotas de contato e responde
+       * `Cannot POST /applications/:id/contacts/phones`. O sintoma aparece na
+       * jornada da familia, longe da causa, porque o `web` implanta sozinho.
+       *
+       * `preserve()` e nao um valor: a chave e segredo (PRD 13.4) e um valor
+       * aqui estaria versionado, o que anularia o indice cego. Ela e definida
+       * uma vez, fora do repositorio - ver docs/DEPLOY.md. Declara-la assim
+       * tambem impede que `railway config apply` a remova por nao constar do
+       * arquivo.
+       */
+      CONTACT_FINGERPRINT_KEY: preserve(),
     },
   });
 

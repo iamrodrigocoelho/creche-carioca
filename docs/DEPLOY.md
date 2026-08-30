@@ -45,7 +45,32 @@ railway init      # cria o projeto, se ainda nao existir
 railway link      # vincula este diretorio a um projeto e ambiente
 ```
 
-## 2. Planejar e aplicar
+## 2. Definir o segredo do indice cego
+
+A `api` nao sobe sem `CONTACT_FINGERPRINT_KEY`. E a chave do indice cego de
+contatos (ADR-0028): o schema de configuracao a exige com pelo menos 32
+caracteres e nao tem valor padrao de proposito, porque uma chave versionada
+seria publica e um indice cego com chave publica nao esconde nada.
+
+Por isso ela nao esta em `.railway/railway.ts` como valor, e sim como
+`preserve()`: o arquivo declara que a variavel existe e que o `apply` nao deve
+toca-la. O valor e definido uma unica vez, aqui:
+
+```
+railway variables --service api --set "CONTACT_FINGERPRINT_KEY=$(openssl rand -hex 32)"
+```
+
+Faca isso **antes** do primeiro `apply`. Sem a variavel, o processo lanca
+`Configuracao invalida: CONTACT_FINGERPRINT_KEY: ...` antes de escutar na
+porta, o healthcheck reprova e o Railway mantem a versao anterior no ar - com
+a api antiga respondendo `Cannot POST /applications/:id/contacts/phones`
+enquanto o `web`, que implanta separado, ja mostra a etapa de contatos.
+
+A chave **nao tem rotacao**: troca-la invalida todos os indices ja gravados e a
+deteccao de telefone repetido para de funcionar para os contatos antigos ate
+serem reescritos (docs/DECISIONS.md, ADR-0028).
+
+## 3. Planejar e aplicar
 
 ```
 railway config plan     # mostra o diff contra o ambiente vinculado
@@ -61,7 +86,7 @@ healthcheck, watch paths e variaveis ja definidos. A `DATABASE_URL` da api e
 uma referencia ao Postgres do projeto, resolvida pelo Railway - nao ha
 credencial no repositorio (PRD 13.4).
 
-## 3. Gerar os dominios publicos
+## 4. Gerar os dominios publicos
 
 O nome do dominio so existe depois que o Railway o gera, entao ele nao pode ser
 declarado no arquivo. Mas nao precisa ser feito no painel:
@@ -83,12 +108,12 @@ resposta e 502.
 
 Equivalente no painel: `Settings` -> `Networking` -> `Generate Domain`.
 
-## 4. Redeploy do `web`
+## 5. Redeploy do `web`
 
 Obrigatorio, e a razao e especifica: `NEXT_PUBLIC_API_URL` e lida em tempo de
 **build**. O valor entra no bundle e no `connect-src` da CSP montada por
 `apps/web/next.config.mjs`. Como a variavel referencia o dominio da api, que
-so passou a existir no passo 3, o primeiro build do `web` foi feito sem ela.
+so passou a existir no passo 4, o primeiro build do `web` foi feito sem ela.
 
 ```
 railway redeploy --service web --from-source
@@ -103,7 +128,7 @@ Equivalente no painel: servico `web` -> menu do deploy -> `Redeploy`.
 Trocar essa variavel sem rebuildar nunca tem efeito: a CSP antiga continua
 bloqueando as chamadas.
 
-## 5. Verificar
+## 6. Verificar
 
 ```
 curl -s https://<dominio-da-api>/health/ready
@@ -113,7 +138,10 @@ Esperado: `{"status":"ready", ...}` com `postgres: up`. Um `503` com
 `postgres: down` significa que a `DATABASE_URL` nao esta resolvendo.
 
 Depois, abrir o `web` e enviar uma inscricao em `/inscricao` - e o caminho que
-exercita web -> CORS -> api -> PostgreSQL de ponta a ponta.
+exercita web -> CORS -> api -> PostgreSQL de ponta a ponta. Va ate a etapa de
+contatos e salve um telefone: e o unico passo da jornada que depende de
+`CONTACT_FINGERPRINT_KEY`, e um `Cannot POST .../contacts/phones` ali significa
+que a api ao vivo e uma build anterior, mantida no ar por um deploy reprovado.
 
 ## Alterar a infraestrutura depois
 
@@ -122,6 +150,14 @@ diferenciado contra o ambiente ao vivo; nao ha arquivo de estado para
 sincronizar ou divergir.
 
 ## Pontos de atencao
+
+**Um deploy reprovado deixa a versao ANTERIOR no ar.** O Railway so troca o
+deployment ativo quando o healthcheck passa, entao uma api que nao inicia nao
+derruba o site - ela some do diff. Como `api` e `web` implantam separados, o
+front novo passa a conversar com a api velha, e o erro aparece como rota
+inexistente (`Cannot POST /applications/:id/contacts/phones`) e nao como falha
+de configuracao. Ao ver 404 numa rota que existe no codigo, confira primeiro os
+logs do ultimo deploy da `api` e o commit da build ativa.
 
 **`/health/ready` responde 503 sem banco.** E o healthcheck da `api`, e o
 PostgreSQL e dependencia critica. Uma `DATABASE_URL` errada reprova o deploy e
