@@ -56,6 +56,18 @@ export default defineRailway(() => {
     env: {
       NODE_ENV: 'production',
       API_LOG_LEVEL: 'info',
+      /**
+       * `PORT` e a porta que o healthcheck do Railway sonda, por dentro da
+       * rede, e nao o target port do dominio - o target port so resolve o
+       * roteamento publico. Sem declarar `PORT` aqui, o Railway sonda a porta
+       * que ele injeta, na qual a API nao escuta, e o deploy reprova no
+       * healthcheck com a aplicacao no ar e saudavel.
+       *
+       * `API_PORT` fica explicito ao lado, ainda que repita o default do
+       * schema, para que as duas portas nunca divirjam em silencio.
+       */
+      PORT: '3333',
+      API_PORT: '3333',
       /** Referencia tipada ao Postgres do projeto - resolvida pelo Railway. */
       DATABASE_URL: db.env.DATABASE_URL,
       /**
@@ -85,6 +97,12 @@ export default defineRailway(() => {
     healthcheckTimeout: 120,
     env: {
       NODE_ENV: 'production',
+      /**
+       * Porta sondada pelo healthcheck - ver a nota em `PORT` no servico `api`.
+       * Aqui ela precisa ser 3000 porque o script fixa `next start --port 3000`
+       * e ignora a porta injetada pelo Railway.
+       */
+      PORT: '3000',
       /**
        * Lida em tempo de BUILD: entra no bundle e no `connect-src` da CSP
        * montada por apps/web/next.config.mjs. Alterar esta variavel exige
