@@ -55,3 +55,9 @@ pnpm-debug.log*
 # As fixtures do pipeline sao derivadas dos datasets e precisam ser versionadas
 # para o CI rodar sem os arquivos originais (que ficam fora do repositorio).
 !packages/data-pipeline/test/fixtures/**
+
+# Pacote da publicacao estatica. Gerado na branch `static-deploy`, que compartilha
+# este diretorio de trabalho; nunca pertence ao repositorio.
+match-perfeito-estatico.zip
+match-perfeito-estatico/
+apps/web/out/

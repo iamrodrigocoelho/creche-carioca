@@ -404,7 +404,47 @@ Mas repetir um CEP é uma situação real e legítima: quem trabalha em casa tem
 
 ---
 
-## ADR-0027 — Painel do gestor antecipado sobre dados sintéticos
+## ADR-0027 — Índice cego agora, cifragem depois
+
+**Status:** Aceita · Fase 5
+
+**Contexto.** PRD §13.4 pede criptografar em nível de aplicação os valores completos de telefone e perfis sociais "quando viável". O plano marcava a avaliação para esta fase.
+
+Cifrar de verdade traria junto o que a cifragem sempre traz: uma chave que precisa existir em desenvolvimento, no CI e em produção, um caminho de rotação, e a perda da capacidade de comparar valores — e comparar é necessário, porque PRD §8.3 exige sinalizar telefone duplicado.
+
+**Decisão.** Nesta fase entra apenas o **índice cego**: um HMAC-SHA256 do valor normalizado, gravado ao lado do valor. A duplicidade é detectada comparando índices, nunca valores. O valor completo continua em texto no banco, apoiado na criptografia em repouso que PRD §13.4 já exige em produção.
+
+O índice é um HMAC, e não um SHA-256 simples, e isso não é preciosismo. O espaço de telefones brasileiros tem menos de 10¹¹ combinações: uma tabela de todos os hashes possíveis se constrói em minutos num laptop. Sem segredo, o "índice cego" seria uma tradução reversível do número — pior que inútil, porque pareceria proteção.
+
+**Consequências.** Duas honestas, e vale nomeá-las.
+
+A primeira: **isto não protege o telefone hoje.** Quem tiver acesso ao banco lê os números. O que o índice entrega é estrutura — quando a cifragem chegar na Fase 14, o índice já estará calculado e correto, e nenhum dado precisará ser migrado. Foi essa a razão de fazer metade agora em vez de nada.
+
+A segunda: `CONTACT_FINGERPRINT_KEY` **não tem rotação**. Trocar a chave invalida todos os índices gravados, e a detecção de duplicidade para de funcionar para os contatos antigos até serem reescritos. A variável não tem valor padrão de propósito — uma chave embutida no código seria pública, e um índice com chave pública não esconde nada.
+
+O canal entra no cálculo (`TELEFONE:`, `SOCIAL:INSTAGRAM:`) para que o mesmo texto em contextos diferentes nunca colida, e para que o mesmo `@handle` em duas redes não seja lido como duplicata.
+
+---
+
+## ADR-0028 — `ContactPoint` unificado por canal
+
+**Status:** Aceita · Fase 5
+
+**Contexto.** Telefone e perfil social têm campos quase disjuntos: um tem E.164 e consentimentos de ligação, SMS e WhatsApp; o outro tem plataforma, `@handle` e autorização de contato. Tabelas separadas pareceriam mais limpas.
+
+**Decisão.** Uma tabela só, discriminada por `channel`, como PRD §11 já previa ao descrever `ContactPoint` como "telefone, e-mail ou perfil social".
+
+A razão é que **as regras que importam são sobre o conjunto**, não sobre cada tipo: exatamente um principal, nunca ficar sem telefone, rede social nunca como único contato. Com tabelas separadas, cada uma dessas regras viraria uma consulta em duas fontes e uma decisão fora do banco. O índice único parcial que garante "no máximo um principal por inscrição" simplesmente não existiria.
+
+Os campos que não se aplicam ficam nulos, e check constraints impedem as combinações sem sentido: telefone com plataforma preenchida, social com E.164, principal que não é telefone.
+
+**Consequências.** A tabela tem colunas nulas por construção, o que é o custo previsível da escolha. Em troca, "quantos contatos alcançáveis esta inscrição tem" é uma consulta, e as invariantes vivem onde podem ser garantidas.
+
+Os endpoints continuam separados (`/contacts/phones` e `/contacts/social`) porque os campos obrigatórios diferem: um schema único com metade dos campos opcionais aceitaria combinações que o banco depois recusaria.
+
+---
+
+## ADR-0029 — Painel do gestor antecipado sobre dados sintéticos
 
 **Status:** Aceita · Antecipação da Fase 10
 
@@ -424,7 +464,7 @@ Nomes de unidade são fictícios, na convenção da rede. Atribuir fila fabricad
 
 ---
 
-## ADR-0028 — Pressão medida pela primeira opção, sem semáforo de cor
+## ADR-0030 — Pressão medida pela primeira opção, sem semáforo de cor
 
 **Status:** Aceita · Antecipação da Fase 10
 

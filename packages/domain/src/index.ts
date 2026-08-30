@@ -3,6 +3,38 @@ export type { DomainErrorCode } from './errors';
 
 export { CEP_LENGTH, CEP_SECTOR_LENGTH, cepSector, formatCep, normalizeCep } from './cep';
 
+export {
+  BRAZIL_COUNTRY_CODE,
+  formatPhone,
+  isMobile,
+  maskPhone,
+  normalizeE164,
+} from './contact/phone';
+
+export {
+  canRemoveContact,
+  CONTACT_CHANNELS,
+  CONTACT_RELATIONS,
+  CONTACT_STATUSES,
+  flagDuplicateContacts,
+  formatHandle,
+  hasReachableContact,
+  isThirdParty,
+  maskHandle,
+  normalizeHandle,
+  phonesAmong,
+  reconcilePrimary,
+  SOCIAL_PLATFORMS,
+} from './contact/rules';
+export type {
+  ContactChannel,
+  ContactRelation,
+  ContactRuleViolation,
+  ContactStatus,
+  ContactSummary,
+  SocialPlatform,
+} from './contact/rules';
+
 export { SHIFTS, isShift, shiftLabel } from './shift';
 export type { Shift } from './shift';
 

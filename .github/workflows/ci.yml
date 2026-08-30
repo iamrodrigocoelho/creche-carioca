@@ -43,6 +43,8 @@ jobs:
       # Credenciais efêmeras do runner, sem valor fora deste job (PRD 13.4).
       DATABASE_URL: postgresql://match:match_ci@localhost:5432/match_perfeito?schema=public
       DATABASE_URL_TEST: postgresql://match:match_ci@localhost:5432/match_perfeito_test?schema=public
+      # Indice cego de contatos (ADR-0028). Efemera, sem valor fora deste job.
+      CONTACT_FINGERPRINT_KEY: chave-efemera-de-ci-somente-para-testes-0123456789
 
     steps:
       - uses: actions/checkout@v7

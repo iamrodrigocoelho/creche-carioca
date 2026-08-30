@@ -43,6 +43,20 @@ export const envSchema = z.object({
   API_RATE_LIMIT_TTL_MS: z.coerce.number().int().positive().default(60_000),
   API_RATE_LIMIT: z.coerce.number().int().positive().default(120),
   API_LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
+  /**
+   * Chave do indice cego de contatos (ADR-0027).
+   *
+   * O indice e um HMAC do valor normalizado, usado para detectar telefone ou
+   * perfil repetido sem comparar o valor. Precisa de chave porque o espaco de
+   * telefones brasileiros e pequeno: um hash sem segredo seria revertido por
+   * forca bruta em minutos, e deixaria de ser indice cego.
+   *
+   * Sem padrao, e de proposito. Um valor embutido no codigo seria publico, e um
+   * indice com chave publica nao protege nada.
+   */
+  CONTACT_FINGERPRINT_KEY: z
+    .string()
+    .min(32, 'Defina CONTACT_FINGERPRINT_KEY com pelo menos 32 caracteres. Veja .env.example.'),
 });
 
 export type AppEnv = z.infer<typeof envSchema>;

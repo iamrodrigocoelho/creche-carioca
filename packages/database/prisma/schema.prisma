@@ -1,7 +1,7 @@
 // Schema canonico do Match Perfeito.
 //
 // Cobre o subconjunto do modelo de PRD 11 que a Fase 2 utiliza. As entidades
-// restantes (Unit, UnitCapacity, ContactPoint, Preference,
+// restantes (Unit, UnitCapacity, Preference,
 // CriterionResponse, ScoreResult, AllocationRun, Allocation, Convocation,
 // ContactAttempt, MessageTemplate) entram nas fases seguintes, conforme
 // IMPLEMENTATION_PLAN.md.
@@ -114,6 +114,7 @@ model Application {
 
   statusEvents    StatusEvent[]
   locationAnchors LocationAnchor[]
+  contactPoints   ContactPoint[]
 
   /// Uma crianca tem no maximo uma inscricao por processo. Sustenta o principio
   /// "uma crianca, uma oferta" (PRD 7.3) e o alerta de multiplas selecoes para a
@@ -157,6 +158,66 @@ model LocationAnchor {
 
   @@unique([applicationId, position])
   @@index([applicationId])
+}
+
+/// Contato da familia, unificado por canal (PRD 11, 8.3, 8.4).
+///
+/// Telefone e perfil social convivem na mesma tabela porque as regras que
+/// importam sao sobre o CONJUNTO — exatamente um principal, nunca ficar sem
+/// telefone, rede social nunca como unico contato — e essas regras precisam
+/// enxergar todos os canais de uma vez.
+model ContactPoint {
+  id            String         @id @default(uuid()) @db.Uuid
+  applicationId String         @db.Uuid
+  channel       ContactChannel
+
+  /// Telefone em E.164. Nulo nos perfis sociais.
+  e164 String? @db.VarChar(16)
+
+  /// Plataforma e `@handle`. Nulos nos telefones.
+  platform       SocialPlatform?
+  handle         String?         @db.VarChar(30)
+  /// PRD 8.4: o handle e mutavel, entao integracoes futuras devem preferir o
+  /// identificador interno da plataforma. Ainda nao ha vinculacao real (B-06).
+  platformUserId String?         @db.VarChar(64)
+
+  /// Indice cego do valor normalizado (ADR-0027). Serve para detectar
+  /// duplicidade sem comparar o valor, e para continuar servindo quando o valor
+  /// passar a ser cifrado.
+  fingerprint String @db.VarChar(64)
+
+  /// Rotulo livre da familia. Texto escapado na exibicao.
+  label     String?         @db.VarChar(60)
+  relation  ContactRelation
+  isPrimary Boolean         @default(false)
+  priority  Int             @default(1) @db.SmallInt
+
+  /// Consentimentos por meio (PRD 8.3). Nenhum e presumido.
+  allowsCall           Boolean @default(false)
+  allowsSms            Boolean @default(false)
+  allowsWhatsapp       Boolean @default(false)
+  /// PRD 8.4: autorizacao explicita para contato por rede social.
+  allowsSocial         Boolean @default(false)
+  /// PRD 8.3: telefone de terceiro exige confirmacao de autorizacao.
+  thirdPartyAuthorized Boolean @default(false)
+
+  status ContactStatus @default(INFORMED)
+
+  /// OTP simulado (PRD 8.3). PRD 13.4 exige guardar token apenas como hash.
+  otpHash      String?   @db.VarChar(64)
+  otpExpiresAt DateTime? @db.Timestamptz(6)
+  otpAttempts  Int       @default(0) @db.SmallInt
+
+  consentedAt     DateTime? @db.Timestamptz(6)
+  lastValidatedAt DateTime? @db.Timestamptz(6)
+  createdAt       DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime  @updatedAt @db.Timestamptz(6)
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId])
+  @@index([applicationId, channel])
+  @@index([applicationId, fingerprint])
 }
 
 /// Transicao temporal de status (PRD 11, 16).
@@ -234,6 +295,39 @@ enum ApplicationStatus {
   RASCUNHO
   SUBMETIDA
   CANCELADA
+}
+
+enum ContactChannel {
+  TELEFONE
+  EMAIL
+  SOCIAL
+}
+
+/// Plataformas de PRD 8.4. TikTok permanece adapter simulado (B-06).
+enum SocialPlatform {
+  INSTAGRAM
+  FACEBOOK
+  TIKTOK
+  X
+}
+
+/// Maquina de status de PRD 8.4, usada tambem pelo OTP simulado do telefone.
+enum ContactStatus {
+  INFORMED
+  PENDING_VERIFICATION
+  VERIFIED
+  INVALID
+  REVOKED
+}
+
+/// Relacao com a crianca (PRD 8.3).
+enum ContactRelation {
+  RESPONSAVEL
+  MAE
+  PAI
+  FAMILIAR
+  VIZINHO
+  OUTRO
 }
 
 /// Tipos de ponto de referencia de PRD 8.2.
