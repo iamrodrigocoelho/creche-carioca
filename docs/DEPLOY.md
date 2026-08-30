@@ -108,6 +108,44 @@ resposta e 502.
 
 Equivalente no painel: `Settings` -> `Networking` -> `Generate Domain`.
 
+## 4b. Ligar um dominio proprio (opcional)
+
+O projeto usa `crechecarioca.rio.br`, com DNS no Hostinger. O dominio gerado
+pelo Railway continua existindo e respondendo depois disso - e por ele que se
+testa o `web` quando o DNS proprio esta propagando ou quebrado.
+
+1. Painel do Railway, servico `web` -> `Settings` -> `Networking` ->
+   `Custom Domain`, ou `railway domain --service web --port 3000 <dominio>`.
+   O `--port` continua sendo o _target port_ da tabela acima.
+2. O Railway devolve um alvo `<id>.up.railway.app`. No DNS do Hostinger,
+   crie um `CNAME` do subdominio para esse alvo. Apague qualquer `CNAME` ou
+   `A` anterior do mesmo nome - o `www` vinha apontando para `cdn.hstgr.net`.
+3. Espere o Railway marcar o dominio como ativo (ele emite o TLS sozinho,
+   depois de enxergar o registro).
+
+Apex (`crechecarioca.rio.br`) nao aceita `CNAME`: o registro dele e um `A`
+para o edge do Railway, informado pelo painel no momento em que o dominio e
+adicionado. Nao invente esse IP a partir de um `dig` - ele muda.
+
+Conferindo a propagacao:
+
+```
+dig +short www.crechecarioca.rio.br    # espera-se <id>.up.railway.app
+dig +short crechecarioca.rio.br        # espera-se o IP do edge do Railway
+```
+
+Um `dig` que devolve `cdn.hstgr.net` significa que o registro antigo do
+Hostinger ainda esta na zona ou no cache.
+
+**As origens ficam no `.railway/railway.ts`, nao na CLI.** `WEB_CUSTOM_ORIGINS`
+alimenta o `API_CORS_ORIGINS` da api e `API_CUSTOM_ORIGIN` alimenta o
+`NEXT_PUBLIC_API_URL` do web. Setar essas variaveis com
+`railway variables --set` funciona ate o proximo `railway config apply`, que
+restaura o valor declarado no arquivo e derruba o CORS do dominio proprio.
+
+Dominio proprio na api exige o passo 5: `NEXT_PUBLIC_API_URL` e lida em tempo
+de build.
+
 ## 5. Redeploy do `web`
 
 Obrigatorio, e a razao e especifica: `NEXT_PUBLIC_API_URL` e lida em tempo de

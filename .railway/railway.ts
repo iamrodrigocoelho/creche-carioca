@@ -23,6 +23,31 @@ const BRANCH = 'main';
  */
 const ROOT_DIRECTORY = '/';
 
+/**
+ * Dominios publicos.
+ *
+ * O dominio gerado pelo Railway (`RAILWAY_PUBLIC_DOMAIN`) e uma referencia
+ * resolvida por ele no deploy, e continua existindo mesmo depois de um dominio
+ * proprio ser ligado ao servico. Ja o dominio proprio o Railway nao expoe como
+ * variavel: ele precisa ser escrito aqui, senao o proximo `railway config
+ * apply` sobrescreve o que tiver sido setado pela CLI e derruba o CORS.
+ *
+ * O apex e o `www` respondem os dois, entao os dois entram na allowlist: o que
+ * nao estiver la toma erro de CORS no browser, e a origem sobrando e inofensiva.
+ * Lista vazia / `null` = o servico usa apenas o dominio gerado.
+ */
+const WEB_CUSTOM_ORIGINS = ['https://crechecarioca.rio.br', 'https://www.crechecarioca.rio.br'];
+const API_CUSTOM_ORIGIN: string | null = null;
+
+const GENERATED_WEB_ORIGIN = 'https://${{web.RAILWAY_PUBLIC_DOMAIN}}';
+const GENERATED_API_ORIGIN = 'https://${{api.RAILWAY_PUBLIC_DOMAIN}}';
+
+/**
+ * O dominio gerado permanece na allowlist de proposito: e por ele que se testa
+ * o `web` quando o DNS do dominio proprio esta propagando ou quebrado.
+ */
+const CORS_ORIGINS = [...WEB_CUSTOM_ORIGINS, GENERATED_WEB_ORIGIN].join(',');
+
 /** Um push que so toca o front nao precisa redeployar a API, e vice-versa. */
 const SHARED_WATCH = ['packages/**', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', 'turbo.json'];
 
@@ -85,10 +110,10 @@ export default defineRailway(() => {
       /** Referencia tipada ao Postgres do projeto - resolvida pelo Railway. */
       DATABASE_URL: db.env.DATABASE_URL,
       /**
-       * Allowlist de CORS (PRD 13.5). Resolvido pelo Railway a partir do
-       * dominio publico do `web`, que precisa existir - ver docs/DEPLOY.md.
+       * Allowlist de CORS (PRD 13.5): dominio proprio do `web`, quando houver,
+       * mais o dominio gerado pelo Railway - ver docs/DEPLOY.md.
        */
-      API_CORS_ORIGINS: 'https://${{web.RAILWAY_PUBLIC_DOMAIN}}',
+      API_CORS_ORIGINS: CORS_ORIGINS,
       /**
        * Chave do indice cego de contatos (ADR-0028), obrigatoria no schema de
        * `apps/api/src/common/config/env.ts`: sem ela `loadEnv()` lanca e a API
@@ -138,7 +163,7 @@ export default defineRailway(() => {
        * montada por apps/web/next.config.mjs. Alterar esta variavel exige
        * rebuild do `web` - trocar o valor sozinho nao tem efeito.
        */
-      NEXT_PUBLIC_API_URL: 'https://${{api.RAILWAY_PUBLIC_DOMAIN}}',
+      NEXT_PUBLIC_API_URL: API_CUSTOM_ORIGIN ?? GENERATED_API_ORIGIN,
     },
   });
 
