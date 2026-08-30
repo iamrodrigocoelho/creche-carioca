@@ -6,7 +6,7 @@ import { Footer, GlobalNav } from '@match/ui';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Match Perfeito | Inscrição de creche',
+  title: 'Creche Carioca | Inscrição de creche',
   description:
     'Protótipo de demonstração para a inscrição em creches e Espaços de Desenvolvimento Infantil do Município do Rio de Janeiro.',
   // PRD 13.5: nenhuma referencia publica sequencial deve chegar a indexadores.

@@ -1,4 +1,4 @@
-# PRD - Match Perfeito: Inteligência na Inscrição de Creche
+# PRD - Creche Carioca: Inteligência na Inscrição de Creche
 
 **Versão:** 1.0  
 **Status:** Pronto para desenvolvimento do MVP  
@@ -58,7 +58,7 @@ Se o `/docs/DESIGN.md` estiver ausente ou incompleto, o agente deve registrar o 
 
 ## 2. Resumo executivo
 
-O Match Perfeito é um MVP para reduzir as principais dores do processo de inscrição, classificação e convocação de vagas em creches e Espaços de Desenvolvimento Infantil do Município do Rio de Janeiro, atendendo crianças de aproximadamente 6 meses a 3 anos.
+O Creche Carioca é um MVP para reduzir as principais dores do processo de inscrição, classificação e convocação de vagas em creches e Espaços de Desenvolvimento Infantil do Município do Rio de Janeiro, atendendo crianças de aproximadamente 6 meses a 3 anos.
 
 A solução conecta três momentos hoje tratados de forma fragmentada:
 

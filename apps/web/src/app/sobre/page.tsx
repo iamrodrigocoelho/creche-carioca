@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Sobre a demonstração | Match Perfeito',
+  title: 'Sobre a demonstração | Creche Carioca',
 };
 
 /**
@@ -15,7 +15,7 @@ export default function SobrePage() {
         <div className="mp-tile__inner mp-stack-md">
           <h1 className="mp-display-md">Sobre esta demonstração</h1>
           <p className="mp-lead">
-            O Match Perfeito é um protótipo construído para o Hackathon SME-Rio + Rio Impact Lab
+            O Creche Carioca é um protótipo construído para o Hackathon SME-Rio + Rio Impact Lab
             2026. Ele demonstra como a inscrição, a classificação e a convocação de vagas de creche
             poderiam funcionar de forma integrada e rastreável.
           </p>

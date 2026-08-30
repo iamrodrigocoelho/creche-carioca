@@ -30,7 +30,7 @@ export function Footer() {
             <ul>
               <li>
                 <a className="mp-footer__link" href="/sobre">
-                  O que é o Match Perfeito
+                  O que é o Creche Carioca
                 </a>
               </li>
               <li>

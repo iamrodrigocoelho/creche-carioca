@@ -1,5 +1,5 @@
 /**
- * Infraestrutura do Match Perfeito no Railway (PRD 19).
+ * Infraestrutura do Creche Carioca no Railway (PRD 19).
  *
  * Substitui o Config as Code (`railway.json`), descontinuado pelo Railway:
  * servicos novos nao conseguem mais opta-lo, e os arquivos existentes param de

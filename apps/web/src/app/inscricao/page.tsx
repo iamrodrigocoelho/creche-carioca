@@ -5,7 +5,7 @@ import { DemoBadge } from '@match/ui';
 import { ApplicationForm } from '@/components/ApplicationForm';
 
 export const metadata: Metadata = {
-  title: 'Etapa 1 · Dados da criança | Match Perfeito',
+  title: 'Etapa 1 · Dados da criança | Creche Carioca',
 };
 
 export default function InscricaoPage() {

@@ -1,4 +1,4 @@
-# IMPLEMENTATION_PLAN.md — Match Perfeito
+# IMPLEMENTATION_PLAN.md — Creche Carioca
 
 **Escopo:** plano de desenvolvimento incremental do MVP descrito em `PRD.md`.
 **Fontes de verdade:** `PRD.md` (comportamento, regras, requisitos técnicos) e `/docs/DESIGN.md` (apresentação visual).

@@ -2,7 +2,7 @@
   "name": "match-perfeito",
   "version": "0.1.0",
   "private": true,
-  "description": "Match Perfeito - Inteligencia na Inscricao de Creche (MVP). Ver PRD.md e docs/DESIGN.md.",
+  "description": "Creche Carioca - Inteligencia na Inscricao de Creche (MVP). Ver PRD.md e docs/DESIGN.md.",
   "packageManager": "pnpm@11.1.3",
   "engines": {
     "node": ">=22.11.0"
