@@ -181,3 +181,61 @@ Registradas para que nenhuma fase futura as feche por inércia. Todas constam de
 | PostGIS                                         | **Em aberto**. `PRD.md` §15.4 condiciona a "se disponível"; avaliar na Fase 13                                                                                |
 | Base legal, consentimentos e retenção           | **Fora do MVP**. `PRD.md` §13.1 exige validação pelo encarregado de dados e pelas áreas jurídica e de segurança da SME                                        |
 | RPO, RTO e infraestrutura de produção           | **Fora do MVP**. `PRD.md` §15.6 proíbe assumir valores                                                                                                        |
+
+---
+
+## ADR-0013 — Adapter PostgreSQL/Prisma substitui o repositório em memória
+
+**Status:** Aceita · Fase 2 · substitui a parte provisória do ADR-0003
+
+**Contexto.** O ADR-0003 previa a troca assim que houvesse banco disponível. A máquina não tem Docker, mas já roda **PostgreSQL 16.13 via Homebrew** na porta 5432, o que destravou a fase sem instalar nada.
+
+**Decisão.** `PrismaApplicationRepository` passa a atender a porta `ApplicationRepository`. O `InMemoryApplicationRepository` foi **removido**, não mantido em paralelo: uma segunda implementação que nenhum teste exercita é código morto, e `PRD.md` §14.3 exige explicitamente "API com PostgreSQL real".
+
+A porta ganhou `WriteContext` (correlation ID, ator, papel) para que a persistência não precise adivinhar quem originou a operação, conforme `PRD.md` §8.16.
+
+**Consequências.** A API deixa de subir sem banco — `DATABASE_URL` passou a ser obrigatória e validada na inicialização. Isso é intencional: falhar no boot é melhor do que falhar na primeira escrita. Toda escrita é transacional (`PRD.md` §15.6): inscrição, evento de status e evento de auditoria entram juntos ou não entram.
+
+---
+
+## ADR-0014 — A regra de grupamento passa a vir de `RuleVersion`
+
+**Status:** Aceita · Fase 2 · evolui o ADR-0007
+
+**Contexto.** Na Fase 1 a política de grupamento era a constante `DEMO_AGE_GROUP_POLICY_2026` no domínio. `PRD.md` §8.7 exige que alterar uma regra crie uma nova versão sem reescrever resultado histórico — o que uma constante de código não consegue garantir.
+
+**Decisão.** A política agora vive em `RuleVersion`, com `version`, `status`, `effectiveFrom`, `source` e um `payload` JSON. `RuleVersionService` carrega a versão vigente e **revalida o payload com Zod a cada leitura**; regra malformada falha de forma explícita em vez de produzir resultado silenciosamente errado.
+
+A constante permanece no domínio como **fonte do seed e fixture de teste**, não mais como caminho de execução.
+
+**Consequências.** O banco passa a ser a autoridade sobre qual regra estava vigente, que é a precondição para reconstruir uma pontuação histórica. O `ageGroup.policy.id` exposto na API deixou de ser um slug e passou a ser o UUID da versão de regra — identidade real, rastreável até a linha.
+
+---
+
+## ADR-0015 — Append-only imposto por trigger, não por convenção
+
+**Status:** Aceita · Fase 2
+
+**Contexto.** `PRD.md` §13.8 exige que a auditoria seja append-only e que "acesso de administrador não elimine rastreabilidade". Disciplina de aplicação não cumpre isso: um bug, um script ad hoc ou um usuário com privilégio elevado apagariam a trilha.
+
+**Decisão.** A função `match_append_only_guard()` bloqueia `UPDATE` e `DELETE` em `AuditEvent` e em `StatusEvent`. `StatusEvent` recebe a mesma proteção por ser, por definição, um histórico temporal — reescrever o passado invalidaria o cálculo de tempo até resposta de `PRD.md` §18.3.
+
+A primeira versão usava `ERRCODE = 'restrict_violation'` (SQLSTATE 23001). O Prisma traduz **toda** a classe 23 para "Foreign key constraint violated" e descarta a mensagem original, escondendo a causa real. Uma migration subsequente removeu o `ERRCODE`, deixando o padrão `P0001`, que o Prisma repassa intacto.
+
+**Consequências.** A garantia vale para qualquer cliente do banco, não só para a API. `TRUNCATE` continua permitido — os triggers são `FOR EACH ROW` sobre `UPDATE`/`DELETE` — o que é deliberado: a suíte de testes precisa de um ponto de partida limpo, e `TRUNCATE` exige privilégio de owner.
+
+---
+
+## ADR-0016 — Prisma dentro de `packages/database`, não em `prisma/` na raiz
+
+**Status:** Aceita · Fase 2 · desvia de `PRD.md` §12.2
+
+**Contexto.** `PRD.md` §12.2 sugere `prisma/` na raiz do repositório. Sob pnpm workspaces o cliente gerado é resolvido por pacote, então um schema na raiz sem um pacote dono torna a resolução do cliente frágil entre API, worker (Fase 11) e pipeline (Fase 3).
+
+**Decisão.** Schema, migrations, seed e cliente vivem em `packages/database`, exportados como `@match/database`. A estrutura de `PRD.md` §12.2 é declarada "sugerida", e este é o ponto em que segui-la literalmente prejudicaria a fase seguinte.
+
+O Prisma 7 removeu `url` do `schema.prisma`: a conexão vem de `prisma.config.ts` (Migrate) e do driver adapter `@prisma/adapter-pg` (execução), ambos lendo do ambiente. Nenhuma credencial no repositório.
+
+**Consequências.** Um único dono do schema para todos os consumidores futuros. O Prisma 7 também deixou de carregar `.env` automaticamente, então API e seed usam `--env-file-if-exists` e `process.loadEnvFile`, sem adicionar dependência de dotenv.
+
+**Nota sobre rollback.** O Prisma Migrate não gera migrations de reversão. A estratégia é _forward-fix_: um problema em produção é corrigido por uma migration nova, nunca por edição de uma já aplicada — como foi feito com o `ERRCODE` acima. `PRD.md` §14.3 pede rollback "quando suportado"; aqui não é.

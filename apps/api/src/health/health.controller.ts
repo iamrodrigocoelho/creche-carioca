@@ -3,17 +3,22 @@ import type { Response } from 'express';
 
 import type { Liveness, Readiness } from '@match/schemas';
 
+import { PrismaService } from '../database/prisma.service';
+
 /**
  * PRD 16.4.
  *
  * `/health/live`: o processo esta vivo.
- * `/health/ready`: dependencias criticas disponiveis. Na Fase 1 nao ha banco nem
- * Redis; eles aparecem como `skipped` e nao criticos, porque PRD 16.4 determina
- * que dependencias opcionais simuladas nao indisponibilizem a aplicacao. A Fase 2
- * promove PostgreSQL a critico e a Fase 11 faz o mesmo com o Redis.
+ * `/health/ready`: dependencias criticas disponiveis. A partir da Fase 2 o
+ * PostgreSQL e critico - sem banco a API nao consegue atender nenhuma escrita,
+ * entao `ready` passa a responder 503. O Redis segue como opcional e simulado
+ * ate a Fase 11, e PRD 16.4 determina que dependencia opcional simulada nao
+ * indisponibilize a aplicacao.
  */
 @Controller('health')
 export class HealthController {
+  constructor(private readonly prisma: PrismaService) {}
+
   @Get('live')
   @HttpCode(HttpStatus.OK)
   live(): Liveness {
@@ -21,14 +26,15 @@ export class HealthController {
   }
 
   @Get('ready')
-  ready(@Res({ passthrough: true }) response: Response): Readiness {
+  async ready(@Res({ passthrough: true }) response: Response): Promise<Readiness> {
+    const databaseUp = await this.prisma.isReachable();
+
     const checks: Readiness['checks'] = [
       { name: 'process', status: 'up', critical: true },
       {
         name: 'postgres',
-        status: 'skipped',
-        critical: false,
-        detail: 'Persistência entra na Fase 2 (repositório em memória na Fase 1).',
+        status: databaseUp ? 'up' : 'down',
+        critical: true,
       },
       {
         name: 'redis',

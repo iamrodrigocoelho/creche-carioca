@@ -13,26 +13,47 @@ import { normalizeCorrelationId } from './logging/correlation';
 import { REDACTED, isSensitiveKey, redact } from './logging/redact';
 import { ZodValidationPipe } from './pipes/zod-validation.pipe';
 
+const MINIMAL_ENV = { DATABASE_URL: 'postgresql://u@localhost:5432/db' };
+
 describe('loadEnv', () => {
   it('aplica os padroes de desenvolvimento', () => {
-    const env = loadEnv({});
+    const env = loadEnv({ ...MINIMAL_ENV });
 
     expect(env.API_PORT).toBe(3333);
     expect(env.API_CORS_ORIGINS).toEqual(['http://localhost:3000']);
   });
 
   it('divide a allowlist de CORS por virgula', () => {
-    const env = loadEnv({ API_CORS_ORIGINS: 'http://a.example, https://b.example' });
+    const env = loadEnv({
+      ...MINIMAL_ENV,
+      API_CORS_ORIGINS: 'http://a.example, https://b.example',
+    });
 
     expect(env.API_CORS_ORIGINS).toEqual(['http://a.example', 'https://b.example']);
   });
 
   it('rejeita curinga em CORS (PRD 13.5)', () => {
-    expect(() => loadEnv({ API_CORS_ORIGINS: '*' })).toThrowError(/Configuracao invalida/);
+    expect(() => loadEnv({ ...MINIMAL_ENV, API_CORS_ORIGINS: '*' })).toThrowError(
+      /Configuracao invalida/,
+    );
   });
 
   it('rejeita porta fora do intervalo valido', () => {
-    expect(() => loadEnv({ API_PORT: '70000' })).toThrowError(/Configuracao invalida/);
+    expect(() => loadEnv({ ...MINIMAL_ENV, API_PORT: '70000' })).toThrowError(
+      /Configuracao invalida/,
+    );
+  });
+
+  // A partir da Fase 2 a API nao opera sem banco: melhor falhar na inicializacao
+  // do que subir e quebrar na primeira escrita.
+  it('exige DATABASE_URL', () => {
+    expect(() => loadEnv({})).toThrowError(/DATABASE_URL/);
+  });
+
+  it('rejeita DATABASE_URL que nao seja PostgreSQL', () => {
+    expect(() => loadEnv({ DATABASE_URL: 'mysql://u@localhost:3306/db' })).toThrowError(
+      /PostgreSQL/,
+    );
   });
 });
 

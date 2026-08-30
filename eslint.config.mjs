@@ -40,7 +40,7 @@ export default tseslint.config(
   },
   {
     // Camadas de bootstrap/CLI podem escrever no stdout de forma controlada.
-    files: ['**/*.config.ts', '**/*.config.mjs', '**/main.ts', '**/scripts/**/*.ts'],
+    files: ['**/*.config.ts', '**/*.config.mjs', '**/main.ts', '**/seed.ts', '**/scripts/**/*.ts'],
     languageOptions: {
       globals: { process: 'readonly', console: 'readonly' },
     },

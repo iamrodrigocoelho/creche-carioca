@@ -15,14 +15,37 @@ Protótipo de demonstração para a inscrição, classificação e convocação 
 
 ## Estado atual
 
-**Fase 1 concluída** — fundação técnica e a primeira fatia funcional ponta a ponta: a família informa mês e ano de nascimento e o turno desejado, e recebe o grupamento etário com a explicação de como ele foi obtido. As demais fases estão descritas no `IMPLEMENTATION_PLAN.md`.
+**Fase 2 concluída** — fundação técnica, a primeira fatia funcional ponta a ponta e a persistência canônica em PostgreSQL. A família informa mês e ano de nascimento e o turno desejado, e recebe o grupamento etário com a explicação de como ele foi obtido; a inscrição é gravada de forma transacional, com histórico de status e trilha de auditoria append-only. As demais fases estão descritas no `IMPLEMENTATION_PLAN.md`.
 
 ## Requisitos
 
 - Node.js **22 LTS** (veja `.nvmrc`)
 - pnpm **11+**
+- **PostgreSQL 16+**, via `docker compose up -d` ou uma instalação local
 
-Docker ainda não é necessário: a Fase 1 não usa banco de dados. Ele passa a ser exigido a partir da Fase 2.
+## Banco de dados
+
+Suba o PostgreSQL com o compose deste repositório:
+
+```bash
+docker compose up -d
+```
+
+Ou use um PostgreSQL local. Em qualquer caso, crie os dois bancos — o de testes precisa ser **separado**, porque a suíte trunca tabelas:
+
+```bash
+createdb match_perfeito
+createdb match_perfeito_test
+```
+
+Ajuste `DATABASE_URL` e `DATABASE_URL_TEST` no `.env` e aplique o schema:
+
+```bash
+pnpm db:deploy    # aplica as migrations
+pnpm db:seed      # publica o processo de demonstração e a regra de grupamento
+```
+
+Outros comandos: `pnpm db:migrate` (cria migration em desenvolvimento), `pnpm db:status`, `pnpm db:studio`.
 
 ## Estrutura
 
@@ -34,7 +57,7 @@ packages/
   domain/     Entidades e regras puras, sem I/O nem framework
   schemas/    Contratos Zod compartilhados entre API e web
   ui/         Tokens e componentes de docs/DESIGN.md
-prisma/       (Fase 2)
+  database/   Schema Prisma, migrations, seed e cliente PostgreSQL
 docs/
 img/logo/     Logotipos oficiais — única fonte autorizada
 ```
@@ -88,13 +111,13 @@ pnpm --filter @match/web exec playwright install chromium
 
 ## Endpoints disponíveis
 
-| Método  | Rota                | Descrição                                  |
-| ------- | ------------------- | ------------------------------------------ |
-| `GET`   | `/health/live`      | Processo vivo                              |
-| `GET`   | `/health/ready`     | Dependências críticas                      |
-| `POST`  | `/applications`     | Cria a inscrição; aceita `Idempotency-Key` |
-| `GET`   | `/applications/:id` | Consulta por UUID                          |
-| `PATCH` | `/applications/:id` | Atualiza entradas e recalcula o grupamento |
+| Método  | Rota                | Descrição                                                        |
+| ------- | ------------------- | ---------------------------------------------------------------- |
+| `GET`   | `/health/live`      | Processo vivo                                                    |
+| `GET`   | `/health/ready`     | Dependências críticas; responde 503 se o PostgreSQL estiver fora |
+| `POST`  | `/applications`     | Cria a inscrição; aceita `Idempotency-Key`                       |
+| `GET`   | `/applications/:id` | Consulta por UUID                                                |
+| `PATCH` | `/applications/:id` | Atualiza entradas e recalcula o grupamento                       |
 
 Exemplo:
 
@@ -113,6 +136,7 @@ curl -s http://localhost:3333/applications \
 - Erros não expõem stack trace nem ecoam o valor recebido do usuário.
 - Referências públicas usam UUID v4, não identificadores sequenciais.
 - Nenhuma mensagem real é enviada: todos os canais de comunicação são simulados.
+- A trilha de auditoria é append-only, garantida por trigger no PostgreSQL — nem um administrador do banco consegue apagá-la.
 
 Detalhes e decisões pendentes estão em [`docs/DECISIONS.md`](docs/DECISIONS.md).
 

@@ -6,6 +6,7 @@ import { ApplicationsModule } from './applications/applications.module';
 import { CommonModule } from './common/common.module';
 import { loadEnv } from './common/config/env';
 import { CorrelationIdMiddleware } from './common/logging/correlation';
+import { DatabaseModule } from './database/database.module';
 import { HealthModule } from './health/health.module';
 
 const env = loadEnv();
@@ -13,6 +14,7 @@ const env = loadEnv();
 @Module({
   imports: [
     CommonModule,
+    DatabaseModule,
     // PRD 13.5: rate limiting por IP e endpoint.
     ThrottlerModule.forRoot({
       throttlers: [{ ttl: env.API_RATE_LIMIT_TTL_MS, limit: env.API_RATE_LIMIT }],

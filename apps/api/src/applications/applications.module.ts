@@ -3,17 +3,18 @@ import { Module } from '@nestjs/common';
 import { APPLICATION_REPOSITORY } from './application.repository';
 import { ApplicationsController } from './applications.controller';
 import { ApplicationsService } from './applications.service';
-import { InMemoryApplicationRepository } from './in-memory-application.repository';
+import { PrismaApplicationRepository } from './prisma-application.repository';
 
 /**
- * ADR-0003: a troca do adapter em memoria pelo adapter Prisma na Fase 2 acontece
- * exclusivamente nesta linha de `provide`.
+ * ADR-0013: o adapter em memoria da Fase 1 foi substituido pelo adapter
+ * PostgreSQL/Prisma. A troca ficou restrita a esta linha de `provide` - nem o
+ * controller nem o dominio precisaram mudar.
  */
 @Module({
   controllers: [ApplicationsController],
   providers: [
     ApplicationsService,
-    { provide: APPLICATION_REPOSITORY, useClass: InMemoryApplicationRepository },
+    { provide: APPLICATION_REPOSITORY, useClass: PrismaApplicationRepository },
   ],
   exports: [ApplicationsService],
 })

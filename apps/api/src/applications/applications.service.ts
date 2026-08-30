@@ -1,9 +1,7 @@
-import { randomUUID } from 'node:crypto';
-
 import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 
-import { findAgeGroupPolicy, resolveAgeGroup } from '@match/domain';
-import type { AgeGroupResolution } from '@match/domain';
+import { resolveAgeGroup } from '@match/domain';
+import type { AgeGroupPolicy, AgeGroupResolution } from '@match/domain';
 import type {
   AgeGroupResult,
   ApplicationResponse,
@@ -11,106 +9,109 @@ import type {
   UpdateApplicationInput,
 } from '@match/schemas';
 
-import { CLOCK, type Clock } from '../common/clock';
+import { currentCorrelationId } from '../common/logging/correlation';
+import { RuleVersionService } from '../database/rule-version.service';
 import {
   APPLICATION_REPOSITORY,
+  UnknownProcessError,
   type ApplicationRecord,
   type ApplicationRepository,
+  type WriteContext,
 } from './application.repository';
 
 /**
- * Casos de uso da inscricao (RF-01, fatia da Fase 1).
+ * Casos de uso da inscricao (RF-01).
  *
- * O servico nao decide regra de negocio: ele orquestra o repositorio e delega o
- * calculo ao dominio puro. PRD 1.2 proibe LLM ou modelo probabilistico nessa
- * decisao - o caminho aqui e inteiramente deterministico.
+ * O servico nao decide regra de negocio: ele orquestra repositorio e regra
+ * versionada, e delega o calculo ao dominio puro. PRD 1.2 proibe LLM ou modelo
+ * probabilistico nessa decisao - o caminho aqui e inteiramente deterministico.
+ *
+ * A partir da Fase 2 a politica de grupamento vem de `RuleVersion` no banco, e
+ * nao mais de uma constante de codigo (ADR-0014).
  */
 @Injectable()
 export class ApplicationsService {
   constructor(
     @Inject(APPLICATION_REPOSITORY)
     private readonly repository: ApplicationRepository,
-    @Inject(CLOCK)
-    private readonly now: Clock,
+    private readonly rules: RuleVersionService,
   ) {}
 
   async create(input: CreateApplicationInput): Promise<ApplicationResponse> {
-    // Falha cedo se o processo nao tiver regra publicada, antes de gravar qualquer coisa.
-    this.requirePolicy(input.processId);
+    // Falha cedo se o processo nao tiver regra publicada, antes de gravar.
+    const policy = await this.requirePolicy(input.processId);
 
-    const timestamp = this.now().toISOString();
-    const record: ApplicationRecord = {
-      // UUID v4: referencia publica nao sequencial e nao enumeravel (PRD 13.5).
-      id: randomUUID(),
-      anonymousChildId: randomUUID(),
-      status: 'RASCUNHO',
-      processId: input.processId,
-      birthYear: input.child.birthYear,
-      birthMonth: input.child.birthMonth,
-      ...(input.child.sex ? { sex: input.child.sex } : {}),
-      desiredShift: input.desiredShift,
-      ...(input.referenceDate ? { referenceDate: input.referenceDate } : {}),
-      createdAt: timestamp,
-      updatedAt: timestamp,
-    };
+    try {
+      const record = await this.repository.create(
+        {
+          processId: input.processId,
+          birthYear: input.child.birthYear,
+          birthMonth: input.child.birthMonth,
+          ...(input.child.sex ? { sex: input.child.sex } : {}),
+          desiredShift: input.desiredShift,
+          ...(input.referenceDate ? { referenceDate: input.referenceDate } : {}),
+        },
+        this.writeContext(),
+      );
 
-    return this.toResponse(await this.repository.create(record));
+      return this.toResponse(record, policy);
+    } catch (error) {
+      if (error instanceof UnknownProcessError) throw unknownProcess();
+      throw error;
+    }
   }
 
   async findById(id: string): Promise<ApplicationResponse> {
     const record = await this.repository.findById(id);
-    if (!record) {
-      throw new NotFoundException({
-        code: 'APPLICATION_NOT_FOUND',
-        message: 'Inscrição não encontrada.',
-      });
-    }
-    return this.toResponse(record);
+    if (!record) throw notFound();
+
+    return this.toResponse(record, await this.requirePolicy(record.processId));
   }
 
   /**
    * PRD 8.1: alterar nascimento OU data de referencia deve recalcular o grupamento.
-   * Como o grupamento e derivado na leitura, basta atualizar as entradas.
+   * Como o grupamento e derivado na leitura (ADR-0012), basta atualizar as entradas.
    */
   async update(id: string, input: UpdateApplicationInput): Promise<ApplicationResponse> {
-    const current = await this.repository.findById(id);
-    if (!current) {
-      throw new NotFoundException({
-        code: 'APPLICATION_NOT_FOUND',
-        message: 'Inscrição não encontrada.',
-      });
-    }
+    const record = await this.repository.update(
+      id,
+      {
+        ...(input.child?.birthYear !== undefined ? { birthYear: input.child.birthYear } : {}),
+        ...(input.child?.birthMonth !== undefined ? { birthMonth: input.child.birthMonth } : {}),
+        ...(input.child?.sex !== undefined ? { sex: input.child.sex } : {}),
+        ...(input.desiredShift !== undefined ? { desiredShift: input.desiredShift } : {}),
+        ...(input.referenceDate !== undefined ? { referenceDate: input.referenceDate } : {}),
+      },
+      this.writeContext(),
+    );
 
-    const sex = input.child?.sex ?? current.sex;
-    const referenceDate = input.referenceDate ?? current.referenceDate;
+    if (!record) throw notFound();
 
-    const updated: ApplicationRecord = {
-      ...current,
-      birthYear: input.child?.birthYear ?? current.birthYear,
-      birthMonth: input.child?.birthMonth ?? current.birthMonth,
-      ...(sex ? { sex } : {}),
-      desiredShift: input.desiredShift ?? current.desiredShift,
-      ...(referenceDate ? { referenceDate } : {}),
-      updatedAt: this.now().toISOString(),
-    };
-
-    return this.toResponse(await this.repository.update(updated));
+    return this.toResponse(record, await this.requirePolicy(record.processId));
   }
 
-  private requirePolicy(processId: string) {
-    const policy = findAgeGroupPolicy(processId);
-    if (!policy) {
-      throw new BadRequestException({
-        code: 'UNKNOWN_PROCESS',
-        message: 'Processo seletivo não disponível nesta demonstração.',
-      });
-    }
+  /**
+   * Identidade do autor da escrita.
+   *
+   * A autenticacao simulada e o RBAC entram na Fase 10 (PRD 13.3). Ate la o ator
+   * e explicitamente anonimo - o campo existe desde ja para que a trilha de
+   * auditoria nunca precise ser retrofitada.
+   */
+  private writeContext(): WriteContext {
+    return {
+      correlationId: currentCorrelationId(),
+      actor: 'anonimo',
+      actorRole: 'PUBLICO',
+    };
+  }
+
+  private async requirePolicy(processCode: string): Promise<AgeGroupPolicy> {
+    const policy = await this.rules.findAgeGroupPolicy(processCode);
+    if (!policy) throw unknownProcess();
     return policy;
   }
 
-  private toResponse(record: ApplicationRecord): ApplicationResponse {
-    const policy = this.requirePolicy(record.processId);
-
+  private toResponse(record: ApplicationRecord, policy: AgeGroupPolicy): ApplicationResponse {
     const resolution = resolveAgeGroup({
       birthYear: record.birthYear,
       birthMonth: record.birthMonth,
@@ -134,6 +135,20 @@ export class ApplicationsService {
       updatedAt: record.updatedAt,
     };
   }
+}
+
+function notFound(): NotFoundException {
+  return new NotFoundException({
+    code: 'APPLICATION_NOT_FOUND',
+    message: 'Inscrição não encontrada.',
+  });
+}
+
+function unknownProcess(): BadRequestException {
+  return new BadRequestException({
+    code: 'UNKNOWN_PROCESS',
+    message: 'Processo seletivo não disponível nesta demonstração.',
+  });
 }
 
 export function toAgeGroupResult(resolution: AgeGroupResolution): AgeGroupResult {

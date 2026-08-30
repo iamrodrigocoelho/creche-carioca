@@ -23,6 +23,27 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
+    # PRD 14.3: "API com PostgreSQL real em container de teste".
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: match
+          POSTGRES_PASSWORD: match_ci
+          POSTGRES_DB: match_perfeito
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U match"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      # Credenciais efêmeras do runner, sem valor fora deste job (PRD 13.4).
+      DATABASE_URL: postgresql://match:match_ci@localhost:5432/match_perfeito?schema=public
+      DATABASE_URL_TEST: postgresql://match:match_ci@localhost:5432/match_perfeito_test?schema=public
+
     steps:
       - uses: actions/checkout@v7
 
@@ -42,17 +63,30 @@ jobs:
       - name: Lint
         run: pnpm lint
 
-      - name: Verificação de tipos
-        run: pnpm typecheck
-
       - name: Formatação
         run: pnpm format:check
 
-      - name: Testes unitários e de integração
-        run: pnpm test:coverage
-
+      # Precede as etapas de banco: `build` gera o cliente Prisma e compila o
+      # seed, que as duas etapas seguintes executam.
       - name: Build
         run: pnpm build
+
+      # O banco de teste precisa existir antes da suíte: ela trunca tabelas e por
+      # isso nunca compartilha o banco de desenvolvimento.
+      - name: Criar banco de teste
+        run: PGPASSWORD=match_ci psql -h localhost -U match -d match_perfeito -c 'CREATE DATABASE match_perfeito_test;'
+
+      - name: Aplicar migrations
+        run: pnpm db:deploy
+
+      - name: Semear dados de demonstração
+        run: pnpm db:seed
+
+      - name: Verificação de tipos
+        run: pnpm typecheck
+
+      - name: Testes unitários e de integração
+        run: pnpm test:coverage
 
       - name: Instalar navegador do Playwright
         run: pnpm --filter @match/web exec playwright install --with-deps chromium

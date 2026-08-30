@@ -27,6 +27,17 @@ const originList = (fallback: string) =>
 export const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   API_PORT: z.coerce.number().int().min(1).max(65535).default(3333),
+  /**
+   * URL do PostgreSQL. Sem padrao: a partir da Fase 2 a API nao opera sem banco,
+   * entao e melhor falhar na inicializacao do que subir e quebrar na primeira
+   * escrita. Contem credencial - nunca versionar (PRD 13.4).
+   */
+  DATABASE_URL: z
+    .string()
+    .min(1, 'Defina DATABASE_URL. Veja .env.example.')
+    .refine((value) => value.startsWith('postgres://') || value.startsWith('postgresql://'), {
+      message: 'DATABASE_URL deve ser uma URL PostgreSQL.',
+    }),
   API_CORS_ORIGINS: originList('http://localhost:3000'),
   API_BODY_LIMIT: z.string().default('256kb'),
   API_RATE_LIMIT_TTL_MS: z.coerce.number().int().positive().default(60_000),

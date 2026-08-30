@@ -6,8 +6,11 @@ packages:
 # explicitamente aprovadas aqui. Cada entrada e uma decisao consciente e auditavel.
 # @swc/core: usado apenas em tempo de teste, para emitir os metadados de decorator
 # que o NestJS exige e o esbuild do Vitest nao produz.
+# @prisma/engines e prisma: baixam os engines nativos do PostgreSQL na instalacao.
 allowBuilds:
+  '@prisma/engines': true
   '@swc/core': true
+  prisma: true
 
 # Versoes recentes liberadas explicitamente da politica de idade minima de release.
 minimumReleaseAgeExclude:

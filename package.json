@@ -15,6 +15,11 @@
     "test": "turbo run test",
     "test:coverage": "turbo run test:coverage",
     "e2e": "pnpm --filter @match/web exec playwright test",
+    "db:migrate": "pnpm --filter @match/database run db:migrate",
+    "db:deploy": "pnpm --filter @match/database run db:deploy",
+    "db:status": "pnpm --filter @match/database run db:status",
+    "db:seed": "pnpm --filter @match/database run db:seed",
+    "db:studio": "pnpm --filter @match/database run db:studio",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm build"

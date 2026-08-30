@@ -3,7 +3,7 @@
 **Escopo:** plano de desenvolvimento incremental do MVP descrito em `PRD.md`.
 **Fontes de verdade:** `PRD.md` (comportamento, regras, requisitos técnicos) e `/docs/DESIGN.md` (apresentação visual).
 **Status:** vivo — atualizado a cada fase concluída.
-**Última atualização:** 30/08/2026 (Fase 1 concluída).
+**Última atualização:** 30/08/2026 (Fase 2 concluída).
 
 > Este documento **não replica** requisitos. Ele referencia os identificadores do PRD (`RF-xx`, seções `§n`) e organiza a ordem de execução. Em qualquer divergência, o `PRD.md` e o `/docs/DESIGN.md` prevalecem.
 
@@ -11,16 +11,16 @@
 
 ## 1. Inspeção inicial do repositório
 
-| Item                                 | Resultado                                                                                 |
-| ------------------------------------ | ----------------------------------------------------------------------------------------- |
-| `CLAUDE.md` / `AGENTS.md` / `README` | Não existiam antes da Fase 1                                                              |
-| Instruções adicionais                | Apenas `.claude/settings.local.json` (permissões locais do agente, sem regras de projeto) |
-| Git                                  | **Não é um repositório Git.** Nenhum commit foi feito (regra de execução)                 |
-| Gerenciador de pacotes               | Nenhum lockfile presente. `pnpm 11.1.3` disponível → adotado (PRD §12.1)                  |
-| Runtime                              | Node.js v22.13.1 (LTS)                                                                    |
-| Docker                               | **Ausente na máquina** (`docker: command not found`)                                      |
-| Conteúdo pré-existente               | `PRD.md`, `docs/DESIGN.md`, `img/logo/*.png` — todos preservados, nenhum sobrescrito      |
-| Datasets                             | O repositório `CIT-SME-RJ/dadoscreche` (PRD §10.1) **não está** presente localmente       |
+| Item                                 | Resultado                                                                                                 |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| `CLAUDE.md` / `AGENTS.md` / `README` | Não existiam antes da Fase 1                                                                              |
+| Instruções adicionais                | Apenas `.claude/settings.local.json` (permissões locais do agente, sem regras de projeto)                 |
+| Git                                  | **Não é um repositório Git.** Nenhum commit foi feito (regra de execução)                                 |
+| Gerenciador de pacotes               | Nenhum lockfile presente. `pnpm 11.1.3` disponível → adotado (PRD §12.1)                                  |
+| Runtime                              | Node.js v22.13.1 (LTS)                                                                                    |
+| Docker                               | **Ausente na máquina** (`docker: command not found`) — desnecessário: PostgreSQL 16.13 local via Homebrew |
+| Conteúdo pré-existente               | `PRD.md`, `docs/DESIGN.md`, `img/logo/*.png` — todos preservados, nenhum sobrescrito                      |
+| Datasets                             | O repositório `CIT-SME-RJ/dadoscreche` (PRD §10.1) **não está** presente localmente                       |
 
 ---
 
@@ -28,15 +28,15 @@
 
 ### 2.1 Bloqueios externos (não impedem o MVP; tratados por mock/config — PRD §21)
 
-| #    | Item                                                                                                         | Impacto                         | Tratamento adotado                                                                                                                                                                |
-| ---- | ------------------------------------------------------------------------------------------------------------ | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| B-01 | Datasets `dadoscreche` não estão no ambiente                                                                 | Fases 3+ dependem deles         | Pipeline lê de `data/raw/` configurável; sem os arquivos, usa amostras sintéticas rotuladas. Fase 3 documenta o download manual                                                   |
-| B-02 | Docker ausente                                                                                               | PostgreSQL/Redis/Testcontainers | `docker-compose.yml` entregue na Fase 1 como artefato (PRD §19, Fase 0), porém **não executado** — a Fase 1 não depende de banco. Fases 2+ exigem Docker ou Postgres/Redis locais |
-| B-03 | Provider de geocodificação indefinido (PRD §21 "Geocodificação")                                             | RF-02                           | Porta `GeocodingProvider` + adapter mock determinístico. Nenhum provider real é escolhido                                                                                         |
-| B-04 | Distância geodésica vs. rota viária (PRD §21 "Distância")                                                    | RF-05                           | Haversine na porta `DistanceProvider`, rotulada como estimativa (PRD §8.5). Decisão de produção permanece aberta                                                                  |
-| B-05 | Identidade oficial / autenticação (PRD §21 "Autenticação")                                                   | RF-10, §13.3                    | Auth simulada e explicitamente identificada; RBAC real no backend                                                                                                                 |
-| B-06 | APIs sociais e TikTok (PRD §21)                                                                              | RF-04, RF-11                    | Todos os adapters sociais permanecem simulados                                                                                                                                    |
-| B-07 | Regras oficiais de desempate e de grupamento etário por processo (PRD §21 "Desempates", §14.5 do calendário) | RF-01, RF-07                    | Política de grupamento e desempates são **dados versionados e parametrizados**, marcados como `DEMONSTRACAO`. Nenhum valor é tratado como oficial                                 |
+| #    | Item                                                                                                         | Impacto                 | Tratamento adotado                                                                                                                                                                                            |
+| ---- | ------------------------------------------------------------------------------------------------------------ | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| B-01 | Datasets `dadoscreche` não estão no ambiente                                                                 | Fases 3+ dependem deles | Pipeline lê de `data/raw/` configurável; sem os arquivos, usa amostras sintéticas rotuladas. Fase 3 documenta o download manual                                                                               |
+| B-02 | ~~Docker ausente~~ **resolvido na Fase 2**                                                                   | PostgreSQL/Redis        | A máquina já roda **PostgreSQL 16.13 via Homebrew**, então a Fase 2 seguiu sem Docker. O `docker-compose.yml` permanece como alternativa equivalente, não executado. O Redis ainda será necessário na Fase 11 |
+| B-03 | Provider de geocodificação indefinido (PRD §21 "Geocodificação")                                             | RF-02                   | Porta `GeocodingProvider` + adapter mock determinístico. Nenhum provider real é escolhido                                                                                                                     |
+| B-04 | Distância geodésica vs. rota viária (PRD §21 "Distância")                                                    | RF-05                   | Haversine na porta `DistanceProvider`, rotulada como estimativa (PRD §8.5). Decisão de produção permanece aberta                                                                                              |
+| B-05 | Identidade oficial / autenticação (PRD §21 "Autenticação")                                                   | RF-10, §13.3            | Auth simulada e explicitamente identificada; RBAC real no backend                                                                                                                                             |
+| B-06 | APIs sociais e TikTok (PRD §21)                                                                              | RF-04, RF-11            | Todos os adapters sociais permanecem simulados                                                                                                                                                                |
+| B-07 | Regras oficiais de desempate e de grupamento etário por processo (PRD §21 "Desempates", §14.5 do calendário) | RF-01, RF-07            | Política de grupamento e desempates são **dados versionados e parametrizados**, marcados como `DEMONSTRACAO`. Nenhum valor é tratado como oficial                                                             |
 
 ### 2.2 Decisões técnicas explicitamente pendentes no PRD — **não** fechadas neste plano
 
@@ -110,14 +110,27 @@ Cobre PRD §19 Fase 0 e a primeira parcela de **RF-01**.
 
 ---
 
-### Fase 2 — Persistência canônica
+### Fase 2 — Persistência canônica ✅ CONCLUÍDA
 
 **Objetivo.** Trocar o repositório em memória por PostgreSQL/Prisma sem alterar o domínio.
-**Funcionalidades.** `prisma/schema.prisma` com as entidades de PRD §11 necessárias até aqui (`Process`, `RuleVersion`, `Child`, `Guardian`, `Application`, `StatusEvent`, `AuditEvent`); migrations; `seed.ts` sintético; adapter Prisma da porta de repositório; `AuditEvent` append-only (RF-16); `/health/ready` passa a verificar o banco.
-**Dependências.** Fase 1; Docker ou Postgres local (B-02).
-**Critérios de aceite.** Migrations aplicam e revertem; constraints de PRD §11.1 aplicáveis existem; nenhum endpoint muda de contrato; auditoria registra ator, ação, entidade, instante UTC e correlation ID sem PII.
-**Testes.** Integração com Postgres real em container; teste de append-only; reexecução de seed idempotente.
-**Riscos.** Ausência de Docker bloqueia a fase (B-02); divergência entre schema Prisma e schemas Zod → teste de contrato.
+
+**Funcionalidades.**
+
+- `packages/database` (`@match/database`) com schema Prisma cobrindo `Process`, `RuleVersion`, `Child`, `Guardian`, `Application`, `StatusEvent` e `AuditEvent` (PRD §11).
+- Três migrations versionadas, incluindo triggers de append-only e check constraints.
+- `seed.ts` sintético e idempotente, que publica o processo de demonstração e a versão de regra de grupamento.
+- `PrismaApplicationRepository` atendendo a porta existente; adapter em memória removido.
+- `RuleVersionService`: a política de grupamento passa a vir do banco, revalidada por Zod a cada leitura.
+- `AuditService` com redação de PII compartilhada com os logs; `StatusEvent` registrando cada transição.
+- `/health/ready` trata o PostgreSQL como dependência crítica.
+
+**Dependências.** Fase 1. **B-02 resolvido de outra forma:** a máquina já tinha PostgreSQL 16.13 via Homebrew, então a fase seguiu sem Docker. O `docker-compose.yml` continua válido como alternativa e permanece não executado.
+
+**Critérios de aceite.** Migrations aplicam (rollback não é suportado pelo Prisma — ver ADR-0016); constraints de PRD §11.1 aplicáveis existem; nenhum endpoint mudou de contrato; auditoria registra ator, papel, ação, entidade, instante UTC, correlation ID e origem, sem PII.
+
+**Testes.** 79 testes na API contra PostgreSQL real, cobrindo escrita transacional, durabilidade, auditoria, append-only, constraints, regra versionada e idempotência do seed.
+
+**Riscos remanescentes.** O banco de teste é compartilhado entre arquivos da suíte; `fileParallelism: false` protege dentro do processo, mas duas execuções simultâneas de `pnpm --filter @match/api test` se atropelariam no `TRUNCATE`.
 
 ---
 
@@ -269,3 +282,10 @@ Detalhadas em `docs/DECISIONS.md`:
 - **ADR-0010** — CSP sem origem externa, mantendo `'unsafe-inline'` temporariamente; nonce na Fase 14.
 - **ADR-0011** — Build da API por `tsc`; `@nestjs/cli` removido por incompatibilidade com Node 22.
 - **ADR-0012** — Grupamento derivado na leitura, nunca persistido, garantindo o recálculo de PRD §8.1.
+
+### Decisões da Fase 2
+
+- **ADR-0013** — Adapter Prisma substitui o repositório em memória, que foi removido em vez de mantido em paralelo.
+- **ADR-0014** — A regra de grupamento migra da constante de código para `RuleVersion` no banco.
+- **ADR-0015** — Append-only imposto por trigger no PostgreSQL, não por convenção de aplicação.
+- **ADR-0016** — Prisma em `packages/database` em vez de `prisma/` na raiz; desvio justificado de PRD §12.2.

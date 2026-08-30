@@ -2,20 +2,23 @@ import 'reflect-metadata';
 
 import { Test } from '@nestjs/testing';
 import type { INestApplication } from '@nestjs/common';
+import type { PrismaClient } from '@match/database';
 import request from 'supertest';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import { applicationSchema, apiErrorSchema } from '@match/schemas';
 
 import { AppModule } from '../app.module';
 import { configureApp } from '../bootstrap';
 import { loadEnv } from '../common/config/env';
+import { ensureSeed, resetTransactionalData, testPrismaClient } from '../../test/database';
 
 /**
- * Testes de integracao HTTP da fatia da Fase 1.
+ * Testes de integracao HTTP.
  *
- * Exercitam a aplicacao Nest completa (middleware de correlation ID, pipes,
- * filtro de excecao e hardening), nao apenas o controller isolado.
+ * PRD 14.3 exige "API com PostgreSQL real". A suite sobe a aplicacao Nest
+ * completa (middleware de correlation ID, pipes, filtro de excecao e hardening)
+ * contra o banco de teste, sem qualquer mock de persistencia.
  */
 
 const validBody = {
@@ -27,8 +30,12 @@ const validBody = {
 describe('API de inscricoes', () => {
   let app: INestApplication;
   let http: string;
+  let prisma: PrismaClient;
 
   beforeAll(async () => {
+    prisma = testPrismaClient();
+    await ensureSeed(prisma);
+
     const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
 
     app = moduleRef.createNestApplication();
@@ -38,8 +45,13 @@ describe('API de inscricoes', () => {
     http = await app.getUrl();
   });
 
+  beforeEach(async () => {
+    await resetTransactionalData(prisma);
+  });
+
   afterAll(async () => {
     await app.close();
+    await prisma.$disconnect();
   });
 
   describe('GET /health', () => {
@@ -50,14 +62,21 @@ describe('API de inscricoes', () => {
       expect(typeof response.body.uptimeSeconds).toBe('number');
     });
 
-    it('responde readiness com dependencias opcionais marcadas como skipped (PRD 16.4)', async () => {
+    it('trata o PostgreSQL como dependencia critica e disponivel (PRD 16.4)', async () => {
       const response = await request(http).get('/health/ready').expect(200);
 
       expect(response.body.status).toBe('ready');
       const postgres = response.body.checks.find(
         (check: { name: string }) => check.name === 'postgres',
       );
-      expect(postgres).toMatchObject({ status: 'skipped', critical: false });
+      expect(postgres).toMatchObject({ status: 'up', critical: true });
+    });
+
+    it('mantem o Redis como dependencia opcional simulada (PRD 16.4)', async () => {
+      const response = await request(http).get('/health/ready').expect(200);
+
+      const redis = response.body.checks.find((check: { name: string }) => check.name === 'redis');
+      expect(redis).toMatchObject({ status: 'skipped', critical: false });
     });
   });
 
