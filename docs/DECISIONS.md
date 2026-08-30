@@ -589,3 +589,54 @@ Cada botão nomeia a unidade que move ("Mover Creche X para cima"), e não apena
 **Consequências.** O arrastar nativo funciona mal em toque, e isso é aceito — os controles acessíveis cobrem esse caso, e são o caminho que a maioria vai usar no celular. Se a avaliação de acessibilidade da Fase 14 apontar que não basta, a troca por uma biblioteca fica restrita a este componente.
 
 O E2E exercita a reordenação **apenas com teclado**, que é o caminho difícil e o que o plano nomeia como critério.
+
+---
+
+## ADR-0037 — A régua de 2025 como versão de pontuação da demonstração
+
+**Status:** Aceita · Fase 7
+
+**Contexto.** PRD §8.7 exige reconstruir a pontuação a partir do catálogo de perguntas e do peso vigente. A Query C traz exatamente isso, e é dado **oficial** da SME: 13 perguntas por processo, com o peso de cada uma e a marca de critério de desempate.
+
+Só que a régua de 2026 não existe. Nenhum edital foi publicado, e B-07 registra isso desde a Fase 1.
+
+Havia ainda um segundo fato: a régua mudou entre 2023 e 2024. O total saiu de 465 para 100 pontos, e "A criança tem alguma deficiência?" caiu de 100 para 25. Uma série montada sem versionar isso fica errada.
+
+**Decisão.** O pipeline gera `packages/database/src/criteria.json` com a régua dos **cinco processos**, e não apenas do mais recente: PRD §8.7 exige reconstruir por processo/ano, e um resultado de 2022 só se reproduz com a régua de 2022.
+
+O seed publica a régua de **2025** como `RuleVersion` de tipo `SCORING`, versão 1, marcada `DEMONSTRACAO`. A escolha do ano é de demonstração; a régua copiada é oficial, e o `source` da versão diz de onde veio.
+
+**Consequências.** A distinção precisa aparecer na interface, e aparece: o selo diz "Régua do processo de 2025 · demonstração", e o texto explica que a regra de 2026 não foi publicada. Passar a régua de um ano por regra de outro sem dizer seria o que PRD §1.2 proíbe.
+
+Quando a régua oficial de 2026 sair, ela entra como **versão 2**. A versão 1 permanece, e os resultados calculados com ela continuam reproduzíveis — que é o ponto inteiro de `ScoreResult` ser append-only.
+
+O artefato tem 16 KB e é versionado pela mesma razão dos outros: o CI não tem os datasets.
+
+---
+
+## ADR-0038 — A política de confirmação é parte da regra, não uma interpretação fixa
+
+**Status:** Aceita · Fase 7
+
+**Contexto.** PRD §8.7 lista "confirmação da resposta" entre as entradas da pontuação, mas não diz como ela entra. A leitura natural seria: só pontua o que foi confirmado.
+
+Os dados desmentem essa leitura. Cruzando `resposta` e `confirmado` nas 4,3 milhões de respostas históricas:
+
+| resposta | confirmado |      linhas |
+| -------- | ---------- | ----------: |
+| Não      | Não        |   3.474.194 |
+| Não      | **Sim**    | **472.047** |
+| Sim      | Não        |     341.260 |
+| Sim      | Sim        |      69.618 |
+
+As 472 mil linhas com resposta "Não" e confirmação "Sim" mostram que o campo não significa "o Sim foi validado" — se significasse, essa combinação não existiria. O dicionário de dados descreve `confirmado` apenas como "confirmação/validação", sem definir o que é validado.
+
+**Decisão.** A política é um campo da regra versionada, com dois valores: `DECLARADA` pontua a resposta da família, confirmada ou não; `CONFIRMADA` exige a validação para somar. A escolhida viaja no `ScoreResult`, junto com a versão da regra.
+
+A demonstração usa `DECLARADA`. Com `CONFIRMADA`, toda inscrição nova valeria zero até alguém da rede conferir — e não existe esse alguém nesta demonstração, nem o fluxo que o produziria antes da Fase 10.
+
+**Consequências.** Descobrir o significado real de `confirmado` deixa de ser pré-requisito para pontuar: quando a SME esclarecer, muda-se o valor do campo numa versão nova, sem tocar no motor nem invalidar resultados anteriores.
+
+O motor distingue `AGUARDA_CONFIRMACAO` de `RESPOSTA_NEGATIVA` no detalhamento, o que importa para a família: "você disse que sim, mas ainda não foi validado" e "não se aplica a você" são coisas diferentes, e só a primeira pede alguma ação.
+
+`confirmed` nunca é definido pela família — a validação é da rede, e o endpoint de respostas não o aceita como entrada.

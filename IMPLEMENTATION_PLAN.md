@@ -3,7 +3,7 @@
 **Escopo:** plano de desenvolvimento incremental do MVP descrito em `PRD.md`.
 **Fontes de verdade:** `PRD.md` (comportamento, regras, requisitos técnicos) e `/docs/DESIGN.md` (apresentação visual).
 **Status:** vivo — atualizado a cada fase concluída.
-**Última atualização:** 30/08/2026 (Fase 6 concluída; interface do painel do gestor antecipada — ADR-0031).
+**Última atualização:** 30/08/2026 (Fase 7 concluída; interface do painel do gestor antecipada — ADR-0031).
 
 > Este documento **não replica** requisitos. Ele referencia os identificadores do PRD (`RF-xx`, seções `§n`) e organiza a ordem de execução. Em qualquer divergência, o `PRD.md` e o `/docs/DESIGN.md` prevalecem.
 
@@ -245,14 +245,29 @@ Cobre PRD §19 Fase 0 e a primeira parcela de **RF-01**.
 
 ---
 
-### Fase 7 — Motor de pontuação versionado (RF-07)
+### Fase 7 — Motor de pontuação versionado (RF-07) ✅ CONCLUÍDA
 
 **Objetivo.** Reconstruir pontuação determinística e explicável por versão de regra.
-**Funcionalidades.** `packages/matching-engine` (parte de pontuação); `Criterion`, `CriterionResponse`, `ScoreResult`; `POST /score-runs`, `GET /score-runs/:id`; explicação estruturada; nova versão nunca reescreve histórico.
-**Dependências.** Fases 3 (catálogo de perguntas), 5.
-**Critérios de aceite.** Todos os de PRD §8.7; nenhuma inferência de LLM decide números.
-**Testes.** Pontuação por processo/ano; desempates; imutabilidade de versão; cobertura ≥ 90% no pacote.
-**Riscos.** Regras oficiais de desempate não confirmadas (B-07) → configuração versionada rotulada.
+
+**Funcionalidades.**
+
+- `packages/matching-engine` com o motor de pontuação puro: soma por critério, política de confirmação, desempate e comparação para classificação. Sem banco, sem HTTP, sem relógio.
+- `Criterion`, `CriterionResponse` e `ScoreResult` no schema canônico. A régua entra por artefato versionado gerado da Query C (ADR-0037) e é publicada como `RuleVersion` do tipo `SCORING`.
+- `GET`/`PUT /applications/:id/criteria` e `POST`/`GET /applications/:id/score-runs`.
+- Explicação estruturada: cada linha traz peso, pontos somados, resposta e o motivo em código estável — nunca texto pronto.
+- Etapa 5 da interface, com a pontuação recalculada a cada resposta e o detalhamento visível.
+
+**Dependências.** Fases 3 (catálogo de perguntas) e 5.
+
+**Critérios de aceite.** Nenhuma inferência decide números — o motor é puro e determinístico. Uma alteração de peso cria versão nova; `ScoreResult` é append-only por trigger, e o teste prova que o banco recusa `UPDATE` e `DELETE`. Cada resultado guarda entradas, versão da regra, pontos por critério, total e desempates.
+
+**Testes.** 55 novos: 24 no motor (97% de cobertura, acima dos 90% exigidos), 21 de integração HTTP contra PostgreSQL real, 10 de componente e 5 E2E.
+
+**A régua é oficial; a escolha de qual usar é que não é.** A Query C traz a régua real de cada processo: 13 perguntas, e de 2024 em diante somando exatamente 100 pontos, com CadÚnico valendo 51 sozinho. Como a regra de 2026 não foi publicada (B-07), a demonstração usa a de 2025 — a mais recente completa. A `RuleVersion` é marcada `DEMONSTRACAO` e a interface diz de que ano a régua veio.
+
+**O que os dados obrigaram a decidir.** `confirmado` **não** é subconjunto de `resposta`: há 472 mil linhas com resposta "Não" e confirmação "Sim", e o dicionário não define o que a confirmação significa. Em vez de adivinhar, a política de confirmação virou parte da regra versionada e viaja no resultado (ADR-0038).
+
+**Riscos remanescentes.** Os desempates oficiais seguem não confirmados (B-07): a ordem usada é a da própria régua, que é a escolha mais defensável disponível e vive no dado versionado, não no código. `confirmed` nunca é definido pela família — a validação é da rede, e o fluxo que a produz só existe a partir da Fase 10.
 
 ---
 
@@ -389,3 +404,8 @@ Detalhadas em `docs/DECISIONS.md`:
 - **ADR-0034** — Unidades entram no banco por artefato versionado carregado pelo seed, e não por loader de Parquet.
 - **ADR-0035** — O berçário único da origem mapeia para as duas faixas da política; nada mais é inferido.
 - **ADR-0036** — Reordenação por botões acessíveis como caminho principal; arrastar nativo como conveniência.
+
+### Decisões da Fase 7
+
+- **ADR-0037** — Régua de pontuação por artefato versionado da Query C; a de 2025 serve à demonstração enquanto a de 2026 não existe.
+- **ADR-0038** — Política de confirmação como parte da regra versionada, em vez de interpretação fixa de um campo ambíguo.

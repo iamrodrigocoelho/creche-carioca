@@ -41,6 +41,9 @@ importers:
       '@match/domain':
         specifier: workspace:*
         version: link:../../packages/domain
+      '@match/matching-engine':
+        specifier: workspace:*
+        version: link:../../packages/matching-engine
       '@match/schemas':
         specifier: workspace:*
         version: link:../../packages/schemas
@@ -226,11 +229,30 @@ importers:
         specifier: ^4.1.11
         version: 4.1.11(@types/node@22.20.1)(@vitest/coverage-v8@4.1.11)(jsdom@30.0.1(@noble/hashes@1.8.0))(vite@8.2.2(@types/node@22.20.1)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12))
 
+  packages/matching-engine:
+    dependencies:
+      '@match/domain':
+        specifier: workspace:*
+        version: link:../domain
+    devDependencies:
+      '@vitest/coverage-v8':
+        specifier: ^4.1.11
+        version: 4.1.11(vitest@4.1.11)
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^4.1.11
+        version: 4.1.11(@types/node@22.20.1)(@vitest/coverage-v8@4.1.11)(jsdom@30.0.1(@noble/hashes@1.8.0))(vite@8.2.2(@types/node@22.20.1)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12))
+
   packages/schemas:
     dependencies:
       '@match/domain':
         specifier: workspace:*
         version: link:../domain
+      '@match/matching-engine':
+        specifier: workspace:*
+        version: link:../matching-engine
       zod:
         specifier: ^4.5.4
         version: 4.5.4

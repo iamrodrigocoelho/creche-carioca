@@ -11,10 +11,13 @@ export type {
   AuditEvent,
   Child,
   ContactPoint,
+  Criterion,
+  CriterionResponse,
   Guardian,
   LocationAnchor,
   Process,
   RuleVersion,
+  ScoreResult,
   StatusEvent,
 } from '@prisma/client';
 

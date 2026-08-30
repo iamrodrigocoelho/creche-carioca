@@ -21,6 +21,7 @@ import { AgeGroupResult } from './AgeGroupResult';
 import { ContactsStep } from './ContactsStep';
 import { LocationAnchorsStep } from './LocationAnchorsStep';
 import { PreferencesStep } from './PreferencesStep';
+import { ScoringStep } from './ScoringStep';
 
 /**
  * Etapa 1 da jornada da familia (RF-01, fatia da Fase 1).
@@ -139,9 +140,9 @@ export function ApplicationForm() {
             anchorsVersion={anchorsVersion}
           />
         ) : null}
+        <ScoringStep applicationId={state.application.id} />
         <p className="mp-caption mp-muted">
-          As próximas etapas — pontuação e convocação — ainda estão em construção nesta
-          demonstração.
+          A próxima etapa — a convocação — ainda está em construção nesta demonstração.
         </p>
       </div>
     );

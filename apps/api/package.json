@@ -14,6 +14,7 @@
   "dependencies": {
     "@match/database": "workspace:*",
     "@match/domain": "workspace:*",
+    "@match/matching-engine": "workspace:*",
     "@match/schemas": "workspace:*",
     "@nestjs/common": "^12.0.1",
     "@nestjs/core": "^12.0.1",

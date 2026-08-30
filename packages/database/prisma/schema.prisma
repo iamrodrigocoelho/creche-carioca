@@ -1,7 +1,7 @@
 // Schema canonico do Creche Carioca.
 //
 // Cobre o subconjunto do modelo de PRD 11 que a Fase 2 utiliza. As entidades
-// restantes (UnitCapacity,
+// restantes (UnitCapacity, AllocationRun, Allocation, Convocation,
 // CriterionResponse, ScoreResult, AllocationRun, Allocation, Convocation,
 // ContactAttempt, MessageTemplate) entram nas fases seguintes, conforme
 // IMPLEMENTATION_PLAN.md.
@@ -63,6 +63,9 @@ model RuleVersion {
 
   process Process @relation(fields: [processId], references: [id], onDelete: Restrict)
 
+  criteria     Criterion[]
+  scoreResults ScoreResult[]
+
   @@unique([processId, kind, version])
   @@index([processId, kind, effectiveFrom])
 }
@@ -112,10 +115,12 @@ model Application {
   child    Child     @relation(fields: [childId], references: [id], onDelete: Restrict)
   guardian Guardian? @relation(fields: [guardianId], references: [id], onDelete: SetNull)
 
-  statusEvents    StatusEvent[]
-  locationAnchors LocationAnchor[]
-  contactPoints   ContactPoint[]
-  preferences     Preference[]
+  statusEvents       StatusEvent[]
+  locationAnchors    LocationAnchor[]
+  contactPoints      ContactPoint[]
+  preferences        Preference[]
+  criterionResponses CriterionResponse[]
+  scoreResults       ScoreResult[]
 
   /// Uma crianca tem no maximo uma inscricao por processo. Sustenta o principio
   /// "uma crianca, uma oferta" (PRD 7.3) e o alerta de multiplas selecoes para a
@@ -159,6 +164,88 @@ model LocationAnchor {
 
   @@unique([applicationId, position])
   @@index([applicationId])
+}
+
+/// Pergunta de classificacao e seu peso na regua vigente (PRD 11, 8.7).
+///
+/// Carregado do artefato versionado gerado pelo pipeline a partir da Query C
+/// (ADR-0037). E dado OFICIAL da SME, nao sintetico — o que e de demonstracao e
+/// a escolha de qual ano usar como regua de 2026, que ninguem publicou (B-07).
+model Criterion {
+  id            String @id @default(uuid()) @db.Uuid
+  ruleVersionId String @db.Uuid
+
+  /// `perg_id` da origem: estavel entre processos, e a chave de negocio.
+  code              Int
+  /// `ich_perg_id` do processo de onde a regua veio. Muda a cada ano (PRD 10.4).
+  processQuestionId Int
+  text              String @db.VarChar(500)
+  order             Int    @db.SmallInt
+
+  points     Int     @db.SmallInt
+  /// Criterio de desempate nao soma pontos; ordena empates (PRD 8.7).
+  isTiebreak Boolean @default(false)
+
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+
+  ruleVersion RuleVersion         @relation(fields: [ruleVersionId], references: [id], onDelete: Restrict)
+  responses   CriterionResponse[]
+
+  @@unique([ruleVersionId, code])
+  @@index([ruleVersionId, order])
+}
+
+/// Resposta da familia a um criterio (PRD 11, 8.7).
+model CriterionResponse {
+  id            String @id @default(uuid()) @db.Uuid
+  applicationId String @db.Uuid
+  criterionId   String @db.Uuid
+
+  /// Resposta declarada pela familia.
+  answer    Boolean
+  /// Validacao pela rede. Independente da resposta: ver ADR-0038.
+  confirmed Boolean @default(false)
+
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  criterion   Criterion   @relation(fields: [criterionId], references: [id], onDelete: Restrict)
+
+  @@unique([applicationId, criterionId])
+  @@index([applicationId])
+}
+
+/// Pontuacao calculada e sua explicacao (PRD 11, 8.7).
+///
+/// Tabela append-only, como `AuditEvent` e `StatusEvent` (ADR-0015): PRD 8.7
+/// determina que uma alteracao de peso crie nova versao e **nunca reescreva
+/// resultado historico**. Recalcular gera uma linha nova; a anterior permanece.
+model ScoreResult {
+  id            String @id @default(uuid()) @db.Uuid
+  applicationId String @db.Uuid
+  ruleVersionId String @db.Uuid
+
+  total    Int @db.SmallInt
+  /// Soma dos pesos da regua, para ler o total como fracao do maximo.
+  maxTotal Int @db.SmallInt
+
+  /// Entradas, pontos por criterio e desempates, como PRD 8.7 exige guardar.
+  /// Snapshot: reproduz o resultado mesmo que a inscricao mude depois.
+  breakdown Json
+
+  computedAt    DateTime @default(now()) @db.Timestamptz(6)
+  /// Correlation ID da requisicao que originou o calculo (PRD 16.1).
+  correlationId String   @db.VarChar(64)
+
+  // `Restrict`, e nao `Cascade`, pela mesma razao de `StatusEvent`: apagar a
+  // inscricao apagaria o historico de pontuacao que PRD 8.7 manda preservar — e
+  // o trigger append-only recusaria a exclusao em cascata de qualquer forma.
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Restrict)
+  ruleVersion RuleVersion @relation(fields: [ruleVersionId], references: [id], onDelete: Restrict)
+
+  @@index([applicationId, computedAt])
+  @@index([ruleVersionId])
 }
 
 /// Unidade escolar (PRD 11).

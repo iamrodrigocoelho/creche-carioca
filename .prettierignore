@@ -16,3 +16,4 @@ docs/DESIGN.md
 # Artefato gerado pelo pipeline: uma unidade por linha, de proposito, para o
 # arquivo ficar menor que indentado e o diff continuar legivel.
 packages/database/src/units.json
+packages/database/src/criteria.json

@@ -1,0 +1,561 @@
+{
+  "importVersion": "2026-08-30T17-02-20-191Z",
+  "generatedFrom": "cur_catalogo_perguntas (Query C): régua oficial de 2021 a 2025",
+  "processes": [
+    {
+      "year": 2021,
+      "prmId": 179,
+      "totalPoints": 465,
+      "criteria": [
+        {
+          "code": 2,
+          "processQuestionId": 95,
+          "text": "A criança tem alguma deficiência?",
+          "order": 1,
+          "points": 100,
+          "isTiebreak": false
+        },
+        {
+          "code": 7,
+          "processQuestionId": 96,
+          "text": "A criança tem déficit nutricional ou doença crônica ou familiar com doença crônica?",
+          "order": 2,
+          "points": 10,
+          "isTiebreak": false
+        },
+        {
+          "code": 8,
+          "processQuestionId": 97,
+          "text": "Já ocorreu alguma situação de violência na residência da criança praticado por algum membro do núcleo familiar?",
+          "order": 3,
+          "points": 10,
+          "isTiebreak": false
+        },
+        {
+          "code": 9,
+          "processQuestionId": 98,
+          "text": "Existe algum membro do núcleo familiar que faz uso de drogas ou é alcoólatra?",
+          "order": 4,
+          "points": 10,
+          "isTiebreak": false
+        },
+        {
+          "code": 12,
+          "processQuestionId": 120,
+          "text": "Existe algum membro do núcleo familiar que é presidiário ou ex-presidiário nos últimos 5 anos?",
+          "order": 5,
+          "points": 5,
+          "isTiebreak": false
+        },
+        {
+          "code": 11,
+          "processQuestionId": 121,
+          "text": "Faz parte do programa bolsa família?",
+          "order": 6,
+          "points": 100,
+          "isTiebreak": false
+        },
+        {
+          "code": 3,
+          "processQuestionId": 122,
+          "text": "Possui Cartão Carioca?",
+          "order": 7,
+          "points": 100,
+          "isTiebreak": false
+        },
+        {
+          "code": 26,
+          "processQuestionId": 123,
+          "text": "Possui irmão participando de processo classificatório na creche?",
+          "order": 8,
+          "points": 0,
+          "isTiebreak": true
+        },
+        {
+          "code": 1,
+          "processQuestionId": 124,
+          "text": "A mãe é mãe adolescente?",
+          "order": 9,
+          "points": 0,
+          "isTiebreak": true
+        },
+        {
+          "code": 21,
+          "processQuestionId": 125,
+          "text": "A criança pertence ao Programa Territórios Sociais?",
+          "order": 10,
+          "points": 100,
+          "isTiebreak": false
+        },
+        {
+          "code": 23,
+          "processQuestionId": 126,
+          "text": "O candidato é refugiado?",
+          "order": 11,
+          "points": 10,
+          "isTiebreak": false
+        },
+        {
+          "code": 24,
+          "processQuestionId": 127,
+          "text": "Candidato tem pais ou responsáveis com idade igual ou superior a sessenta anos ?",
+          "order": 12,
+          "points": 10,
+          "isTiebreak": false
+        },
+        {
+          "code": 25,
+          "processQuestionId": 128,
+          "text": "Candidato tem pais ou responsáveis deficientes ?",
+          "order": 13,
+          "points": 10,
+          "isTiebreak": false
+        }
+      ]
+    },
+    {
+      "year": 2022,
+      "prmId": 181,
+      "totalPoints": 465,
+      "criteria": [
+        {
+          "code": 2,
+          "processQuestionId": 142,
+          "text": "A criança tem alguma deficiência?",
+          "order": 1,
+          "points": 100,
+          "isTiebreak": false
+        },
+        {
+          "code": 7,
+          "processQuestionId": 143,
+          "text": "A criança tem déficit nutricional ou doença crônica ou familiar com doença crônica?",
+          "order": 2,
+          "points": 10,
+          "isTiebreak": false
+        },
+        {
+          "code": 8,
+          "processQuestionId": 144,
+          "text": "Já ocorreu alguma situação de violência na residência da criança praticado por algum membro do núcleo familiar?",
+          "order": 3,
+          "points": 10,
+          "isTiebreak": false
+        },
+        {
+          "code": 9,
+          "processQuestionId": 145,
+          "text": "Existe algum membro do núcleo familiar que faz uso de drogas ou é alcoólatra?",
+          "order": 4,
+          "points": 10,
+          "isTiebreak": false
+        },
+        {
+          "code": 10,
+          "processQuestionId": 146,
+          "text": "Existe algum membro do núcleo familiar que é presidiário ou ex-presidiário?",
+          "order": 5,
+          "points": 5,
+          "isTiebreak": false
+        },
+        {
+          "code": 11,
+          "processQuestionId": 147,
+          "text": "Faz parte do programa bolsa família?",
+          "order": 6,
+          "points": 100,
+          "isTiebreak": false
+        },
+        {
+          "code": 3,
+          "processQuestionId": 148,
+          "text": "Possui Cartão Carioca?",
+          "order": 7,
+          "points": 100,
+          "isTiebreak": false
+        },
+        {
+          "code": 26,
+          "processQuestionId": 149,
+          "text": "Possui irmão participando de processo classificatório na creche?",
+          "order": 8,
+          "points": 0,
+          "isTiebreak": true
+        },
+        {
+          "code": 1,
+          "processQuestionId": 150,
+          "text": "A mãe é mãe adolescente?",
+          "order": 9,
+          "points": 0,
+          "isTiebreak": true
+        },
+        {
+          "code": 21,
+          "processQuestionId": 151,
+          "text": "A criança pertence ao Programa Territórios Sociais?",
+          "order": 10,
+          "points": 100,
+          "isTiebreak": false
+        },
+        {
+          "code": 23,
+          "processQuestionId": 152,
+          "text": "O candidato é refugiado?",
+          "order": 11,
+          "points": 10,
+          "isTiebreak": false
+        },
+        {
+          "code": 24,
+          "processQuestionId": 153,
+          "text": "Candidato tem pais ou responsáveis com idade igual ou superior a sessenta anos ?",
+          "order": 12,
+          "points": 10,
+          "isTiebreak": false
+        },
+        {
+          "code": 25,
+          "processQuestionId": 154,
+          "text": "Candidato tem pais ou responsáveis deficientes ?",
+          "order": 13,
+          "points": 10,
+          "isTiebreak": false
+        }
+      ]
+    },
+    {
+      "year": 2023,
+      "prmId": 184,
+      "totalPoints": 465,
+      "criteria": [
+        {
+          "code": 2,
+          "processQuestionId": 155,
+          "text": "A criança tem alguma deficiência?",
+          "order": 1,
+          "points": 100,
+          "isTiebreak": false
+        },
+        {
+          "code": 7,
+          "processQuestionId": 156,
+          "text": "A criança tem déficit nutricional ou doença crônica ou familiar com doença crônica?",
+          "order": 2,
+          "points": 10,
+          "isTiebreak": false
+        },
+        {
+          "code": 8,
+          "processQuestionId": 157,
+          "text": "Já ocorreu alguma situação de violência na residência da criança praticado por algum membro do núcleo familiar?",
+          "order": 3,
+          "points": 10,
+          "isTiebreak": false
+        },
+        {
+          "code": 9,
+          "processQuestionId": 158,
+          "text": "Existe algum membro do núcleo familiar que faz uso de drogas ou é alcoólatra?",
+          "order": 4,
+          "points": 10,
+          "isTiebreak": false
+        },
+        {
+          "code": 12,
+          "processQuestionId": 168,
+          "text": "Existe algum membro do núcleo familiar que é presidiário ou ex-presidiário nos últimos 5 anos?",
+          "order": 5,
+          "points": 5,
+          "isTiebreak": false
+        },
+        {
+          "code": 11,
+          "processQuestionId": 160,
+          "text": "Faz parte do programa bolsa família?",
+          "order": 6,
+          "points": 100,
+          "isTiebreak": false
+        },
+        {
+          "code": 3,
+          "processQuestionId": 161,
+          "text": "Possui Cartão Carioca?",
+          "order": 7,
+          "points": 100,
+          "isTiebreak": false
+        },
+        {
+          "code": 26,
+          "processQuestionId": 162,
+          "text": "Possui irmão participando de processo classificatório na creche?",
+          "order": 8,
+          "points": 0,
+          "isTiebreak": true
+        },
+        {
+          "code": 1,
+          "processQuestionId": 163,
+          "text": "A mãe é mãe adolescente?",
+          "order": 9,
+          "points": 0,
+          "isTiebreak": true
+        },
+        {
+          "code": 21,
+          "processQuestionId": 164,
+          "text": "A criança pertence ao Programa Territórios Sociais?",
+          "order": 10,
+          "points": 100,
+          "isTiebreak": false
+        },
+        {
+          "code": 23,
+          "processQuestionId": 165,
+          "text": "O candidato é refugiado?",
+          "order": 11,
+          "points": 10,
+          "isTiebreak": false
+        },
+        {
+          "code": 24,
+          "processQuestionId": 166,
+          "text": "Candidato tem pais ou responsáveis com idade igual ou superior a sessenta anos ?",
+          "order": 12,
+          "points": 10,
+          "isTiebreak": false
+        },
+        {
+          "code": 25,
+          "processQuestionId": 167,
+          "text": "Candidato tem pais ou responsáveis deficientes ?",
+          "order": 13,
+          "points": 10,
+          "isTiebreak": false
+        }
+      ]
+    },
+    {
+      "year": 2024,
+      "prmId": 194,
+      "totalPoints": 100,
+      "criteria": [
+        {
+          "code": 2,
+          "processQuestionId": 260,
+          "text": "A criança tem alguma deficiência?",
+          "order": 1,
+          "points": 25,
+          "isTiebreak": false
+        },
+        {
+          "code": 28,
+          "processQuestionId": 261,
+          "text": "Criança cuja família seja inscrita no CadÚnico (Cadastro Único para Programas Sociais)?",
+          "order": 2,
+          "points": 25,
+          "isTiebreak": false
+        },
+        {
+          "code": 6,
+          "processQuestionId": 264,
+          "text": "Faz parte do programa bolsa família ou possui Cartão Carioca?",
+          "order": 3,
+          "points": 15,
+          "isTiebreak": false
+        },
+        {
+          "code": 17,
+          "processQuestionId": 265,
+          "text": "A criança e/ou familiar do seu convívio diário é vitima de violência doméstica?",
+          "order": 4,
+          "points": 10,
+          "isTiebreak": false
+        },
+        {
+          "code": 16,
+          "processQuestionId": 266,
+          "text": "Existe algum membro do núcleo familiar que faz uso abusivo de drogas e/ou alcoól?",
+          "order": 5,
+          "points": 10,
+          "isTiebreak": false
+        },
+        {
+          "code": 23,
+          "processQuestionId": 267,
+          "text": "O candidato é refugiado?",
+          "order": 6,
+          "points": 5,
+          "isTiebreak": false
+        },
+        {
+          "code": 18,
+          "processQuestionId": 268,
+          "text": "A criança e/ou alguém do núcleo familiar apresentam doenças crônicas graves?",
+          "order": 7,
+          "points": 3,
+          "isTiebreak": false
+        },
+        {
+          "code": 10,
+          "processQuestionId": 269,
+          "text": "Existe algum membro do núcleo familiar que é presidiário ou ex-presidiário?",
+          "order": 8,
+          "points": 2,
+          "isTiebreak": false
+        },
+        {
+          "code": 25,
+          "processQuestionId": 270,
+          "text": "Candidato tem pais ou responsáveis deficientes ?",
+          "order": 9,
+          "points": 2,
+          "isTiebreak": false
+        },
+        {
+          "code": 20,
+          "processQuestionId": 271,
+          "text": "A criança pertence a família monoparental?",
+          "order": 10,
+          "points": 2,
+          "isTiebreak": false
+        },
+        {
+          "code": 27,
+          "processQuestionId": 272,
+          "text": "Criança aguardou em fila de espera no ano anterior sem ter sido atendida?",
+          "order": 11,
+          "points": 1,
+          "isTiebreak": false
+        },
+        {
+          "code": 29,
+          "processQuestionId": 273,
+          "text": "O Candidato possui irmão matriculado na rede pública ou parceria?",
+          "order": 12,
+          "points": 0,
+          "isTiebreak": true
+        },
+        {
+          "code": 30,
+          "processQuestionId": 274,
+          "text": "O Candidato possui pais ou responsáveis com idade menor que 18 anos?",
+          "order": 13,
+          "points": 0,
+          "isTiebreak": true
+        }
+      ]
+    },
+    {
+      "year": 2025,
+      "prmId": 195,
+      "totalPoints": 100,
+      "criteria": [
+        {
+          "code": 28,
+          "processQuestionId": 275,
+          "text": "Criança cuja família seja inscrita no CadÚnico (Cadastro Único para Programas Sociais)?",
+          "order": 1,
+          "points": 51,
+          "isTiebreak": false
+        },
+        {
+          "code": 31,
+          "processQuestionId": 288,
+          "text": "A criança é público-alvo da educação especial?",
+          "order": 2,
+          "points": 25,
+          "isTiebreak": false
+        },
+        {
+          "code": 6,
+          "processQuestionId": 289,
+          "text": "Faz parte do programa bolsa família ou possui Cartão Carioca?",
+          "order": 3,
+          "points": 2,
+          "isTiebreak": false
+        },
+        {
+          "code": 17,
+          "processQuestionId": 290,
+          "text": "A criança e/ou familiar do seu convívio diário é vitima de violência doméstica?",
+          "order": 4,
+          "points": 4,
+          "isTiebreak": false
+        },
+        {
+          "code": 20,
+          "processQuestionId": 291,
+          "text": "A criança pertence a família monoparental?",
+          "order": 5,
+          "points": 4,
+          "isTiebreak": false
+        },
+        {
+          "code": 25,
+          "processQuestionId": 280,
+          "text": "Candidato tem pais ou responsáveis deficientes ?",
+          "order": 6,
+          "points": 3,
+          "isTiebreak": false
+        },
+        {
+          "code": 18,
+          "processQuestionId": 281,
+          "text": "A criança e/ou alguém do núcleo familiar apresentam doenças crônicas graves?",
+          "order": 7,
+          "points": 3,
+          "isTiebreak": false
+        },
+        {
+          "code": 16,
+          "processQuestionId": 282,
+          "text": "Existe algum membro do núcleo familiar que faz uso abusivo de drogas e/ou alcoól?",
+          "order": 8,
+          "points": 2,
+          "isTiebreak": false
+        },
+        {
+          "code": 12,
+          "processQuestionId": 283,
+          "text": "Existe algum membro do núcleo familiar que é presidiário ou ex-presidiário nos últimos 5 anos?",
+          "order": 9,
+          "points": 2,
+          "isTiebreak": false
+        },
+        {
+          "code": 23,
+          "processQuestionId": 284,
+          "text": "O candidato é refugiado?",
+          "order": 10,
+          "points": 2,
+          "isTiebreak": false
+        },
+        {
+          "code": 27,
+          "processQuestionId": 285,
+          "text": "Criança aguardou em fila de espera no ano anterior sem ter sido atendida?",
+          "order": 11,
+          "points": 2,
+          "isTiebreak": false
+        },
+        {
+          "code": 29,
+          "processQuestionId": 286,
+          "text": "O Candidato possui irmão matriculado na rede pública ou parceria?",
+          "order": 12,
+          "points": 0,
+          "isTiebreak": true
+        },
+        {
+          "code": 30,
+          "processQuestionId": 287,
+          "text": "O Candidato possui pais ou responsáveis com idade menor que 18 anos?",
+          "order": 13,
+          "points": 0,
+          "isTiebreak": true
+        }
+      ]
+    }
+  ]
+}

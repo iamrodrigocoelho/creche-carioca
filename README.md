@@ -29,7 +29,7 @@
 
 ## Estado atual
 
-**Fase 6 concluída** — fundação técnica, a primeira fatia funcional ponta a ponta, a persistência canônica em PostgreSQL, o pipeline de dados históricos, os pontos de referência por CEP, os contatos multicanal e a escolha de unidades. A família informa mês e ano de nascimento e o turno desejado, e recebe o grupamento etário com a explicação de como ele foi obtido; a inscrição é gravada de forma transacional, com histórico de status e trilha de auditoria append-only. Os cinco processos seletivos de 2021 a 2025 são ingeridos em DuckDB e publicados como tabelas curadas em Parquet, com manifesto e relatório de qualidade. A família informa o CEP de residência e, opcionalmente, mais dois pontos de referência, que são geocodificados contra os CEPs reais das unidades escolares — com a margem de erro dita em voz alta, e sem afetar a pontuação. Depois cadastra telefones, com consentimento explícito por meio de contato e verificação simulada, e perfis sociais opcionais; os contatos são sempre exibidos mascarados. Por fim escolhe até cinco unidades em ordem de preferência, a partir de uma lista ordenada por proximidade e explicada campo a campo — com a distância rotulada como estimativa e os números de oferta rotulados como históricos. As demais fases estão descritas no `IMPLEMENTATION_PLAN.md`.
+**Fase 7 concluída** — fundação técnica, a primeira fatia funcional ponta a ponta, a persistência canônica em PostgreSQL, o pipeline de dados históricos, os pontos de referência por CEP, os contatos multicanal, a escolha de unidades e a pontuação versionada. A família informa mês e ano de nascimento e o turno desejado, e recebe o grupamento etário com a explicação de como ele foi obtido; a inscrição é gravada de forma transacional, com histórico de status e trilha de auditoria append-only. Os cinco processos seletivos de 2021 a 2025 são ingeridos em DuckDB e publicados como tabelas curadas em Parquet, com manifesto e relatório de qualidade. A família informa o CEP de residência e, opcionalmente, mais dois pontos de referência, que são geocodificados contra os CEPs reais das unidades escolares — com a margem de erro dita em voz alta, e sem afetar a pontuação. Depois cadastra telefones, com consentimento explícito por meio de contato e verificação simulada, e perfis sociais opcionais; os contatos são sempre exibidos mascarados. Por fim escolhe até cinco unidades em ordem de preferência, a partir de uma lista ordenada por proximidade e explicada campo a campo — com a distância rotulada como estimativa e os números de oferta rotulados como históricos. A pontuação é reconstruída a partir da régua oficial versionada, com o detalhamento de cada critério — quanto vale, quanto somou e por quê. As demais fases estão descritas no `IMPLEMENTATION_PLAN.md`.
 
 ## Requisitos
 
@@ -73,6 +73,7 @@ packages/
   ui/         Tokens e componentes de docs/DESIGN.md
   database/   Schema Prisma, migrations, seed e cliente PostgreSQL
   data-pipeline/  Ingestão DuckDB dos datasets históricos e tabelas curadas
+  matching-engine/  Motor determinístico de pontuação e desempate
 data/
   raw/        Datasets da SME/RJ — não versionados, veja "Dados históricos"
   curated/    Saída do pipeline, uma pasta por versão de importação
@@ -137,6 +138,17 @@ de 2021 a 2025, com a demanda histórica já agregada, e é carregado pelo seed.
 
 ```bash
 pnpm --filter @match/data-pipeline units-reference
+pnpm db:seed
+```
+
+### Régua de pontuação
+
+`packages/database/src/criteria.json` traz a régua oficial dos cinco processos —
+13 perguntas cada, e 100 pontos de 2024 em diante. O seed publica a de 2025 como
+versão de pontuação da demonstração, porque a de 2026 não foi publicada (ADR-0037):
+
+```bash
+pnpm --filter @match/data-pipeline criteria-reference
 pnpm db:seed
 ```
 

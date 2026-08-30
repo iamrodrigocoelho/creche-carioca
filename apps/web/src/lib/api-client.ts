@@ -4,8 +4,10 @@ import {
   contactChallengeSchema,
   contactListSchema,
   locationAnchorListSchema,
+  criterionListSchema,
   preferenceListSchema,
   recommendationListSchema,
+  scoreResultSchema,
   type ApiError,
   type ApplicationResponse,
   type CreateApplicationInput,
@@ -17,7 +19,10 @@ import {
   type LocationAnchorListResponse,
   type PreferenceListResponse,
   type PutPreferencesInput,
+  type CriterionListResponse,
+  type PutCriterionResponsesInput,
   type RecommendationListResponse,
+  type ScoreResultResponse,
   type VerifyContactInput,
 } from '@match/schemas';
 
@@ -296,4 +301,30 @@ export async function listNeighborhoods(): Promise<ApiResult<{ neighborhoods: st
       ? { success: true as const, data: { neighborhoods: parsed.neighborhoods as string[] } }
       : { success: false as const };
   });
+}
+
+export async function listCriteria(
+  applicationId: string,
+): Promise<ApiResult<CriterionListResponse>> {
+  return requestJson(
+    `/applications/${applicationId}/criteria`,
+    { method: 'GET' },
+    (value) =>
+      criterionListSchema.safeParse(value) as
+        { success: true; data: CriterionListResponse } | { success: false },
+  );
+}
+
+/** Registra respostas e devolve a pontuação já recalculada. */
+export async function replaceCriterionResponses(
+  applicationId: string,
+  input: PutCriterionResponsesInput,
+): Promise<ApiResult<ScoreResultResponse>> {
+  return requestJson(
+    `/applications/${applicationId}/criteria`,
+    { method: 'PUT', body: JSON.stringify(input) },
+    (value) =>
+      scoreResultSchema.safeParse(value) as
+        { success: true; data: ScoreResultResponse } | { success: false },
+  );
 }

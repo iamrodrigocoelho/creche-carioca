@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 import { DEMO_AGE_GROUP_POLICY_2026 } from '@match/domain';
 
 import { createPrismaClient, databaseUrlFromEnv } from './client';
+import criteriaReference from './criteria.json';
 import unitsReference from './units.json';
 import { DataStatus, RuleKind } from '@prisma/client';
 import type { DemandLevel } from '@prisma/client';
@@ -92,10 +93,103 @@ export async function seedUnits(
   return { units: units.length };
 }
 
+interface CriterionReference {
+  readonly code: number;
+  readonly processQuestionId: number;
+  readonly text: string;
+  readonly order: number;
+  readonly points: number;
+  readonly isTiebreak: boolean;
+}
+
+interface ProcessCriteriaReference {
+  readonly year: number;
+  readonly prmId: number;
+  readonly totalPoints: number;
+  readonly criteria: readonly CriterionReference[];
+}
+
+/**
+ * Ano cuja regua vira a versao de pontuacao da demonstracao.
+ *
+ * A regua de 2026 nao existe: nenhum edital foi publicado (B-07). 2025 e o
+ * processo mais recente com regua completa — 13 perguntas, 100 pontos — e por
+ * isso e a escolha mais defensavel. A escolha em si e de demonstracao; a regua
+ * copiada e oficial (ADR-0037).
+ */
+export const SCORING_SOURCE_YEAR = 2025;
+
+/**
+ * Politica de confirmacao adotada na demonstracao (ADR-0038).
+ *
+ * `DECLARADA`: pontua a resposta da familia sem exigir validacao. E o que
+ * permite a familia ver a pontuacao enquanto preenche — com `CONFIRMADA`, toda
+ * inscricao nova valeria zero ate alguem da rede conferir, e nao ha esse alguem
+ * nesta demonstracao.
+ */
+export const CONFIRMATION_POLICY = 'DECLARADA';
+
+/**
+ * Publica a regua de pontuacao como `RuleVersion` do tipo `SCORING`.
+ *
+ * Idempotente e imutavel, como a regra de grupamento: uma versao ja publicada
+ * nunca e reescrita (PRD 8.7). Alterar pesos significa publicar a versao
+ * seguinte, o que e decisao explicita e nao efeito do seed.
+ */
+export async function seedScoringRule(
+  prisma: ReturnType<typeof createPrismaClient>,
+  processId: string,
+): Promise<{ criteria: number; created: boolean }> {
+  const source = (criteriaReference.processes as readonly ProcessCriteriaReference[]).find(
+    (item) => item.year === SCORING_SOURCE_YEAR,
+  );
+  if (source === undefined) {
+    throw new Error(`Regua de ${SCORING_SOURCE_YEAR} ausente em criteria.json.`);
+  }
+
+  const existing = await prisma.ruleVersion.findUnique({
+    where: { processId_kind_version: { processId, kind: RuleKind.SCORING, version: 1 } },
+    include: { criteria: { select: { id: true } } },
+  });
+  if (existing) {
+    return { criteria: existing.criteria.length, created: false };
+  }
+
+  await prisma.ruleVersion.create({
+    data: {
+      processId,
+      kind: RuleKind.SCORING,
+      version: 1,
+      status: DataStatus.DEMONSTRACAO,
+      source: `Régua oficial do processo ${source.prmId} (${source.year}), reaproveitada na demonstração. A regra de 2026 não foi publicada (PRD 21).`,
+      effectiveFrom: new Date(`${DEMO_PROCESS.referenceDate}T00:00:00.000Z`),
+      payload: {
+        sourceYear: source.year,
+        sourcePrmId: source.prmId,
+        totalPoints: source.totalPoints,
+        confirmationPolicy: CONFIRMATION_POLICY,
+      },
+      criteria: {
+        create: source.criteria.map((criterion) => ({
+          code: criterion.code,
+          processQuestionId: criterion.processQuestionId,
+          text: criterion.text,
+          order: criterion.order,
+          points: criterion.points,
+          isTiebreak: criterion.isTiebreak,
+        })),
+      },
+    },
+  });
+
+  return { criteria: source.criteria.length, created: true };
+}
+
 export async function seed(prisma: ReturnType<typeof createPrismaClient>): Promise<{
   processCode: string;
   ruleVersionCreated: boolean;
   units: number;
+  criteria: number;
 }> {
   const { units } = await seedUnits(prisma);
   const process_ = await prisma.process.upsert({
@@ -121,8 +215,15 @@ export async function seed(prisma: ReturnType<typeof createPrismaClient>): Promi
 
   // Regra já publicada é imutável (PRD 8.7). Publicar uma alteração significa
   // criar uma versão nova, o que é uma decisão explícita, não efeito do seed.
+  const scoring = await seedScoringRule(prisma, process_.id);
+
   if (existing) {
-    return { processCode: process_.code, ruleVersionCreated: false, units };
+    return {
+      processCode: process_.code,
+      ruleVersionCreated: false,
+      units,
+      criteria: scoring.criteria,
+    };
   }
 
   await prisma.ruleVersion.create({
@@ -146,7 +247,12 @@ export async function seed(prisma: ReturnType<typeof createPrismaClient>): Promi
     },
   });
 
-  return { processCode: process_.code, ruleVersionCreated: true, units };
+  return {
+    processCode: process_.code,
+    ruleVersionCreated: true,
+    units,
+    criteria: scoring.criteria,
+  };
 }
 
 async function main(): Promise<void> {
@@ -170,6 +276,7 @@ async function main(): Promise<void> {
         processCode: result.processCode,
         ruleVersionCreated: result.ruleVersionCreated,
         units: result.units,
+        criteria: result.criteria,
       }),
     );
   } finally {
