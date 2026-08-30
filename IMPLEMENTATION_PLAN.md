@@ -3,7 +3,7 @@
 **Escopo:** plano de desenvolvimento incremental do MVP descrito em `PRD.md`.
 **Fontes de verdade:** `PRD.md` (comportamento, regras, requisitos técnicos) e `/docs/DESIGN.md` (apresentação visual).
 **Status:** vivo — atualizado a cada fase concluída.
-**Última atualização:** 30/08/2026 (Fase 5 concluída).
+**Última atualização:** 30/08/2026 (Fase 5 concluída; interface do painel do gestor antecipada — ADR-0029).
 
 > Este documento **não replica** requisitos. Ele referencia os identificadores do PRD (`RF-xx`, seções `§n`) e organiza a ordem de execução. Em qualquer divergência, o `PRD.md` e o `/docs/DESIGN.md` prevalecem.
 
@@ -269,6 +269,10 @@ Cobre PRD §19 Fase 0 e a primeira parcela de **RF-01**.
 **Testes.** Autorização por objeto e território; IDOR/BOLA; enumeração; rate limiting; E2E "operador sem permissão".
 **Riscos.** Vazamento entre territórios — risco de segurança mais alto do MVP; exige testes negativos abrangentes.
 
+**Antecipação parcial (ADR-0029).** A **interface** do painel foi construída fora de ordem, sobre um conjunto sintético declarado, para validar com o gestor quais leituras importam antes de investir na Fase 6. Já existem em `/gestor`: contagem de inscrições e funil por status, unidades mais procuradas com razão candidato/vaga, fila por unidade, por CRE e por grupamento etário, recorte cruzado por território/grupamento/turno, e comparação com os processos anteriores no mesmo dia da janela. Supressão de célula com menos de cinco inscrições já é aplicada (PRD §13.2).
+
+O que a fase **ainda deve entregar**: a consulta real (depende de `Unit` e `Preference`, Fase 6), auth simulada, RBAC, escopo territorial imposto no repositório, paginação por cursor, contatos mascarados, exportação com permissão específica e auditoria — e os testes negativos de IDOR/BOLA e de vazamento entre CREs. Hoje qualquer perfil vê a rede inteira, e a própria página declara isso.
+
 ---
 
 ### Fase 11 — Convocação rastreável e adapters (RF-11, RF-12, RF-14)
@@ -359,3 +363,5 @@ Detalhadas em `docs/DECISIONS.md`:
 
 - **ADR-0027** — Índice cego com HMAC para duplicidade de contatos; cifragem do valor adiada com dívida explícita.
 - **ADR-0028** — `ContactPoint` unificado por canal, em vez de tabelas separadas para telefone e rede social.
+- **ADR-0029** — Interface do painel do gestor antecipada sobre conjunto sintético determinístico, com derivações puras e tipos no formato da consulta real.
+- **ADR-0030** — Razão candidato/vaga medida pela primeira opção; severidade dita por extenso, sem semáforo de cor.
