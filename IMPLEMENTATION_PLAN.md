@@ -3,7 +3,7 @@
 **Escopo:** plano de desenvolvimento incremental do MVP descrito em `PRD.md`.
 **Fontes de verdade:** `PRD.md` (comportamento, regras, requisitos técnicos) e `/docs/DESIGN.md` (apresentação visual).
 **Status:** vivo — atualizado a cada fase concluída.
-**Última atualização:** 30/08/2026 (Fase 4 concluída).
+**Última atualização:** 30/08/2026 (Fase 5 concluída).
 
 > Este documento **não replica** requisitos. Ele referencia os identificadores do PRD (`RF-xx`, seções `§n`) e organiza a ordem de execução. Em qualquer divergência, o `PRD.md` e o `/docs/DESIGN.md` prevalecem.
 
@@ -189,14 +189,30 @@ Cobre PRD §19 Fase 0 e a primeira parcela de **RF-01**.
 
 ---
 
-### Fase 5 — Contatos multicanal e redes sociais (RF-03, RF-04)
+### Fase 5 — Contatos multicanal e redes sociais (RF-03, RF-04) ✅ CONCLUÍDA
 
 **Objetivo.** Cadastro de telefones e perfis sociais com consentimentos e verificação simulada.
-**Funcionalidades.** `ContactPoint` unificado; E.164; exatamente um principal; impedir remoção do único telefone; OTP simulado; perfis sociais opcionais com máquina de status; mascaramento por padrão.
+
+**Funcionalidades.**
+
+- `ContactPoint` unificado: telefone e perfil social na mesma tabela, porque as regras que importam são sobre o **conjunto** — exatamente um principal, nunca ficar sem telefone, rede social nunca como único contato — e precisam enxergar todos os canais de uma vez.
+- E.164 brasileiro com validação de DDD e de faixa de assinante, no domínio.
+- Consentimento por meio (ligação, SMS, WhatsApp), nenhum presumido além da ligação; SMS e WhatsApp recusados em telefone fixo.
+- Autorização de terceiro exigida quando a relação a caracteriza, imposta também por check constraint.
+- OTP simulado, guardado apenas como hash, com expiração e limite de tentativas.
+- Índice cego HMAC para detectar contato repetido sem comparar o valor (ADR-0027).
+- Mascaramento na fronteira: o valor completo nunca sai da API.
+- Etapa 3 da interface, com os consentimentos explícitos e o aviso de que a verificação é simulada.
+
 **Dependências.** Fase 2.
-**Critérios de aceite.** Todos os de PRD §8.3 e §8.4; rede social nunca é o único contato; `@handle` tratado como mutável.
-**Testes.** Invariantes de telefone principal; mascaramento; XSS em rótulo e `@handle`; ausência de PII em logs.
-**Riscos.** Contato de terceiros exige relação e autorização (PRD §21 "Privacidade"); criptografia em nível de aplicação (PRD §13.4) — avaliar aqui.
+
+**Critérios de aceite.** Exatamente um telefone principal, reconciliado a cada escrita; o único telefone não pode ser removido, nem havendo perfis sociais; rede social nunca é o único contato; `@handle` tratado como mutável, com `platformUserId` reservado para vinculação futura; rótulo e handle recusam caracteres de marcação.
+
+**Testes.** 61 novos: 27 de integração HTTP contra PostgreSQL real, 7 do índice cego, 22 de regras puras no domínio (E.164, mascaramento, invariantes), 12 de componente e 6 E2E.
+
+**A decisão que ficou pela metade, conscientemente.** PRD §13.4 pede criptografar telefone e perfis "quando viável". Foi implementado apenas o **índice cego**, e o valor continua em texto (ADR-0027). O índice é um HMAC com chave, e não um hash simples, porque o espaço de telefones brasileiros tem menos de 10¹¹ combinações — um hash sem segredo seria revertido por força bruta e não mascararia nada. A cifragem em si fica para a Fase 14, e a estrutura permite adicioná-la sem migrar dados.
+
+**Riscos remanescentes.** O valor completo em texto é dívida assumida, não esquecimento. `CONTACT_FINGERPRINT_KEY` não tem rotação: trocar a chave invalida os índices gravados e a detecção de duplicidade para de funcionar para os contatos antigos até serem reescritos. TikTok permanece adapter simulado (B-06), e nenhuma verificação real de perfil acontece.
 
 ---
 
@@ -338,3 +354,8 @@ Detalhadas em `docs/DECISIONS.md`:
 - **ADR-0024** — A incerteza é publicada junto da coordenada, e setor com uma única unidade não é tratado como preciso.
 - **ADR-0025** — `normalizeCep` no domínio, compartilhada entre a ingestão e a API.
 - **ADR-0026** — CEP duplicado na mesma inscrição é sinalizado, nunca recusado.
+
+### Decisões da Fase 5
+
+- **ADR-0027** — Índice cego com HMAC para duplicidade de contatos; cifragem do valor adiada com dívida explícita.
+- **ADR-0028** — `ContactPoint` unificado por canal, em vez de tabelas separadas para telefone e rede social.

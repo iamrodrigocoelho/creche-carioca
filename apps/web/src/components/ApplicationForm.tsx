@@ -18,6 +18,7 @@ import {
   type ApplicationDraft,
 } from '@/lib/form';
 import { AgeGroupResult } from './AgeGroupResult';
+import { ContactsStep } from './ContactsStep';
 import { LocationAnchorsStep } from './LocationAnchorsStep';
 
 /**
@@ -106,9 +107,9 @@ export function ApplicationForm() {
           </Button>
         </div>
         <LocationAnchorsStep applicationId={state.application.id} />
+        <ContactsStep applicationId={state.application.id} />
         <p className="mp-caption mp-muted">
-          As próximas etapas — contatos e escolha de unidades — ainda estão em construção nesta
-          demonstração.
+          A próxima etapa — a escolha de unidades — ainda está em construção nesta demonstração.
         </p>
       </div>
     );

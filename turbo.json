@@ -5,7 +5,7 @@
   // declaradas aqui. Sem `DATABASE_URL_TEST` o `globalSetup` do Vitest falha e o
   // Vitest mascara o erro como "No test files found" — sintoma que só aparece
   // onde não existe um `.env` local, isto é, no CI.
-  "globalEnv": ["NODE_ENV", "DATABASE_URL", "DATABASE_URL_TEST"],
+  "globalEnv": ["NODE_ENV", "DATABASE_URL", "DATABASE_URL_TEST", "CONTACT_FINGERPRINT_KEY"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
