@@ -13,6 +13,8 @@ const OUTRO_CELULAR = '(21) 91234-5678';
 
 async function chegarNaEtapaDeContatos(page: Page) {
   await page.goto('/inscricao');
+  // O React descarta o que for digitado antes de assumir os campos.
+  await page.locator('form.mp-form[data-hydrated="true"]').waitFor();
   await page.getByLabel(/mês de nascimento/i).selectOption('3');
   await page.getByLabel(/ano de nascimento/i).selectOption('2024');
   await page.getByRole('radio', { name: /integral/i }).check();

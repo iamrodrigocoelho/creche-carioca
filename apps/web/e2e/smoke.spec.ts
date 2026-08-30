@@ -13,6 +13,8 @@ test('a jornada calcula e explica o grupamento etário', async ({ page }) => {
 
   await expect(page).toHaveURL(/\/inscricao$/);
 
+  await page.locator('form.mp-form[data-hydrated="true"]').waitFor();
+
   await page.getByLabel(/mês de nascimento/i).selectOption('3');
   await page.getByLabel(/ano de nascimento/i).selectOption('2024');
   await page.getByRole('radio', { name: /integral/i }).check();
@@ -27,6 +29,8 @@ test('a jornada calcula e explica o grupamento etário', async ({ page }) => {
 
 test('o formulário é operável apenas por teclado e reporta erros', async ({ page }) => {
   await page.goto('/inscricao');
+  // O React descarta o que for digitado antes de assumir os campos.
+  await page.locator('form.mp-form[data-hydrated="true"]').waitFor();
 
   await page.getByRole('button', { name: /calcular grupamento/i }).press('Enter');
 

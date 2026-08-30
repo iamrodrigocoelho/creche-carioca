@@ -40,6 +40,16 @@ export function ApplicationForm() {
   const [issues, setIssues] = useState<readonly FieldIssue[]>([]);
   const [fieldErrors, setFieldErrors] = useState<Readonly<Record<string, string>>>({});
   const [state, setState] = useState<FormState>({ kind: 'editing' });
+  /**
+   * Marca que o React assumiu o controle dos campos.
+   *
+   * Entre o HTML do servidor e a hidratacao existe uma janela em que os campos
+   * ja aceitam digitacao, mas o valor e descartado quando o React reidrata a
+   * partir do proprio estado. A janela cresceu com o tamanho da pagina. O
+   * atributo permite que os testes ponta a ponta esperem o momento certo, em vez
+   * de digitar num formulario que ainda vai ser reescrito.
+   */
+  const [hydrated, setHydrated] = useState(false);
   // Incrementado a cada mudanca de ponto de referencia, para a etapa 4 recarregar.
   const [anchorsVersion, setAnchorsVersion] = useState(0);
 
@@ -47,8 +57,15 @@ export function ApplicationForm() {
   const resultRef = useRef<HTMLDivElement>(null);
 
   // Restaura o rascunho apos a hidratacao, para nao divergir do HTML do servidor.
+  //
+  // Usa a forma funcional e so aplica sobre um rascunho intocado: entre a
+  // renderizacao do HTML e este efeito ha uma janela em que a pessoa ja pode ter
+  // preenchido campos, e sobrescrever o que ela digitou apagaria o formulario
+  // sem explicacao. A janela e curta, mas cresce com o tamanho da pagina.
   useEffect(() => {
-    setDraft(readDraft(globalThis.localStorage));
+    const stored = readDraft(globalThis.localStorage);
+    setDraft((current) => (isPristine(current) ? stored : current));
+    setHydrated(true);
   }, []);
 
   function update(field: keyof ApplicationDraft, value: string) {
@@ -133,7 +150,7 @@ export function ApplicationForm() {
   const submitting = state.kind === 'submitting';
 
   return (
-    <form className="mp-form" onSubmit={handleSubmit} noValidate>
+    <form className="mp-form" onSubmit={handleSubmit} noValidate data-hydrated={hydrated}>
       <div ref={summaryRef} tabIndex={-1}>
         <ErrorSummary issues={issues} />
       </div>
@@ -246,6 +263,13 @@ export function ApplicationForm() {
         Não informe dados reais. Esta é uma demonstração e utiliza apenas informações sintéticas.
       </p>
     </form>
+  );
+}
+
+/** `true` enquanto nenhum campo foi tocado. */
+function isPristine(draft: ApplicationDraft): boolean {
+  return (Object.keys(EMPTY_DRAFT) as (keyof ApplicationDraft)[]).every(
+    (field) => draft[field] === EMPTY_DRAFT[field],
   );
 }
 

@@ -535,6 +535,7 @@ Fica pendente pedir à Prefeitura os ativos vetoriais (SVG) ou PNG com transpar�
 O registro do ADR-0031 continua citando o texto "Match Perfeito" removido do cabeçalho: ADR é registro histórico e descreve o que era verdade quando foi escrito.
 
 **Consequências.** Um nome só em tudo que a família e a equipe leem. Os identificadores acima permanecem como dívida de nomenclatura conhecida, a ser paga quando houver uma janela em que renomear o projeto no Railway e invalidar rascunhos não custe nada — provavelmente junto de uma migração de infraestrutura, não isolada.
+
 ## ADR-0034 — Unidades por artefato versionado, não por loader de Parquet
 
 **Status:** Aceita · Fase 6
