@@ -2,7 +2,7 @@
   "name": "@match/api",
   "version": "0.1.0",
   "private": true,
-  "description": "API HTTP NestJS do Match Perfeito (PRD 12.3).",
+  "description": "API HTTP NestJS do Creche Carioca (PRD 12.3).",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "dev": "concurrently -n tsc,node -k \"tsc -p tsconfig.build.json --watch --preserveWatchOutput\" \"node --watch --env-file-if-exists=../../.env dist/main.js\"",

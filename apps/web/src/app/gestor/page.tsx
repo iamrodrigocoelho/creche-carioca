@@ -11,7 +11,7 @@ import { getDemoSnapshot } from '@/lib/dashboard/demo-data';
  */
 
 export const metadata: Metadata = {
-  title: 'Painel do gestor | Match Perfeito',
+  title: 'Painel do gestor | Creche Carioca',
   description:
     'Demonstração do painel operacional: inscrições, unidades mais procuradas e fila de espera por território.',
   robots: { index: false, follow: false },

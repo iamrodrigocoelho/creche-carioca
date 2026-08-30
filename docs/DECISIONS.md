@@ -513,3 +513,25 @@ Fica pendente pedir à Prefeitura os ativos vetoriais (SVG) ou PNG com transpar�
 (3) A cor do foco sai de `--focus-ring`, que aponta para `{colors.primary-focus}` por padrão e é redefinida para `{colors.primary-on-dark}` (5,68:1 contra #13335a) nas superfícies azuis escuras — exatamente o papel que o `DESIGN.md` dá a esse token em _Tokens semânticos_.
 
 **Consequências.** Nenhuma cor nova entrou na paleta: as três correções usam apenas tokens já documentados. `--focus-ring` não é um token de marca, e sim um ponteiro para o token de foco em vigor na superfície atual, o que permite que superfícies escuras futuras herdem o comportamento correto sem repetir a regra.
+
+---
+
+## ADR-0033 — O produto passa a se chamar Creche Carioca
+
+**Status:** Aceita
+
+**Contexto.** O ADR-0031 trouxe a marca do programa para o cabeçalho e o rodapé. A marca diz **Creche Carioca**; o restante da aplicação continuava dizendo _Match Perfeito_ — no `<title>` de toda página, no link "O que é o Match Perfeito" do rodapé e na primeira frase da página Sobre. Uma família que abrisse uma aba veria um nome no logotipo e outro na barra do navegador.
+
+**Decisão.** O nome do produto passa a ser Creche Carioca em todo texto legível por pessoas: interface, títulos de página e documentação (`PRD.md`, `IMPLEMENTATION_PLAN.md`, `docs/DEPLOY.md`, `.env.example` e os comentários de cabeçalho do schema Prisma e da configuração do Railway).
+
+**Identificadores técnicos ficam como estão**, e isso é deliberado — cada um tem um custo concreto que o ganho de consistência não paga:
+
+- `project('match-perfeito')` em `.railway/railway.ts` é o **nome do projeto no Railway**, com serviços e banco já provisionados. Renomear pela IaC não renomeia o projeto existente.
+- `name: match-perfeito` no `docker-compose.yml` é o nome do projeto Compose. Trocá-lo órfã os contêineres e volumes locais de quem já subiu o ambiente.
+- `DRAFT_STORAGE_KEY = 'match-perfeito:rascunho:inscricao'` é a chave de `localStorage` do rascunho. Trocá-la descarta silenciosamente o rascunho de quem estiver com o formulário pela metade.
+- `"name": "match-perfeito"` no `package.json` da raiz é identificador de pacote privado, invisível para qualquer pessoa que use o sistema.
+- O escopo `@match/*` dos pacotes internos atravessa todos os imports do monorepo.
+
+O registro do ADR-0031 continua citando o texto "Match Perfeito" removido do cabeçalho: ADR é registro histórico e descreve o que era verdade quando foi escrito.
+
+**Consequências.** Um nome só em tudo que a família e a equipe leem. Os identificadores acima permanecem como dívida de nomenclatura conhecida, a ser paga quando houver uma janela em que renomear o projeto no Railway e invalidar rascunhos não custe nada — provavelmente junto de uma migração de infraestrutura, não isolada.
