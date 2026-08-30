@@ -103,7 +103,7 @@ O status da regra é propagado até a interface e exibido junto ao resultado.
 
 ## ADR-0008 — Área de proteção clara para o logotipo na navegação azul
 
-**Status:** Provisória · Fase 1 · **TODO: solicitar variante negativa**
+**Status:** Encerrada pelo ADR-0031 · era Provisória · Fase 1
 
 **Contexto.** Conflito documentado. O `/docs/DESIGN.md` especifica `{component.global-nav}` com fundo `{colors.surface-tile-1}` (#13335a) e manda usar "a variante indicada para fundo azul". O diretório `/img/logo` contém apenas duas variantes, ambas para fundo claro:
 
@@ -475,3 +475,41 @@ Havia ainda a questão de como mostrar severidade: o `DESIGN.md` registra em "Kn
 **Decisão.** A razão é medida pela **primeira opção**; a demanda em qualquer opção aparece como coluna separada, para que a diferença fique visível em vez de embutida. A severidade é dita por extenso (Crítica, Alta, Moderada, Equilibrada) e reforçada pelo comprimento da barra, sobre uma rampa de opacidade da mesma cor primária — nenhum vermelho foi inventado. A escala da barra satura em quatro candidatos por vaga: a diferença entre 4 e 6 não muda a decisão do gestor, mas uma barra que nunca enche esconderia a diferença entre 1 e 2, que muda.
 
 **Consequências.** Nenhuma informação do painel depende só de cor (PRD §17) e nenhuma paleta paralela nasce fora do `DESIGN.md`. A "fila" exibida é o excedente da primeira opção sobre as vagas do recorte — uma aproximação declarada na página, não a fila oficial: a alocação real da Fase 8 considera pontuação, desempate e as demais preferências.
+
+---
+
+## ADR-0031 — Marca do programa Creche Carioca a partir de mockups
+
+**Status:** Aceita · encerra o ADR-0008
+
+**Contexto.** O ADR-0008 registrava um TODO: `/img/logo` não tinha variante de logotipo para fundo azul, e a navegação institucional exibia o ativo preto sobre uma área de proteção clara. Chegaram ao diretório dois arquivos novos, `crechecariocaheader.jpeg` e `crechecariocafooter.jpeg`, com a marca do programa — que já embute a assinatura _Prefeitura Rio · Educação_ — em duas composições: placa horizontal e selo circular.
+
+Os dois são **mockups de apresentação**, não ativos de produção. Trazem fundo de textura de papel, traços decorativos nas bordas e, no arquivo de cabeçalho, um xadrez cinza de falsa transparência achatado no JPEG. Usados como estão, o cabeçalho exibiria o xadrez e o rodapé, um retângulo bege sobre `{colors.canvas-parchment}`. O de cabeçalho ainda pesa 1,7 MB para ser exibido a 56px de altura.
+
+**Decisão.** `scripts/build-brand-assets.py` deriva os ativos web a partir dos originais: recorta a silhueta da marca — a placa arredondada e o disco — e torna transparente **apenas o que está fora dela**. O contorno não é inventado: para a placa, ele vem do primeiro e do último pixel azul de cada linha da própria imagem; para o selo, do círculo inscrito no diâmetro medido. Nenhum pixel da marca é tocado: mesmas cores, mesma composição, proporção preservada no redimensionamento.
+
+Isso não é o "recorte" que o `DESIGN.md` proíbe em _Brand Assets_. A proibição protege a marca de ser cortada ou mascarada; aqui o que se remove é o cenário do mockup, que não faz parte dela. Os originais permanecem intactos em `/img/logo` como fonte de verdade.
+
+**Consequências.** A placa tem fundo azul próprio e é legível tanto sobre `{colors.surface-tile-1}` quanto sobre branco, o que **encerra o ADR-0008**: a área de proteção clara deixou de ser necessária e foi removida, junto com o texto "Match Perfeito" que acompanhava o logotipo — a marca agora carrega o nome do programa. Os ativos servidos caem de 1,7 MB para 43 KB (cabeçalho) e de 224 KB para 104 KB (rodapé), a 3× a altura de exibição.
+
+Fica pendente pedir à Prefeitura os ativos vetoriais (SVG) ou PNG com transparência real. A derivação por script é a melhor aproximação possível a partir de um JPEG achatado, e ainda carrega a compressão do original.
+
+---
+
+## ADR-0032 — Correções de contraste e de recolhimento da navegação
+
+**Status:** Aceita
+
+**Contexto.** Uma revisão do que foi implementado contra o `/docs/DESIGN.md` encontrou três desvios, dois deles com efeito direto em acessibilidade:
+
+1. A navegação global não recolhia em ≤ 833px. A _Collapsing Strategy_ pede recolhimento em tablet portrait, e o próprio documento só admite alvo de toque menor que 44px no desktop **porque** assume o menu recolhido no celular. Sem ele, os links ficavam a 12px com cerca de 36px de altura no toque.
+2. A linha legal do rodapé usava `{colors.ink-muted-48}` sobre `{colors.canvas-parchment}` a 12px: 4,24:1, abaixo de WCAG AA. O `DESIGN.md` condiciona esse token, em _Texto, divisores e bordas_, a "não usar abaixo de 14px quando não atingir WCAG AA".
+3. O anel de `:focus-visible` usava `{colors.primary-focus}` em toda a interface. Sobre `{colors.surface-tile-1}` isso rende 2,11:1 — abaixo dos 3:1 que WCAG 1.4.11 exige de indicadores não textuais. Nos links da navegação e nos botões `--on-dark`, o foco de teclado era praticamente invisível.
+
+**Decisão.** (1) A navegação ganhou botão de menu visível apenas em ≤ 833px, com `aria-expanded`/`aria-controls`; os links viram uma bandeja abaixo da barra, em `{typography.button-utility}` (14px, o token que o documento reserva a rótulos de navegação em botão) e com 44px mínimos de altura. Isso torna `GlobalNav` um componente cliente.
+
+(2) A linha legal passa a `{colors.ink-muted-80}`: 7,92:1 sobre o mesmo fundo.
+
+(3) A cor do foco sai de `--focus-ring`, que aponta para `{colors.primary-focus}` por padrão e é redefinida para `{colors.primary-on-dark}` (5,68:1 contra #13335a) nas superfícies azuis escuras — exatamente o papel que o `DESIGN.md` dá a esse token em _Tokens semânticos_.
+
+**Consequências.** Nenhuma cor nova entrou na paleta: as três correções usam apenas tokens já documentados. `--focus-ring` não é um token de marca, e sim um ponteiro para o token de foco em vigor na superfície atual, o que permite que superfícies escuras futuras herdem o comportamento correto sem repetir a regra.

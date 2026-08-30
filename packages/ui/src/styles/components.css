@@ -16,6 +16,10 @@
   min-height: 56px;
   background: var(--color-surface-tile-1);
   color: var(--color-body-on-dark);
+  /* Sobre o azul institucional o anel de foco troca para {colors.primary-on-dark}
+   * (5,68:1 contra #13335a). O {colors.primary-focus} renderia apenas 2,11:1,
+   * abaixo do minimo de 3:1 para indicadores nao textuais. */
+  --focus-ring: var(--color-primary-on-dark);
 }
 
 .mp-global-nav__inner {
@@ -32,36 +36,56 @@
 .mp-global-nav__brand {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
   text-decoration: none;
   color: inherit;
 }
 
-/*
- * TODO (DESIGN.md, Brand Assets): /img/logo nao possui variante negativa/branca
- * para fundo azul. Enquanto ela nao existir, o ativo oficial e apresentado
- * INALTERADO sobre uma area de protecao clara. Nao recolorir, mascarar nem
- * redesenhar o logotipo. Registrado em docs/DECISIONS.md (ADR-0008).
- */
-.mp-global-nav__logo-plate {
-  display: flex;
-  align-items: center;
-  padding: var(--spacing-xs) var(--spacing-sm);
-  background: var(--color-canvas);
-  border-radius: var(--rounded-sm);
-}
-
+/* A placa do programa tem fundo azul proprio e dispensa area de protecao clara
+ * sobre a navegacao (ver docs/DECISIONS.md, ADR-0031 encerrando o ADR-0008). */
 .mp-global-nav__logo {
   display: block;
-  height: 28px;
+  height: 56px;
   width: auto;
 }
 
-.mp-global-nav__product {
-  font: var(--type-tagline-weight) var(--type-tagline-size) / var(--type-tagline-line)
-    var(--font-display);
-  letter-spacing: var(--type-tagline-tracking);
+/* Botao de menu: existe apenas em <= 833px (ver a media query adiante). */
+.mp-global-nav__toggle {
+  display: none;
+  align-items: center;
+  gap: var(--spacing-xs);
+  min-height: var(--touch-target-min);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: transparent;
   color: var(--color-on-primary);
+  border: 1px solid var(--color-on-primary);
+  border-radius: var(--rounded-sm);
+  font-family: var(--font-body);
+  font-size: var(--type-button-utility-size);
+  font-weight: var(--type-button-utility-weight);
+  letter-spacing: var(--type-button-utility-tracking);
+  cursor: pointer;
+}
+
+/* DESIGN.md: `scale(0.95)` e a micro-interacao de toda a plataforma. */
+.mp-global-nav__toggle:active {
+  transform: scale(0.95);
+}
+
+/* Tres barras desenhadas com bordas. Nao e um icone de marca. */
+.mp-global-nav__toggle-bars {
+  width: 16px;
+  height: 10px;
+  border-top: 2px solid currentcolor;
+  border-bottom: 2px solid currentcolor;
+  position: relative;
+}
+
+.mp-global-nav__toggle-bars::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  border-top: 2px solid currentcolor;
 }
 
 .mp-global-nav__links {
@@ -86,16 +110,50 @@
   color: var(--color-primary-on-dark);
 }
 
+/*
+ * DESIGN.md, Collapsing Strategy (tablet portrait, 736-833px): "Global nav
+ * collapses to hamburger". Os links saem da linha e viram uma bandeja abaixo da
+ * barra; o logotipo e o botao de menu continuam visiveis. A bandeja usa
+ * {typography.button-utility} (14px), o token que o DESIGN.md reserva a rotulos
+ * de navegacao em botao, e cada link ocupa os 44px minimos de "Touch Targets" —
+ * o alvo reduzido de 12px so e admitido no desktop, onde nao ha toque.
+ */
 @media (max-width: 833px) {
-  /* DESIGN.md, Collapsing Strategy: em 834px ou menos os links recolhem e o
-   * logotipo oficial permanece visivel. */
-  .mp-global-nav__links {
-    gap: var(--spacing-sm);
+  .mp-global-nav__toggle {
+    display: inline-flex;
   }
 
-  .mp-global-nav__product {
-    font-size: var(--type-caption-strong-size);
-    font-weight: var(--type-caption-strong-weight);
+  .mp-global-nav__links {
+    display: none;
+    position: absolute;
+    inset-inline: 0;
+    top: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: var(--spacing-xs) var(--spacing-lg) var(--spacing-sm);
+    background: var(--color-surface-tile-2);
+    border-top: 1px solid var(--color-primary-on-dark);
+  }
+
+  .mp-global-nav__links--open {
+    display: flex;
+  }
+
+  .mp-global-nav__link {
+    display: flex;
+    align-items: center;
+    min-height: var(--touch-target-min);
+    padding-inline: 0;
+    font-size: var(--type-button-utility-size);
+    line-height: var(--type-button-utility-line);
+    letter-spacing: var(--type-button-utility-tracking);
+  }
+}
+
+@media (max-width: 419px) {
+  .mp-global-nav__logo {
+    height: 44px;
   }
 }
 
@@ -117,14 +175,19 @@
   color: var(--color-body);
 }
 
+/* O anel de foco troca para {colors.primary-on-dark} sobre azul escuro: o
+ * {colors.primary-focus} rende apenas 2,11:1 contra #13335a, abaixo do minimo
+ * de 3:1 para indicadores nao textuais. Ver base.css. */
 .mp-tile--dark {
   background: var(--color-surface-tile-1);
   color: var(--color-body-on-dark);
+  --focus-ring: var(--color-primary-on-dark);
 }
 
 .mp-tile--dark-2 {
   background: var(--color-surface-tile-2);
   color: var(--color-body-on-dark);
+  --focus-ring: var(--color-primary-on-dark);
 }
 
 .mp-tile--dark h1,
@@ -330,6 +393,7 @@
   background: transparent;
   color: var(--color-on-primary);
   border: 1px solid var(--color-on-primary);
+  --focus-ring: var(--color-primary-on-dark);
 }
 
 /* {component.button-pearl-capsule} */
@@ -613,9 +677,13 @@ select.mp-field__control {
   gap: var(--spacing-lg);
 }
 
+/* `align-self` e obrigatorio: o container do rodape e uma coluna flex, e o
+ * padrao `stretch` esticaria o logotipo ate a largura total, distorcendo a
+ * marca — o que o DESIGN.md proibe em Brand Assets. */
 .mp-footer__logo {
   display: block;
-  height: 56px;
+  align-self: flex-start;
+  height: 96px;
   width: auto;
 }
 
@@ -651,7 +719,10 @@ select.mp-field__control {
   font-size: var(--type-fine-print-size);
   line-height: 1.6;
   letter-spacing: var(--type-fine-print-tracking);
-  color: var(--color-ink-muted-48);
+  /* {colors.ink-muted-48} rende 4,24:1 sobre {colors.canvas-parchment} e o
+   * proprio DESIGN.md condiciona seu uso abaixo de 14px a atingir WCAG AA.
+   * {colors.ink-muted-80} rende 7,92:1 sobre o mesmo fundo. */
+  color: var(--color-ink-muted-80);
   border-top: 1px solid var(--color-divider-soft);
   padding-top: var(--spacing-md);
 }

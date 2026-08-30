@@ -51,9 +51,15 @@ img {
   height: auto;
 }
 
-/* PRD 17 / DESIGN.md: foco de teclado sempre visivel. */
+/* PRD 17 / DESIGN.md: foco de teclado sempre visivel.
+ *
+ * A cor sai de `--focus-ring`, que por padrao e {colors.primary-focus} e e
+ * redefinida para {colors.primary-on-dark} nas superficies azuis escuras
+ * (components.css). O {colors.primary-focus} rende 6,04:1 sobre branco, mas
+ * apenas 2,11:1 sobre #13335a — abaixo do minimo de 3:1 que WCAG 1.4.11 exige
+ * de indicadores nao textuais. */
 :focus-visible {
-  outline: 2px solid var(--color-primary-focus);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
   border-radius: var(--rounded-xs);
 }

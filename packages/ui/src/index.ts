@@ -16,5 +16,5 @@ export { Footer } from './components/Footer';
 export { GlobalNav } from './components/GlobalNav';
 export type { GlobalNavProps, NavItem } from './components/GlobalNav';
 
-export { BRAND_ALT_TEXT, LOGO_HORIZONTAL_BLACK, LOGO_VERTICAL_BLUE, PRODUCT_NAME } from './brand';
+export { BRAND_ALT_TEXT, LOGO_CRECHE_CARIOCA_FOOTER, LOGO_CRECHE_CARIOCA_HEADER } from './brand';
 export type { BrandLogo } from './brand';

@@ -1,17 +1,17 @@
-import { BRAND_ALT_TEXT, LOGO_VERTICAL_BLUE } from '../brand';
+import { BRAND_ALT_TEXT, LOGO_CRECHE_CARIOCA_FOOTER } from '../brand';
 
 /**
  * {component.footer} do DESIGN.md.
  *
  * Fundo {colors.canvas-parchment}, texto {colors.ink-muted-80}, padding vertical
- * 64px, logotipo oficial de `/img/logo`. A variante vertical azul e usada porque
- * o fundo do rodape e claro.
+ * 64px, logotipo oficial de `/img/logo` — o selo circular do programa, que ja
+ * embute a assinatura institucional.
  *
  * O aviso legal e obrigatorio: PRD 1.2 e 4.3 proibem apresentar o MVP como
  * sistema oficial de matricula ou seus dados como retrato oficial do municipio.
  */
 export function Footer() {
-  const logo = LOGO_VERTICAL_BLUE;
+  const logo = LOGO_CRECHE_CARIOCA_FOOTER;
 
   return (
     <footer className="mp-footer">
