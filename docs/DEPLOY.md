@@ -127,6 +127,23 @@ sincronizar ou divergir.
 PostgreSQL e dependencia critica. Uma `DATABASE_URL` errada reprova o deploy e
 dispara rollback, em vez de publicar uma API que quebra na primeira escrita.
 
+**`PORT` e o que o healthcheck sonda, nao o target port do dominio.** Sao duas
+coisas diferentes: o target port resolve o roteamento publico, e a variavel
+`PORT` diz ao Railway em que porta sondar o conteiner por dentro da rede. Sem
+declarar `PORT`, o Railway sonda a porta que ele injeta - na qual nenhuma das
+duas aplicacoes escuta - e o deploy reprova no healthcheck com a aplicacao no
+ar e saudavel. O dominio publico passa a responder:
+
+```
+{"status":"error","code":404,"message":"Application not found"}
+```
+
+Isso e o rollback: sem deployment ativo, o roteador nao tem para onde mandar. E
+o mesmo sintoma de "servico nunca existiu", o que torna o diagnostico enganoso.
+
+Por isso `PORT` esta declarado explicitamente nos dois servicos em
+`.railway/railway.ts`, com o mesmo valor do target port de cada um.
+
 **O builder e o Railpack, nao o Nixpacks.** O Nixpacks esta descontinuado no
 Railway, e a imagem dele embute um corepack antigo demais para o pnpm 11.1.3,
 que usa `import()` dinamico no entrypoint CJS. Com ele o build morre no
