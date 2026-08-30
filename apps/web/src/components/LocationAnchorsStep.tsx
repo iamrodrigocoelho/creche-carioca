@@ -36,9 +36,15 @@ const MAX_ANCHORS = 3;
 
 interface Props {
   readonly applicationId: string;
+  /**
+   * Avisa que os pontos mudaram. A etapa 4 depende deles para calcular
+   * distancias, e sem esse aviso continuaria mostrando a lista carregada antes
+   * de a familia informar o primeiro CEP.
+   */
+  readonly onChange?: () => void;
 }
 
-export function LocationAnchorsStep({ applicationId }: Props) {
+export function LocationAnchorsStep({ applicationId, onChange }: Props) {
   const [anchors, setAnchors] = useState<readonly LocationAnchorResponse[]>([]);
   const [hasResidence, setHasResidence] = useState(false);
   const [cep, setCep] = useState('');
@@ -51,20 +57,29 @@ export function LocationAnchorsStep({ applicationId }: Props) {
   useEffect(() => {
     let active = true;
     void listLocationAnchors(applicationId).then((result) => {
-      if (active && result.ok) apply(result.data);
+      // Só a lista. Limpar o formulário aqui apagaria o que a pessoa já tivesse
+      // digitado enquanto a carga inicial não terminava — e ela terminaria
+      // depois em qualquer conexão lenta ou página cheia.
+      if (active && result.ok) showList(result.data);
     });
     return () => {
       active = false;
     };
   }, [applicationId]);
 
-  function apply(data: LocationAnchorListResponse) {
+  function showList(data: LocationAnchorListResponse) {
     setAnchors(data.anchors);
     setHasResidence(data.hasResidence);
     // O proximo ponto nunca e outra residencia: ela ocupa a primeira posicao.
     setKind(data.hasResidence ? 'TRABALHO' : 'RESIDENCIA');
+  }
+
+  /** Após uma escrita: além da lista, limpa o formulário e avisa a etapa 4. */
+  function apply(data: LocationAnchorListResponse) {
+    showList(data);
     setCep('');
     setLabel('');
+    onChange?.();
   }
 
   async function handleAdd(event: React.FormEvent<HTMLFormElement>) {

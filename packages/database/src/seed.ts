@@ -3,7 +3,9 @@ import { resolve } from 'node:path';
 import { DEMO_AGE_GROUP_POLICY_2026 } from '@match/domain';
 
 import { createPrismaClient, databaseUrlFromEnv } from './client';
+import unitsReference from './units.json';
 import { DataStatus, RuleKind } from '@prisma/client';
+import type { DemandLevel } from '@prisma/client';
 
 /**
  * Seed de dados sintéticos (PRD 19, Fase 1 do roadmap: "Criar dados sintéticos").
@@ -24,10 +26,78 @@ const DEMO_PROCESS = {
   status: DataStatus.DEMONSTRACAO,
 } as const;
 
+interface UnitReference {
+  readonly code: string;
+  readonly name: string;
+  readonly type: string | null;
+  readonly neighborhood: string | null;
+  readonly cep: string | null;
+  readonly cre: number | null;
+  readonly microarea: string | null;
+  readonly latitude: number | null;
+  readonly longitude: number | null;
+  readonly historicalAgeGroups: readonly string[];
+  readonly historicalShifts: readonly string[];
+  readonly historicalApplications: number;
+  readonly historicalChildren: number;
+  readonly historicalYears: number;
+  readonly demandLevel: string;
+}
+
+/**
+ * Carrega as unidades do artefato versionado (ADR-0034).
+ *
+ * Diferente do processo e da regra, isto NAO e dado sintetico: sao unidades
+ * publicas reais, derivadas dos datasets da SME. O que e de demonstracao e a
+ * oferta de 2026, que ninguem declarou — por isso grupamentos e turnos vao
+ * rotulados como historicos.
+ *
+ * Idempotente por `code`, que e a chave natural vinda da origem (ADR-0018).
+ */
+export async function seedUnits(
+  prisma: ReturnType<typeof createPrismaClient>,
+): Promise<{ units: number }> {
+  const units = unitsReference.units as readonly UnitReference[];
+
+  // O artefato so muda quando e regerado, e sao 872 upserts sequenciais. Reler
+  // o que ja esta la a cada `beforeAll` da suite custava segundos por arquivo de
+  // teste, sem mudar nada.
+  const current = await prisma.unit.count();
+  if (current === units.length) return { units: current };
+
+  for (const unit of units) {
+    const data = {
+      name: unit.name,
+      type: unit.type,
+      neighborhood: unit.neighborhood,
+      cep: unit.cep,
+      cre: unit.cre,
+      microarea: unit.microarea,
+      latitude: unit.latitude,
+      longitude: unit.longitude,
+      historicalAgeGroups: [...unit.historicalAgeGroups],
+      historicalShifts: [...unit.historicalShifts],
+      historicalApplications: unit.historicalApplications,
+      historicalChildren: unit.historicalChildren,
+      historicalYears: unit.historicalYears,
+      demandLevel: unit.demandLevel as DemandLevel,
+    };
+    await prisma.unit.upsert({
+      where: { code: unit.code },
+      update: data,
+      create: { code: unit.code, ...data },
+    });
+  }
+
+  return { units: units.length };
+}
+
 export async function seed(prisma: ReturnType<typeof createPrismaClient>): Promise<{
   processCode: string;
   ruleVersionCreated: boolean;
+  units: number;
 }> {
+  const { units } = await seedUnits(prisma);
   const process_ = await prisma.process.upsert({
     where: { code: DEMO_PROCESS.code },
     // Nome e data de referência podem ser corrigidos; o código é a identidade.
@@ -52,7 +122,7 @@ export async function seed(prisma: ReturnType<typeof createPrismaClient>): Promi
   // Regra já publicada é imutável (PRD 8.7). Publicar uma alteração significa
   // criar uma versão nova, o que é uma decisão explícita, não efeito do seed.
   if (existing) {
-    return { processCode: process_.code, ruleVersionCreated: false };
+    return { processCode: process_.code, ruleVersionCreated: false, units };
   }
 
   await prisma.ruleVersion.create({
@@ -76,7 +146,7 @@ export async function seed(prisma: ReturnType<typeof createPrismaClient>): Promi
     },
   });
 
-  return { processCode: process_.code, ruleVersionCreated: true };
+  return { processCode: process_.code, ruleVersionCreated: true, units };
 }
 
 async function main(): Promise<void> {
@@ -99,6 +169,7 @@ async function main(): Promise<void> {
         message: 'seed_concluido',
         processCode: result.processCode,
         ruleVersionCreated: result.ruleVersionCreated,
+        units: result.units,
       }),
     );
   } finally {

@@ -20,6 +20,7 @@ import {
 import { AgeGroupResult } from './AgeGroupResult';
 import { ContactsStep } from './ContactsStep';
 import { LocationAnchorsStep } from './LocationAnchorsStep';
+import { PreferencesStep } from './PreferencesStep';
 
 /**
  * Etapa 1 da jornada da familia (RF-01, fatia da Fase 1).
@@ -39,6 +40,8 @@ export function ApplicationForm() {
   const [issues, setIssues] = useState<readonly FieldIssue[]>([]);
   const [fieldErrors, setFieldErrors] = useState<Readonly<Record<string, string>>>({});
   const [state, setState] = useState<FormState>({ kind: 'editing' });
+  // Incrementado a cada mudanca de ponto de referencia, para a etapa 4 recarregar.
+  const [anchorsVersion, setAnchorsVersion] = useState(0);
 
   const summaryRef = useRef<HTMLDivElement>(null);
   const resultRef = useRef<HTMLDivElement>(null);
@@ -106,10 +109,22 @@ export function ApplicationForm() {
             Simular outra criança
           </Button>
         </div>
-        <LocationAnchorsStep applicationId={state.application.id} />
+        <LocationAnchorsStep
+          applicationId={state.application.id}
+          onChange={() => setAnchorsVersion((version) => version + 1)}
+        />
         <ContactsStep applicationId={state.application.id} />
+        {state.application.ageGroup.code ? (
+          <PreferencesStep
+            applicationId={state.application.id}
+            ageGroupCode={state.application.ageGroup.code}
+            shift={state.application.desiredShift}
+            anchorsVersion={anchorsVersion}
+          />
+        ) : null}
         <p className="mp-caption mp-muted">
-          A próxima etapa — a escolha de unidades — ainda está em construção nesta demonstração.
+          As próximas etapas — pontuação e convocação — ainda estão em construção nesta
+          demonstração.
         </p>
       </div>
     );

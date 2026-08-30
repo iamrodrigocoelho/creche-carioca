@@ -23,7 +23,7 @@
 
 ## Estado atual
 
-**Fase 5 concluída** — fundação técnica, a primeira fatia funcional ponta a ponta, a persistência canônica em PostgreSQL, o pipeline de dados históricos, os pontos de referência por CEP e os contatos multicanal. A família informa mês e ano de nascimento e o turno desejado, e recebe o grupamento etário com a explicação de como ele foi obtido; a inscrição é gravada de forma transacional, com histórico de status e trilha de auditoria append-only. Os cinco processos seletivos de 2021 a 2025 são ingeridos em DuckDB e publicados como tabelas curadas em Parquet, com manifesto e relatório de qualidade. A família informa o CEP de residência e, opcionalmente, mais dois pontos de referência, que são geocodificados contra os CEPs reais das unidades escolares — com a margem de erro dita em voz alta, e sem afetar a pontuação. Depois cadastra telefones, com consentimento explícito por meio de contato e verificação simulada, e perfis sociais opcionais; os contatos são sempre exibidos mascarados. As demais fases estão descritas no `IMPLEMENTATION_PLAN.md`.
+**Fase 6 concluída** — fundação técnica, a primeira fatia funcional ponta a ponta, a persistência canônica em PostgreSQL, o pipeline de dados históricos, os pontos de referência por CEP, os contatos multicanal e a escolha de unidades. A família informa mês e ano de nascimento e o turno desejado, e recebe o grupamento etário com a explicação de como ele foi obtido; a inscrição é gravada de forma transacional, com histórico de status e trilha de auditoria append-only. Os cinco processos seletivos de 2021 a 2025 são ingeridos em DuckDB e publicados como tabelas curadas em Parquet, com manifesto e relatório de qualidade. A família informa o CEP de residência e, opcionalmente, mais dois pontos de referência, que são geocodificados contra os CEPs reais das unidades escolares — com a margem de erro dita em voz alta, e sem afetar a pontuação. Depois cadastra telefones, com consentimento explícito por meio de contato e verificação simulada, e perfis sociais opcionais; os contatos são sempre exibidos mascarados. Por fim escolhe até cinco unidades em ordem de preferência, a partir de uma lista ordenada por proximidade e explicada campo a campo — com a distância rotulada como estimativa e os números de oferta rotulados como históricos. As demais fases estão descritas no `IMPLEMENTATION_PLAN.md`.
 
 ## Requisitos
 
@@ -121,6 +121,17 @@ dos CEPs reais das famílias. Regere quando a base de unidades mudar:
 
 ```bash
 pnpm --filter @match/data-pipeline cep-reference
+```
+
+### Referência de unidades
+
+`packages/database/src/units.json` traz as 872 unidades que aparecem nas inscrições
+de 2021 a 2025, com a demanda histórica já agregada, e é carregado pelo seed. Também
+é versionado, pela mesma razão (ADR-0029):
+
+```bash
+pnpm --filter @match/data-pipeline units-reference
+pnpm db:seed
 ```
 
 A precisão é a do setor, não a do endereço: raio mediano de 750 m, com cauda até

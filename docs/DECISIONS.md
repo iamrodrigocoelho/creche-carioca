@@ -535,3 +535,56 @@ Fica pendente pedir à Prefeitura os ativos vetoriais (SVG) ou PNG com transpar�
 O registro do ADR-0031 continua citando o texto "Match Perfeito" removido do cabeçalho: ADR é registro histórico e descreve o que era verdade quando foi escrito.
 
 **Consequências.** Um nome só em tudo que a família e a equipe leem. Os identificadores acima permanecem como dívida de nomenclatura conhecida, a ser paga quando houver uma janela em que renomear o projeto no Railway e invalidar rascunhos não custe nada — provavelmente junto de uma migração de infraestrutura, não isolada.
+## ADR-0034 — Unidades por artefato versionado, não por loader de Parquet
+
+**Status:** Aceita · Fase 6
+
+**Contexto.** A Fase 3 publica as unidades curadas em Parquet, sob `data/curated/`, que não é versionado. A recomendação da Fase 6 lê unidades do PostgreSQL. Faltava a ponte — e ela precisa funcionar tanto na máquina de quem desenvolve quanto no runner do CI, que não tem os datasets.
+
+A alternativa natural seria um comando que importa o Parquet para o banco, e um punhado de unidades sintéticas no seed para o CI. Ela tem um defeito silencioso: os testes passariam a exercitar unidades que não existem, e um erro de mapeamento no caminho real não apareceria em lugar nenhum.
+
+**Decisão.** O pipeline gera `packages/database/src/units.json` e o seed o carrega. Um caminho só, com dado real, em qualquer ambiente. É o mesmo padrão já firmado pelo `cep-sectors.json` (ADR-0023), e pela mesma razão.
+
+O artefato traz apenas as **872 unidades que aparecem nas inscrições de 2021 a 2025**. As outras 1.210 do catálogo são escolas municipais que não ofertam creche. Não existe lista oficial de quem oferta em 2026; o histórico é o melhor indício disponível, e isso é inferência, não dado oficial.
+
+A demanda histórica vai pré-calculada. Agregar 837 mil linhas a cada consulta seria desperdício, e o número não muda entre importações.
+
+**Consequências.** São 331 KB versionados, gravados com uma unidade por linha — bem menor que indentado, e o diff continua mostrando exatamente quais unidades mudaram. O arquivo precisa ser regerado com `pnpm --filter @match/data-pipeline units-reference` quando a base mudar, como as fixtures e a referência de CEP.
+
+O seed pula a carga quando a contagem já bate. Sem isso, 872 upserts sequenciais rodavam a cada `beforeAll` da suíte e custavam oito segundos por execução.
+
+---
+
+## ADR-0035 — O berçário único da origem e as quatro faixas da política
+
+**Status:** Aceita · Fase 6
+
+**Contexto.** As bases de 2021 a 2025 registram três grupamentos: Berçário, Maternal I e Maternal II. A política de grupamento etário da demonstração tem quatro faixas, com o berçário dividido em I e II (ADR-0007, dado marcado como `DEMONSTRACAO`).
+
+O card precisa dizer se a unidade já atendeu o grupamento da criança. Sem tratar a divergência, toda criança de berçário veria "não atende", o que é falso.
+
+**Decisão.** `BERCARIO_I` e `BERCARIO_II` casam com o rótulo "Berçário" da origem; `MATERNAL_I` e `MATERNAL_II` casam com os homônimos.
+
+O mapeamento afirma um fato: a divisão em I e II é da política, não da origem, então uma unidade que atendeu "Berçário" atendeu as duas faixas. Ele não afirma o inverso — nada permite dizer que uma unidade que só atendeu "Maternal II" atenderia berçário.
+
+**Consequências.** A divergência fica registrada em vez de escondida atrás de uma normalização silenciosa. Se a SME publicar a política oficial com outra divisão, o mapeamento é o único lugar a mudar.
+
+Vale notar o que isto **não** é: não é uma afirmação sobre a oferta de 2026, que não existe nos datasets. Todo o card é rotulado como histórico, e a resposta da API carrega um aviso fixo dizendo de onde os números vêm.
+
+---
+
+## ADR-0036 — Botões de mover como caminho principal, arrastar como conveniência
+
+**Status:** Aceita · Fase 6
+
+**Contexto.** PRD §8.6 exige que a ordem das preferências seja alterável por drag-and-drop **e** por controles acessíveis. As duas coisas, não uma.
+
+Uma biblioteca como a `dnd-kit` entrega arrastar com suporte a teclado, toque e leitor de tela já resolvido, ao custo de uma dependência nova de front-end — que PRD §13.7 manda tratar como decisão consciente de cadeia de suprimentos.
+
+**Decisão.** Os botões "mover para cima" e "mover para baixo" são o caminho principal: funcionam com teclado, com leitor de tela e no celular, e são testáveis sem simular gestos. O arrastar usa a API nativa do navegador, sem dependência.
+
+Cada botão nomeia a unidade que move ("Mover Creche X para cima"), e não apenas a direção: numa lista de cinco, um leitor de tela anunciando só "mover para cima" cinco vezes não diz o que vai acontecer.
+
+**Consequências.** O arrastar nativo funciona mal em toque, e isso é aceito — os controles acessíveis cobrem esse caso, e são o caminho que a maioria vai usar no celular. Se a avaliação de acessibilidade da Fase 14 apontar que não basta, a troca por uma biblioteca fica restrita a este componente.
+
+O E2E exercita a reordenação **apenas com teclado**, que é o caminho difícil e o que o plano nomeia como critério.

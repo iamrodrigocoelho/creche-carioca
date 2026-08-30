@@ -1,7 +1,7 @@
 // Schema canonico do Creche Carioca.
 //
 // Cobre o subconjunto do modelo de PRD 11 que a Fase 2 utiliza. As entidades
-// restantes (Unit, UnitCapacity, Preference,
+// restantes (UnitCapacity,
 // CriterionResponse, ScoreResult, AllocationRun, Allocation, Convocation,
 // ContactAttempt, MessageTemplate) entram nas fases seguintes, conforme
 // IMPLEMENTATION_PLAN.md.
@@ -115,6 +115,7 @@ model Application {
   statusEvents    StatusEvent[]
   locationAnchors LocationAnchor[]
   contactPoints   ContactPoint[]
+  preferences     Preference[]
 
   /// Uma crianca tem no maximo uma inscricao por processo. Sustenta o principio
   /// "uma crianca, uma oferta" (PRD 7.3) e o alerta de multiplas selecoes para a
@@ -158,6 +159,71 @@ model LocationAnchor {
 
   @@unique([applicationId, position])
   @@index([applicationId])
+}
+
+/// Unidade escolar (PRD 11).
+///
+/// Carregada do artefato versionado gerado pelo pipeline (ADR-0034). Sao as 872
+/// unidades que aparecem nas inscricoes de 2021 a 2025 — o melhor indicio
+/// disponivel de quem oferta creche, ja que nao ha lista oficial de 2026.
+model Unit {
+  id   String  @id @default(uuid()) @db.Uuid
+  /// `esc_codigo` normalizado. Chave natural vinda da origem (ADR-0018).
+  code String  @unique @db.VarChar(7)
+  name String  @db.VarChar(160)
+  /// Tipo declarado na origem: Creche, EDI, Creche Parceira, CIEP...
+  type String? @db.VarChar(40)
+
+  neighborhood String? @db.VarChar(80)
+  cep          String? @db.VarChar(8)
+  cre          Int?    @db.SmallInt
+  microarea    String? @db.VarChar(16)
+  latitude     Float?
+  longitude    Float?
+
+  /// Grupamentos e turnos OBSERVADOS no historico, nao oferta declarada de 2026.
+  /// PRD 8.5 exige que dado historico seja rotulado como historico.
+  historicalAgeGroups String[]
+  historicalShifts    String[]
+
+  historicalApplications Int         @default(0)
+  historicalChildren     Int         @default(0)
+  historicalYears        Int         @default(0)
+  /// Faixa relativa por quartil. PRD 8.5 proibe prometer chance de vaga.
+  demandLevel            DemandLevel @default(BAIXA)
+
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  preferences Preference[]
+
+  @@index([neighborhood])
+  @@index([cre])
+  @@index([demandLevel])
+}
+
+/// Unidade escolhida e ordem (PRD 11, 8.6).
+model Preference {
+  id            String @id @default(uuid()) @db.Uuid
+  applicationId String @db.Uuid
+  unitId        String @db.Uuid
+  /// 1 a 5, na ordem exata submetida pela familia (PRD 8.6).
+  position      Int    @db.SmallInt
+
+  /// Grupamento e turno pretendidos nesta escolha. Compoem a chave de unicidade
+  /// de PRD 8.6: a mesma unidade pode voltar para outro grupamento ou turno.
+  ageGroupCode String @db.VarChar(20)
+  shift        String @db.VarChar(10)
+
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  unit        Unit        @relation(fields: [unitId], references: [id], onDelete: Restrict)
+
+  @@unique([applicationId, position])
+  @@unique([applicationId, unitId, ageGroupCode, shift])
+  @@index([applicationId])
+  @@index([unitId])
 }
 
 /// Contato da familia, unificado por canal (PRD 11, 8.3, 8.4).
@@ -295,6 +361,14 @@ enum ApplicationStatus {
   RASCUNHO
   SUBMETIDA
   CANCELADA
+}
+
+/// Faixa relativa de demanda historica, por quartil (PRD 8.5).
+enum DemandLevel {
+  BAIXA
+  MEDIA
+  ALTA
+  MUITO_ALTA
 }
 
 enum ContactChannel {

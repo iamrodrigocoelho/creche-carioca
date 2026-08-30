@@ -10,6 +10,7 @@ import { ContactsModule } from './contacts/contacts.module';
 import { DatabaseModule } from './database/database.module';
 import { HealthModule } from './health/health.module';
 import { LocationAnchorsModule } from './location-anchors/location-anchors.module';
+import { UnitsModule } from './units/units.module';
 
 const env = loadEnv();
 
@@ -25,6 +26,7 @@ const env = loadEnv();
     ApplicationsModule,
     LocationAnchorsModule,
     ContactsModule,
+    UnitsModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

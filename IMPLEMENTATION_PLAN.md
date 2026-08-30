@@ -3,7 +3,7 @@
 **Escopo:** plano de desenvolvimento incremental do MVP descrito em `PRD.md`.
 **Fontes de verdade:** `PRD.md` (comportamento, regras, requisitos técnicos) e `/docs/DESIGN.md` (apresentação visual).
 **Status:** vivo — atualizado a cada fase concluída.
-**Última atualização:** 30/08/2026 (Fase 5 concluída; interface do painel do gestor antecipada — ADR-0029).
+**Última atualização:** 30/08/2026 (Fase 6 concluída; interface do painel do gestor antecipada — ADR-0031).
 
 > Este documento **não replica** requisitos. Ele referencia os identificadores do PRD (`RF-xx`, seções `§n`) e organiza a ordem de execução. Em qualquer divergência, o `PRD.md` e o `/docs/DESIGN.md` prevalecem.
 
@@ -33,7 +33,7 @@
 | B-01 | ~~Datasets `dadoscreche` não estão no ambiente~~ **resolvido na Fase 3**                                     | Fases 3+ dependem deles | Baixados de `github.com/CIT-SME-RJ/dadoscreche` para `data/raw/`, fora do versionamento. O pipeline lê de `DATA_RAW_DIR` configurável e falha com instrução de download quando os arquivos faltam; as fixtures versionadas cobrem o CI |
 | B-02 | ~~Docker ausente~~ **resolvido na Fase 2**                                                                   | PostgreSQL/Redis        | A máquina já roda **PostgreSQL 16.13 via Homebrew**, então a Fase 2 seguiu sem Docker. O `docker-compose.yml` permanece como alternativa equivalente, não executado. O Redis ainda será necessário na Fase 11                          |
 | B-03 | Provider de geocodificação indefinido (PRD §21 "Geocodificação") — **contornado na Fase 4**                  | RF-02                   | Porta `GeocodingProvider` com adapter determinístico ancorado no setor de CEP das unidades reais (ADR-0023). Nenhum provider real foi escolhido; a troca fica restrita a uma linha de `provide`                                        |
-| B-04 | Distância geodésica vs. rota viária (PRD §21 "Distância")                                                    | RF-05                   | Haversine na porta `DistanceProvider`, rotulada como estimativa (PRD §8.5). Decisão de produção permanece aberta                                                                                                                       |
+| B-04 | Distância geodésica vs. rota viária (PRD §21 "Distância") — **contornado na Fase 6**                         | RF-05                   | Haversine no domínio, e toda distância viaja com o método e a incerteza herdada da geocodificação. Nenhum tempo de percurso é inventado. A decisão de produção permanece aberta                                                        |
 | B-05 | Identidade oficial / autenticação (PRD §21 "Autenticação")                                                   | RF-10, §13.3            | Auth simulada e explicitamente identificada; RBAC real no backend                                                                                                                                                                      |
 | B-06 | APIs sociais e TikTok (PRD §21)                                                                              | RF-04, RF-11            | Todos os adapters sociais permanecem simulados                                                                                                                                                                                         |
 | B-07 | Regras oficiais de desempate e de grupamento etário por processo (PRD §21 "Desempates", §14.5 do calendário) | RF-01, RF-07            | Política de grupamento e desempates são **dados versionados e parametrizados**, marcados como `DEMONSTRACAO`. Nenhum valor é tratado como oficial                                                                                      |
@@ -216,14 +216,32 @@ Cobre PRD §19 Fase 0 e a primeira parcela de **RF-01**.
 
 ---
 
-### Fase 6 — Recomendação de unidades e preferências (RF-05, RF-06)
+### Fase 6 — Recomendação de unidades e preferências (RF-05, RF-06) ✅ CONCLUÍDA
 
 **Objetivo.** Recomendar unidades compatíveis e capturar até cinco preferências ordenadas.
-**Funcionalidades.** `GET /units/recommendations` com filtros; distância geodésica rotulada como estimativa; explicação da recomendação a partir de dados estruturados; `PUT /applications/:id/preferences`; reordenação por drag-and-drop **e** por controles acessíveis; alertas informativos.
-**Dependências.** Fases 3, 4.
-**Critérios de aceite.** Card exibe todos os campos de PRD §8.5; recomendação não impede escolha livre; unicidade de unidade por grupamento/turno.
-**Testes.** Ordenação por ponto de referência; unicidade; E2E de reordenação por teclado; a11y da lista.
-**Riscos.** Sem mapa ainda (decisão pendente §2.2) — a lista equivalente (PRD §17) é entregue primeiro, o que também garante a alternativa textual.
+
+**Funcionalidades.**
+
+- `Unit` e `Preference` no schema canônico. As 872 unidades entram por um artefato versionado gerado pelo pipeline e carregado pelo seed (ADR-0029) — a ponte que faltava entre o Parquet da Fase 3 e o PostgreSQL.
+- `GET /units/recommendations` com filtros de bairro, CRE, tipo e busca textual.
+- Distância geodésica (Haversine) no domínio, sempre acompanhada do método e da incerteza herdada da geocodificação.
+- Explicação estruturada por unidade: proximidade, mesmo bairro, grupamento e turno já atendidos, nível de demanda.
+- `PUT /applications/:id/preferences` substituindo a lista inteira, porque a ordem submetida é o dado.
+- Etapa 4 da interface, com reordenação por botões de mover e por arrastar (ADR-0031).
+
+**Dependências.** Fases 3 e 4. **B-04 contornado:** nenhuma decisão de rota viária foi tomada.
+
+**Critérios de aceite.** O card traz todos os campos de PRD §8.5; a proximidade ordena mas **nunca filtra**, e o total devolvido cobre o catálogo inteiro; a mesma unidade não se repete para o mesmo grupamento e turno, mas pode voltar em outro turno; unidade distante é sinalizada sem bloquear.
+
+**Testes.** 45 novos: 21 de regras puras no domínio (distância, ordenação, explicação), 17 de integração HTTP contra PostgreSQL real, 11 de componente e 5 E2E, incluindo reordenação apenas com teclado.
+
+**O que os dados obrigaram a decidir.**
+
+- **As bases têm 3 grupamentos e a política tem 4.** A origem registra um único "Berçário"; a política de demonstração o divide em I e II. O mapeamento afirma o que é fato — uma unidade que atendeu "Berçário" atendeu as duas faixas — e nada além disso (ADR-0030).
+- **Não existe oferta declarada para 2026.** Grupamentos, turnos e demanda vêm de 2021–2025, e a resposta carrega um aviso fixo dizendo isso. Apresentar histórico como oferta seria o que PRD §1.2 proíbe.
+- **20 das 872 unidades não têm coordenada.** Vão para o fim da lista, nunca são descartadas: sumir com elas as tornaria inescolhíveis por defeito do dado.
+
+**Riscos remanescentes.** A demanda é rotulada por quartil da própria distribuição, o que é relativo e não promete chance de vaga — mas depende de a interface manter esse cuidado na redação. `UnitCapacity` não existe: a capacidade real é insumo da Fase 8 e continua sendo o risco aberto de PRD §21. O artefato de unidades tem 331 KB e precisa ser regerado quando a base mudar.
 
 ---
 
@@ -365,3 +383,9 @@ Detalhadas em `docs/DECISIONS.md`:
 - **ADR-0028** — `ContactPoint` unificado por canal, em vez de tabelas separadas para telefone e rede social.
 - **ADR-0029** — Interface do painel do gestor antecipada sobre conjunto sintético determinístico, com derivações puras e tipos no formato da consulta real.
 - **ADR-0030** — Razão candidato/vaga medida pela primeira opção; severidade dita por extenso, sem semáforo de cor.
+
+### Decisões da Fase 6
+
+- **ADR-0034** — Unidades entram no banco por artefato versionado carregado pelo seed, e não por loader de Parquet.
+- **ADR-0035** — O berçário único da origem mapeia para as duas faixas da política; nada mais é inferido.
+- **ADR-0036** — Reordenação por botões acessíveis como caminho principal; arrastar nativo como conveniência.

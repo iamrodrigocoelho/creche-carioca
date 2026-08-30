@@ -4,6 +4,8 @@ import {
   contactChallengeSchema,
   contactListSchema,
   locationAnchorListSchema,
+  preferenceListSchema,
+  recommendationListSchema,
   type ApiError,
   type ApplicationResponse,
   type CreateApplicationInput,
@@ -13,6 +15,9 @@ import {
   type CreatePhoneContactInput,
   type CreateSocialContactInput,
   type LocationAnchorListResponse,
+  type PreferenceListResponse,
+  type PutPreferencesInput,
+  type RecommendationListResponse,
   type VerifyContactInput,
 } from '@match/schemas';
 
@@ -232,4 +237,63 @@ export async function confirmContactVerification(
     { method: 'PUT', body: JSON.stringify(input) },
     parseContactList,
   );
+}
+
+const parsePreferenceList = (value: unknown) =>
+  preferenceListSchema.safeParse(value) as
+    { success: true; data: PreferenceListResponse } | { success: false };
+
+export interface RecommendationFilters {
+  readonly neighborhood?: string;
+  readonly search?: string;
+  readonly limit?: number;
+}
+
+export async function listRecommendations(
+  applicationId: string,
+  filters: RecommendationFilters = {},
+): Promise<ApiResult<RecommendationListResponse>> {
+  const params = new URLSearchParams({ applicationId });
+  if (filters.neighborhood) params.set('neighborhood', filters.neighborhood);
+  if (filters.search) params.set('search', filters.search);
+  params.set('limit', String(filters.limit ?? 20));
+
+  return requestJson(
+    `/units/recommendations?${params.toString()}`,
+    { method: 'GET' },
+    (value) =>
+      recommendationListSchema.safeParse(value) as
+        { success: true; data: RecommendationListResponse } | { success: false },
+  );
+}
+
+export async function listPreferences(
+  applicationId: string,
+): Promise<ApiResult<PreferenceListResponse>> {
+  return requestJson(
+    `/applications/${applicationId}/preferences`,
+    { method: 'GET' },
+    parsePreferenceList,
+  );
+}
+
+export async function replacePreferences(
+  applicationId: string,
+  input: PutPreferencesInput,
+): Promise<ApiResult<PreferenceListResponse>> {
+  return requestJson(
+    `/applications/${applicationId}/preferences`,
+    { method: 'PUT', body: JSON.stringify(input) },
+    parsePreferenceList,
+  );
+}
+
+/** Bairros conhecidos, para o filtro e para o caminho de PRD 8.2. */
+export async function listNeighborhoods(): Promise<ApiResult<{ neighborhoods: string[] }>> {
+  return requestJson('/neighborhoods', { method: 'GET' }, (value) => {
+    const parsed = value as { neighborhoods?: unknown };
+    return Array.isArray(parsed.neighborhoods)
+      ? { success: true as const, data: { neighborhoods: parsed.neighborhoods as string[] } }
+      : { success: false as const };
+  });
 }

@@ -12,3 +12,7 @@ next-env.d.ts
 # Documentos-fonte: nao reformatar (PRD.md e DESIGN.md sao fontes de verdade).
 PRD.md
 docs/DESIGN.md
+
+# Artefato gerado pelo pipeline: uma unidade por linha, de proposito, para o
+# arquivo ficar menor que indentado e o diff continuar legivel.
+packages/database/src/units.json

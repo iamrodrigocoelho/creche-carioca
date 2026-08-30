@@ -35,6 +35,34 @@ export type {
   SocialPlatform,
 } from './contact/rules';
 
+export {
+  ANCHOR_KINDS,
+  MAX_ANCHOR_POSITION,
+  MIN_ANCHOR_POSITION,
+  RESIDENCE_POSITION,
+} from './location-anchor';
+export type { AnchorKind } from './location-anchor';
+
+export { estimateDistance, haversineKm } from './recommendation/distance';
+export type { Coordinate, DistanceEstimate } from './recommendation/distance';
+
+export {
+  DEMAND_LEVELS,
+  FAR_DISTANCE_KM,
+  isFarFromAllAnchors,
+  recommendUnits,
+  servedAgeGroup,
+} from './recommendation/recommend';
+export type {
+  AnchorDistance,
+  DemandLevel,
+  RecommendableUnit,
+  RecommendationAnchor,
+  RecommendationInput,
+  RecommendationReason,
+  RecommendedUnit,
+} from './recommendation/recommend';
+
 export { SHIFTS, isShift, shiftLabel } from './shift';
 export type { Shift } from './shift';
 
