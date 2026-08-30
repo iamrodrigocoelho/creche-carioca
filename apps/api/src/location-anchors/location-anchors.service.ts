@@ -1,12 +1,12 @@
 import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 
 import {
-  MAX_ANCHOR_POSITION,
+  flagDuplicateCeps,
   RESIDENCE_POSITION,
-  type CreateLocationAnchorParsed,
-  type LocationAnchorListResponse,
-  type LocationAnchorResponse,
-} from '@match/schemas';
+  resolveAnchorPosition,
+  type AnchorRuleViolation,
+} from '@match/domain';
+import type { CreateLocationAnchorParsed, LocationAnchorListResponse } from '@match/schemas';
 
 import { CLOCK, type Clock } from '../common/clock';
 import { currentCorrelationId } from '../common/logging/correlation';
@@ -58,20 +58,13 @@ export class LocationAnchorsService {
     input: CreateLocationAnchorParsed,
   ): Promise<LocationAnchorListResponse> {
     const existing = await this.repository.listByApplication(applicationId);
-    const position = input.position ?? this.nextFreePosition(existing);
-
-    if (position === RESIDENCE_POSITION && input.kind !== 'RESIDENCIA') {
-      throw new BadRequestException({
-        code: 'ANCHOR_POSITION_MISMATCH',
-        message: 'O primeiro ponto de referência é o CEP de residência.',
-      });
-    }
-    if (position !== RESIDENCE_POSITION && input.kind === 'RESIDENCIA') {
-      throw new BadRequestException({
-        code: 'ANCHOR_POSITION_MISMATCH',
-        message: 'A residência é sempre o primeiro ponto de referência.',
-      });
-    }
+    const decided = resolveAnchorPosition({
+      requested: input.position,
+      kind: input.kind,
+      taken: existing.map((record) => record.position),
+    });
+    if (!decided.ok) throw ruleViolation(decided.violation);
+    const { position } = decided;
 
     const geocoded = await this.geocoding.geocode(input.cep);
 
@@ -132,38 +125,25 @@ export class LocationAnchorsService {
     applicationId: string,
     records: readonly LocationAnchorRecord[],
   ): LocationAnchorListResponse {
-    const firstByCep = new Map<string, number>();
-    const anchors: LocationAnchorResponse[] = records.map((record) => {
-      const firstPosition = firstByCep.get(record.cep);
-      if (firstPosition === undefined) firstByCep.set(record.cep, record.position);
-
-      return {
-        ...record,
-        duplicateOfPosition: firstPosition ?? null,
-      };
-    });
-
     return {
       applicationId,
-      anchors,
+      anchors: flagDuplicateCeps(records),
       hasResidence: records.some((record) => record.position === RESIDENCE_POSITION),
     };
-  }
-
-  private nextFreePosition(existing: readonly LocationAnchorRecord[]): number {
-    const taken = new Set(existing.map((record) => record.position));
-    for (let position = RESIDENCE_POSITION; position <= MAX_ANCHOR_POSITION; position += 1) {
-      if (!taken.has(position)) return position;
-    }
-    throw new BadRequestException({
-      code: 'ANCHOR_LIMIT_REACHED',
-      message: 'São no máximo três pontos de referência. Remova um antes de adicionar outro.',
-    });
   }
 
   private writeContext(): WriteContext {
     return { correlationId: currentCorrelationId(), ...ANONYMOUS_ACTOR };
   }
+}
+
+/** Traduz a violacao de regra do dominio para a resposta HTTP. */
+function ruleViolation(violation: AnchorRuleViolation): BadRequestException {
+  const message =
+    violation === 'ANCHOR_LIMIT_REACHED'
+      ? 'São no máximo três pontos de referência. Remova um antes de adicionar outro.'
+      : 'O primeiro ponto de referência é o CEP de residência.';
+  return new BadRequestException({ code: violation, message });
 }
 
 function applicationNotFound(): NotFoundException {

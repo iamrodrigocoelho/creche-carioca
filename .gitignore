@@ -55,3 +55,6 @@ pnpm-debug.log*
 # As fixtures do pipeline sao derivadas dos datasets e precisam ser versionadas
 # para o CI rodar sem os arquivos originais (que ficam fora do repositorio).
 !packages/data-pipeline/test/fixtures/**
+
+# Saida do build estatico (docs/DEPLOY-ESTATICO.md).
+apps/web/out/

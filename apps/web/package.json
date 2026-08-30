@@ -10,10 +10,13 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "build:static": "NEXT_PUBLIC_STATIC_MODE=true next build && node scripts/build-static.mjs",
+    "e2e:static": "playwright test -c playwright.static.config.ts"
   },
   "dependencies": {
     "@match/domain": "workspace:*",
+    "@match/geo": "workspace:*",
     "@match/schemas": "workspace:*",
     "@match/ui": "workspace:*",
     "next": "^16.3.3",
@@ -31,6 +34,7 @@
     "@types/react-dom": "^19.2.5",
     "@vitejs/plugin-react": "^6.1.1",
     "@vitest/coverage-v8": "^4.1.11",
+    "http-server": "^14.1.1",
     "jsdom": "^30.0.1",
     "typescript": "^5.9.3",
     "vitest": "^4.1.11"

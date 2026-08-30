@@ -9,6 +9,8 @@ export default tseslint.config(
       '**/node_modules/**',
       '**/dist/**',
       '**/.next/**',
+      // Saida do build estatico: bundles minificados (docs/DEPLOY-ESTATICO.md).
+      'apps/web/out/**',
       '**/.turbo/**',
       '**/coverage/**',
       '**/playwright-report/**',

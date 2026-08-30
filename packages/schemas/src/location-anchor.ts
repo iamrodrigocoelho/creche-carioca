@@ -1,4 +1,10 @@
-import { normalizeCep } from '@match/domain';
+import {
+  ANCHOR_KINDS,
+  MAX_ANCHOR_POSITION,
+  MIN_ANCHOR_POSITION,
+  normalizeCep,
+  RESIDENCE_POSITION,
+} from '@match/domain';
 import { z } from 'zod';
 
 /**
@@ -9,13 +15,11 @@ import { z } from 'zod';
  * de a familia poder informa-los sem receio.
  */
 
-export const ANCHOR_KINDS = ['RESIDENCIA', 'TRABALHO', 'REDE_APOIO', 'OUTRO'] as const;
 export const GEOCODING_STATUSES = ['PENDENTE', 'RESOLVIDO', 'FALHOU'] as const;
 
-/** Posicao 1 e a residencia; 2 e 3 sao os pontos opcionais de PRD 8.2. */
-export const MIN_ANCHOR_POSITION = 1;
-export const MAX_ANCHOR_POSITION = 3;
-export const RESIDENCE_POSITION = 1;
+// As posicoes e os tipos vivem no dominio, ao lado das regras que os usam, e sao
+// reexportados para quem consome apenas os contratos.
+export { ANCHOR_KINDS, MAX_ANCHOR_POSITION, MIN_ANCHOR_POSITION, RESIDENCE_POSITION };
 
 export const anchorKindSchema = z.enum(ANCHOR_KINDS, {
   error: 'Selecione o tipo do ponto de referência.',
@@ -108,7 +112,7 @@ export const neighborhoodListSchema = z.object({
   neighborhoods: z.array(z.string()),
 });
 
-export type AnchorKind = (typeof ANCHOR_KINDS)[number];
+export type { AnchorKind } from '@match/domain';
 export type GeocodingStatus = (typeof GEOCODING_STATUSES)[number];
 export type CreateLocationAnchorInput = z.input<typeof createLocationAnchorSchema>;
 export type CreateLocationAnchorParsed = z.output<typeof createLocationAnchorSchema>;

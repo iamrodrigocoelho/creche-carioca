@@ -1,4 +1,5 @@
 import { AGE_GROUP_CODES, SHIFTS } from '@match/domain';
+import type { AgeGroupResolution } from '@match/domain';
 import { z } from 'zod';
 
 /**
@@ -106,3 +107,25 @@ export type CreateApplicationInput = z.infer<typeof createApplicationSchema>;
 export type UpdateApplicationInput = z.infer<typeof updateApplicationSchema>;
 export type AgeGroupResult = z.infer<typeof ageGroupResultSchema>;
 export type ApplicationResponse = z.infer<typeof applicationSchema>;
+
+/**
+ * Converte a resolucao do dominio no contrato publicado.
+ *
+ * Vive aqui, e nao na API, porque o build estatico resolve o grupamento no
+ * proprio navegador e precisa produzir exatamente a mesma resposta (ADR-0027).
+ */
+export function toAgeGroupResult(resolution: AgeGroupResolution): AgeGroupResult {
+  return {
+    outcome: resolution.outcome,
+    code: resolution.band?.code ?? null,
+    label: resolution.band?.label ?? null,
+    ageInMonths: resolution.ageInMonths,
+    referenceDate: resolution.referenceDate,
+    policy: resolution.policy,
+    explanation: resolution.explanation.map((step) => ({
+      code: step.code,
+      values: step.values,
+      summary: step.summary,
+    })),
+  };
+}

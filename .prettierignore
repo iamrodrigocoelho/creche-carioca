@@ -12,3 +12,4 @@ next-env.d.ts
 # Documentos-fonte: nao reformatar (PRD.md e DESIGN.md sao fontes de verdade).
 PRD.md
 docs/DESIGN.md
+apps/web/out/

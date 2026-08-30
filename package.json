@@ -22,7 +22,9 @@
     "db:studio": "pnpm --filter @match/database run db:studio",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm build"
+    "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+    "build:static": "pnpm --filter @match/web run build:static",
+    "e2e:static": "pnpm --filter @match/web run e2e:static"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

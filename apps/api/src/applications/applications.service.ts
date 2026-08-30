@@ -1,9 +1,9 @@
 import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 
 import { resolveAgeGroup } from '@match/domain';
-import type { AgeGroupPolicy, AgeGroupResolution } from '@match/domain';
+import type { AgeGroupPolicy } from '@match/domain';
+import { toAgeGroupResult } from '@match/schemas';
 import type {
-  AgeGroupResult,
   ApplicationResponse,
   CreateApplicationInput,
   UpdateApplicationInput,
@@ -145,20 +145,4 @@ function unknownProcess(): BadRequestException {
     code: 'UNKNOWN_PROCESS',
     message: 'Processo seletivo não disponível nesta demonstração.',
   });
-}
-
-export function toAgeGroupResult(resolution: AgeGroupResolution): AgeGroupResult {
-  return {
-    outcome: resolution.outcome,
-    code: resolution.band?.code ?? null,
-    label: resolution.band?.label ?? null,
-    ageInMonths: resolution.ageInMonths,
-    referenceDate: resolution.referenceDate,
-    policy: resolution.policy,
-    explanation: resolution.explanation.map((step) => ({
-      code: step.code,
-      values: step.values,
-      summary: step.summary,
-    })),
-  };
 }

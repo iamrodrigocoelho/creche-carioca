@@ -12,7 +12,7 @@ import { ensureSeed, resetTransactionalData, testPrismaClient } from '../../test
 import { AppModule } from '../app.module';
 import { configureApp } from '../bootstrap';
 import { loadEnv } from '../common/config/env';
-import reference from '../geocoding/cep-sectors.json';
+import { allSectors } from '@match/geo';
 
 /**
  * Pontos de referencia contra PostgreSQL real (PRD 14.3, RF-02).
@@ -21,7 +21,7 @@ import reference from '../geocoding/cep-sectors.json';
  * outro nao. Fixar valores no codigo faria a suite depender de a referencia
  * nunca mudar.
  */
-const SETOR_CONHECIDO = Object.keys(reference.sectors)[0] as string;
+const SETOR_CONHECIDO = Object.keys(allSectors())[0] as string;
 const CEP_RESOLVIVEL = `${SETOR_CONHECIDO}000`;
 const CEP_SEM_SETOR = '99999000';
 

@@ -18,7 +18,7 @@ import { DuckDBInstance } from '@duckdb/node-api';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const CURATED = join(here, '../../../data/curated');
-const DESTINO = join(here, '../../../apps/api/src/geocoding/cep-sectors.json');
+const DESTINO = join(here, '../../geo/src/cep-sectors.json');
 
 const versoes = readdirSync(CURATED).sort();
 const ultima = versoes.at(-1);

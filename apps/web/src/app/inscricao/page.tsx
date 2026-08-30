@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { DemoBadge } from '@match/ui';
 
 import { ApplicationForm } from '@/components/ApplicationForm';
+import { StaticModeNotice } from '@/components/StaticModeNotice';
 
 export const metadata: Metadata = {
   title: 'Etapa 1 · Dados da criança | Match Perfeito',
@@ -26,6 +27,8 @@ export default function InscricaoPage() {
           referência do processo seletivo. <strong>Turno</strong> é a parte do dia em que a criança
           fica na unidade.
         </p>
+
+        <StaticModeNotice />
 
         <ApplicationForm />
       </div>

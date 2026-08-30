@@ -59,6 +59,7 @@ packages/
   ui/         Tokens e componentes de docs/DESIGN.md
   database/   Schema Prisma, migrations, seed e cliente PostgreSQL
   data-pipeline/  Ingestão DuckDB dos datasets históricos e tabelas curadas
+  geo/        Referência de setores de CEP e a regra de precisão
 data/
   raw/        Datasets da SME/RJ — não versionados, veja "Dados históricos"
   curated/    Saída do pipeline, uma pasta por versão de importação
@@ -117,6 +118,20 @@ pnpm --filter @match/data-pipeline cep-reference
 
 A precisão é a do setor, não a do endereço: raio mediano de 750 m, com cauda até
 10,7 km. Cada resposta carrega essa margem, e a interface a exibe (ADR-0024).
+
+## Publicação estática
+
+A branch `static-deploy` gera uma versão que roda inteiramente no navegador, sem
+servidor e sem banco, para hospedagem de arquivos. As regras são as mesmas — vêm
+de `@match/domain` e `@match/geo`, e não são reimplementadas (ADR-0027).
+
+```bash
+pnpm build:static   # gera apps/web/out/
+pnpm e2e:static     # percorre a jornada com a API desligada
+```
+
+O procedimento completo e o que se perde sem servidor estão em
+`docs/DEPLOY-ESTATICO.md`.
 
 ## Como executar
 

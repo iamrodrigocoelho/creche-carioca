@@ -401,3 +401,29 @@ Mas repetir um CEP é uma situação real e legítima: quem trabalha em casa tem
 **Decisão.** A duplicidade é calculada na leitura e devolvida como `duplicateOfPosition`, apontando para a primeira ocorrência. A interface avisa e segue: "Este CEP é igual ao do ponto 1. Pode continuar assim, se for o caso."
 
 **Consequências.** A família fica informada sem ser bloqueada — que é o que "sinalizar" quer dizer. A Fase 6, ao ordenar unidades por proximidade a cada ponto, precisa saber que dois pontos podem coincidir, para não apresentar a mesma distância duas vezes como se fossem evidências independentes.
+
+---
+
+## ADR-0027 — Modo estático por flag, com as regras compartilhadas
+
+**Status:** Aceita · branch `static-deploy`
+
+**Contexto.** A demonstração precisa ser publicável em hospedagem de arquivos estáticos (Hostinger), sem servidor Node e sem PostgreSQL. A aplicação, porém, é Next + NestJS + Postgres, e as regras de negócio vivem no servidor.
+
+O caminho óbvio seria bifurcar o repositório: uma branch com o front-end reescrito para funcionar sozinho. O problema é que "reescrito" significa reimplementar o cálculo de grupamento, a geocodificação e as regras de posição dos pontos de referência. Duas implementações da mesma regra divergem — e divergiriam em silêncio, fazendo a mesma família ver resultados diferentes conforme a versão que abrisse.
+
+**Decisão.** Não há reimplementação. As regras foram extraídas para pacotes que os dois lados consomem:
+
+- `@match/domain` ganhou as regras puras dos pontos de referência (posição, duplicidade) e já tinha o cálculo de grupamento;
+- `@match/geo` nasceu com a referência de setores de CEP e a política de precisão, antes presas dentro do adapter da API;
+- `toAgeGroupResult` saiu do serviço da API para `@match/schemas`.
+
+O serviço da API foi reescrito para chamar essas funções em vez de conter a lógica — e seus 96 testes passaram sem alteração, o que é a evidência de que o comportamento não mudou.
+
+`apps/web/src/lib/static-backend.ts` implementa o mesmo contrato do cliente HTTP, trocando o PostgreSQL por `localStorage`. `NEXT_PUBLIC_STATIC_MODE=true` liga o desvio, ativa `output: 'export'` e remove a origem da API da CSP.
+
+**Consequências.** A `static-deploy` é a `main` mais arquivos aditivos, então rebasear a cada fase tende a não conflitar. Em troca, a lógica de negócio agora roda também no cliente, onde quem controla o navegador controla o resultado — aceitável para uma demonstração, inaceitável para produção, e por isso `docs/DEPLOY-ESTATICO.md` enumera o que se perde em vez de deixar implícito.
+
+`pnpm e2e:static` percorre a jornada sobre os arquivos exportados com a API desligada, e falha se qualquer requisição sair da origem. É o que impede uma regra de escapar de volta para o servidor sem que se perceba.
+
+Os cabeçalhos de segurança viraram um `.htaccess` gerado a partir de `securityHeaders` em `next.config.mjs` — a mesma fonte usada pelo modo com servidor, para que os dois não divirjam.

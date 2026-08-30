@@ -1,4 +1,10 @@
 import {
+  createApplicationLocally,
+  listAnchorsLocally,
+  removeAnchorLocally,
+  upsertAnchorLocally,
+} from './static-backend';
+import {
   apiErrorSchema,
   applicationSchema,
   locationAnchorListSchema,
@@ -9,7 +15,7 @@ import {
   type LocationAnchorListResponse,
 } from '@match/schemas';
 
-import { API_URL } from './config';
+import { API_URL, STATIC_MODE } from './config';
 
 /**
  * Cliente HTTP da API.
@@ -49,6 +55,10 @@ export async function createApplication(
   input: CreateApplicationInput,
   options: { readonly idempotencyKey?: string; readonly signal?: AbortSignal } = {},
 ): Promise<ApiResult<ApplicationResponse>> {
+  // No modo estatico nao ha o que chamar: a regra roda aqui mesmo. A chave de
+  // idempotencia perde o proposito, ja que nao existe requisicao a repetir.
+  if (STATIC_MODE) return createApplicationLocally(input);
+
   let response: Response;
 
   try {
@@ -117,6 +127,8 @@ const parseAnchorList = (value: unknown) =>
 export async function listLocationAnchors(
   applicationId: string,
 ): Promise<ApiResult<LocationAnchorListResponse>> {
+  if (STATIC_MODE) return listAnchorsLocally(applicationId);
+
   return requestJson(
     `/applications/${applicationId}/location-anchors`,
     { method: 'GET' },
@@ -128,6 +140,8 @@ export async function upsertLocationAnchor(
   applicationId: string,
   input: CreateLocationAnchorInput,
 ): Promise<ApiResult<LocationAnchorListResponse>> {
+  if (STATIC_MODE) return upsertAnchorLocally(applicationId, input);
+
   return requestJson(
     `/applications/${applicationId}/location-anchors`,
     { method: 'POST', body: JSON.stringify(input) },
@@ -139,6 +153,8 @@ export async function removeLocationAnchor(
   applicationId: string,
   position: number,
 ): Promise<ApiResult<LocationAnchorListResponse>> {
+  if (STATIC_MODE) return removeAnchorLocally(applicationId, position);
+
   return requestJson(
     `/applications/${applicationId}/location-anchors/${position}`,
     { method: 'DELETE' },

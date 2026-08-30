@@ -8,7 +8,13 @@
  * fontes, imagens e scripts vem apenas do proprio dominio, o que tambem impede
  * o carregamento remoto de logotipos proibido pelo DESIGN.md.
  */
+const staticMode = process.env.NEXT_PUBLIC_STATIC_MODE === 'true';
 const apiOrigin = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3333';
+
+// No modo estatico nao existe API para contatar: a jornada roda no navegador
+// (ADR-0027). Manter a origem na CSP autorizaria uma conexao que nunca deveria
+// acontecer, entao ela sai.
+const connectSrc = staticMode ? "connect-src 'self'" : `connect-src 'self' ${apiOrigin}`;
 
 const contentSecurityPolicy = [
   "default-src 'self'",
@@ -16,7 +22,7 @@ const contentSecurityPolicy = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data:",
   "font-src 'self'",
-  `connect-src 'self' ${apiOrigin}`,
+  connectSrc,
   "object-src 'none'",
   "base-uri 'none'",
   "form-action 'self'",
@@ -32,14 +38,38 @@ const securityHeaders = [
   { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
 ];
 
-/** @type {import('next').NextConfig} */
+/**
+ * `output: 'export'` gera HTML estatico em `out/`, sem servidor Node.
+ *
+ * A exportacao estatica nao suporta `headers()` — quem serve os arquivos e o
+ * servidor web da hospedagem. Os mesmos cabeçalhos sao emitidos no `.htaccess`
+ * por `scripts/build-static.mjs`, e `securityHeaders` continua sendo a unica
+ * fonte deles, para os dois modos nao divergirem.
+ *
+ * `images.unoptimized` e obrigatorio na exportacao: o otimizador de imagens do
+ * Next precisa de servidor.
+ *
+ * @type {import('next').NextConfig}
+ */
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  transpilePackages: ['@match/ui', '@match/domain', '@match/schemas'],
-  async headers() {
-    return [{ source: '/:path*', headers: securityHeaders }];
-  },
+  transpilePackages: ['@match/ui', '@match/domain', '@match/schemas', '@match/geo'],
+  ...(staticMode
+    ? {
+        output: 'export',
+        images: { unoptimized: true },
+        // Sem servidor para negociar `/rota` -> `/rota.html`, a hospedagem serve
+        // melhor `/rota/index.html`.
+        trailingSlash: true,
+      }
+    : {
+        async headers() {
+          return [{ source: '/:path*', headers: securityHeaders }];
+        },
+      }),
 };
+
+export { securityHeaders };
 
 export default nextConfig;

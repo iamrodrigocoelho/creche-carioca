@@ -1,0 +1,25 @@
+{
+  "name": "@match/geo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Referencia de setores de CEP e a regra de precisao, compartilhadas pela API e pelo build estatico (ADR-0023, ADR-0024).",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@match/domain": "workspace:*"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^4.1.11",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.11"
+  }
+}
