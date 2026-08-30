@@ -10,13 +10,13 @@ import type {
 } from '@match/schemas';
 
 import { currentCorrelationId } from '../common/logging/correlation';
+import { ANONYMOUS_ACTOR, type WriteContext } from '../common/write-context';
 import { RuleVersionService } from '../database/rule-version.service';
 import {
   APPLICATION_REPOSITORY,
   UnknownProcessError,
   type ApplicationRecord,
   type ApplicationRepository,
-  type WriteContext,
 } from './application.repository';
 
 /**
@@ -98,11 +98,7 @@ export class ApplicationsService {
    * auditoria nunca precise ser retrofitada.
    */
   private writeContext(): WriteContext {
-    return {
-      correlationId: currentCorrelationId(),
-      actor: 'anonimo',
-      actorRole: 'PUBLICO',
-    };
+    return { correlationId: currentCorrelationId(), ...ANONYMOUS_ACTOR };
   }
 
   private async requirePolicy(processCode: string): Promise<AgeGroupPolicy> {

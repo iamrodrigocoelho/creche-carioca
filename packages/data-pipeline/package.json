@@ -14,7 +14,8 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "ingest": "node dist/cli.js",
-    "fixtures": "node scripts/generate-fixtures.mjs"
+    "fixtures": "node scripts/generate-fixtures.mjs",
+    "cep-reference": "node scripts/generate-cep-reference.mjs"
   },
   "dependencies": {
     "@duckdb/node-api": "1.5.5-r.4",

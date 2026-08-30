@@ -1,6 +1,8 @@
 export { DomainError, isDomainError } from './errors';
 export type { DomainErrorCode } from './errors';
 
+export { CEP_LENGTH, CEP_SECTOR_LENGTH, cepSector, formatCep, normalizeCep } from './cep';
+
 export { SHIFTS, isShift, shiftLabel } from './shift';
 export type { Shift } from './shift';
 

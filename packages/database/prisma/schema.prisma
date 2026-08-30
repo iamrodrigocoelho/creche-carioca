@@ -1,7 +1,7 @@
 // Schema canonico do Match Perfeito.
 //
 // Cobre o subconjunto do modelo de PRD 11 que a Fase 2 utiliza. As entidades
-// restantes (Unit, UnitCapacity, LocationAnchor, ContactPoint, Preference,
+// restantes (Unit, UnitCapacity, ContactPoint, Preference,
 // CriterionResponse, ScoreResult, AllocationRun, Allocation, Convocation,
 // ContactAttempt, MessageTemplate) entram nas fases seguintes, conforme
 // IMPLEMENTATION_PLAN.md.
@@ -26,16 +26,16 @@ datasource db {
 
 /// Processo seletivo e suas datas de referencia (PRD 11).
 model Process {
-  id          String   @id @default(uuid()) @db.Uuid
+  id            String     @id @default(uuid()) @db.Uuid
   /// Codigo estavel usado nas APIs, ex.: "DEMO-2026".
-  code        String   @unique
-  name        String
+  code          String     @unique
+  name          String
   /// Data de corte padrao do processo, no formato YYYY-MM-DD.
-  referenceDate String @db.VarChar(10)
+  referenceDate String     @db.VarChar(10)
   /// `DEMONSTRACAO` impede que o processo seja lido como oficial (PRD 1.2).
-  status      DataStatus
-  createdAt   DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt   DateTime @updatedAt @db.Timestamptz(6)
+  status        DataStatus
+  createdAt     DateTime   @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime   @updatedAt @db.Timestamptz(6)
 
   ruleVersions RuleVersion[]
   applications Application[]
@@ -49,17 +49,17 @@ model Process {
 /// resultado historico." Por isso nao existe caminho de atualizacao para o
 /// `payload`: publicar uma regra nova significa inserir uma nova linha.
 model RuleVersion {
-  id        String   @id @default(uuid()) @db.Uuid
-  processId String   @db.Uuid
-  version   Int
-  kind      RuleKind
-  status    DataStatus
+  id            String     @id @default(uuid()) @db.Uuid
+  processId     String     @db.Uuid
+  version       Int
+  kind          RuleKind
+  status        DataStatus
   /// Conteudo da regra validado por schema Zod na leitura.
-  payload   Json
+  payload       Json
   /// Origem declarada, para rastreabilidade e auditoria.
-  source    String
-  effectiveFrom DateTime @db.Timestamptz(6)
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  source        String
+  effectiveFrom DateTime   @db.Timestamptz(6)
+  createdAt     DateTime   @default(now()) @db.Timestamptz(6)
 
   process Process @relation(fields: [processId], references: [id], onDelete: Restrict)
 
@@ -69,14 +69,14 @@ model RuleVersion {
 
 /// Identificador anonimo e dados minimos da crianca (PRD 8.1, 11).
 model Child {
-  id         String   @id @default(uuid()) @db.Uuid
+  id           String   @id @default(uuid()) @db.Uuid
   /// Referencia anonima exposta ao cliente. Nunca um dado nominal.
-  anonymousRef String @unique @db.Uuid
-  birthYear  Int
-  birthMonth Int
-  sex        Sex?
-  createdAt  DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt  DateTime @updatedAt @db.Timestamptz(6)
+  anonymousRef String   @unique @db.Uuid
+  birthYear    Int
+  birthMonth   Int
+  sex          Sex?
+  createdAt    DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime @updatedAt @db.Timestamptz(6)
 
   applications Application[]
 
@@ -97,22 +97,23 @@ model Guardian {
 
 /// Inscricao da crianca no processo (PRD 11).
 model Application {
-  id         String   @id @default(uuid()) @db.Uuid
-  processId  String   @db.Uuid
-  childId    String   @db.Uuid
-  guardianId String?  @db.Uuid
-  status     ApplicationStatus @default(RASCUNHO)
-  desiredShift Shift
+  id                    String            @id @default(uuid()) @db.Uuid
+  processId             String            @db.Uuid
+  childId               String            @db.Uuid
+  guardianId            String?           @db.Uuid
+  status                ApplicationStatus @default(RASCUNHO)
+  desiredShift          Shift
   /// Sobrescreve `Process.referenceDate` quando informado (PRD 8.1).
-  referenceDateOverride String? @db.VarChar(10)
-  createdAt  DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt  DateTime @updatedAt @db.Timestamptz(6)
+  referenceDateOverride String?           @db.VarChar(10)
+  createdAt             DateTime          @default(now()) @db.Timestamptz(6)
+  updatedAt             DateTime          @updatedAt @db.Timestamptz(6)
 
   process  Process   @relation(fields: [processId], references: [id], onDelete: Restrict)
   child    Child     @relation(fields: [childId], references: [id], onDelete: Restrict)
   guardian Guardian? @relation(fields: [guardianId], references: [id], onDelete: SetNull)
 
-  statusEvents StatusEvent[]
+  statusEvents    StatusEvent[]
+  locationAnchors LocationAnchor[]
 
   /// Uma crianca tem no maximo uma inscricao por processo. Sustenta o principio
   /// "uma crianca, uma oferta" (PRD 7.3) e o alerta de multiplas selecoes para a
@@ -122,19 +123,55 @@ model Application {
   @@index([childId])
 }
 
+/// Ponto de referencia informado pela familia (PRD 8.2, RF-02).
+///
+/// Sao no maximo tres por inscricao. A posicao 1 e a residencia e e obrigatoria;
+/// as posicoes 2 e 3 sao opcionais. Os pontos servem apenas a recomendacao e
+/// nunca alteram a pontuacao oficial (PRD 8.2).
+model LocationAnchor {
+  id            String     @id @default(uuid()) @db.Uuid
+  applicationId String     @db.Uuid
+  /// 1 = residencia, 2 e 3 opcionais. Unica por inscricao.
+  position      Int        @db.SmallInt
+  kind          AnchorKind
+  /// CEP como texto de 8 digitos, preservando zeros a esquerda (PRD 10.3).
+  cep           String     @db.VarChar(8)
+  /// Rotulo amigavel escolhido pela familia. Texto livre: escapado na exibicao.
+  label         String?    @db.VarChar(60)
+
+  status       GeocodingStatus @default(PENDENTE)
+  latitude     Float?
+  longitude    Float?
+  /// Raio de incerteza declarado pelo provider, em quilometros. Existe para que
+  /// a interface mostre a estimativa como estimativa (PRD 8.5, 17).
+  precisionKm  Float?
+  /// Bairro resolvido pelo provider. Sustenta a busca por bairro quando a
+  /// geocodificacao falha (PRD 8.2).
+  neighborhood String?         @db.VarChar(80)
+
+  lastValidatedAt DateTime? @db.Timestamptz(6)
+  createdAt       DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime  @updatedAt @db.Timestamptz(6)
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@unique([applicationId, position])
+  @@index([applicationId])
+}
+
 /// Transicao temporal de status (PRD 11, 16).
 ///
 /// Tabela append-only, garantida por trigger na migration. PRD 10.4 registra que
 /// a ausencia de timestamp de status na base historica impede calcular tempo real
 /// de convocacao; aqui o historico e completo desde a origem.
 model StatusEvent {
-  id            String   @id @default(uuid()) @db.Uuid
-  applicationId String   @db.Uuid
+  id            String             @id @default(uuid()) @db.Uuid
+  applicationId String             @db.Uuid
   fromStatus    ApplicationStatus?
   toStatus      ApplicationStatus
   reason        String?
   correlationId String
-  occurredAt    DateTime @default(now()) @db.Timestamptz(6)
+  occurredAt    DateTime           @default(now()) @db.Timestamptz(6)
 
   application Application @relation(fields: [applicationId], references: [id], onDelete: Restrict)
 
@@ -150,7 +187,7 @@ model StatusEvent {
 /// PRD 8.16 proibe registrar telefone, `@handle`, token ou resposta sensivel.
 /// O campo `metadata` passa pela mesma redacao aplicada aos logs.
 model AuditEvent {
-  id            String   @id @default(uuid()) @db.Uuid
+  id            String      @id @default(uuid()) @db.Uuid
   /// Identificador do ator. Na Fase 2 e sempre `system`/`anonymous`; a
   /// autenticacao simulada da Fase 10 passa a preencher o usuario real.
   actor         String
@@ -162,7 +199,7 @@ model AuditEvent {
   origin        AuditOrigin
   correlationId String
   metadata      Json?
-  occurredAt    DateTime @default(now()) @db.Timestamptz(6)
+  occurredAt    DateTime    @default(now()) @db.Timestamptz(6)
 
   @@index([entity, entityId])
   @@index([occurredAt])
@@ -197,6 +234,22 @@ enum ApplicationStatus {
   RASCUNHO
   SUBMETIDA
   CANCELADA
+}
+
+/// Tipos de ponto de referencia de PRD 8.2.
+enum AnchorKind {
+  RESIDENCIA
+  TRABALHO
+  REDE_APOIO
+  OUTRO
+}
+
+/// Resultado da geocodificacao. `FALHOU` nao e erro: PRD 8.2 exige que a familia
+/// siga por bairro ou busca textual quando o CEP nao resolve.
+enum GeocodingStatus {
+  PENDENTE
+  RESOLVIDO
+  FALHOU
 }
 
 enum AuditOrigin {

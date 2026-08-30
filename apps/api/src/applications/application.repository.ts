@@ -1,6 +1,8 @@
 import type { Shift } from '@match/domain';
 import type { Sex } from '@match/schemas';
 
+import type { WriteContext } from '../common/write-context';
+
 /**
  * Porta de persistencia da inscricao.
  *
@@ -44,19 +46,6 @@ export interface UpdateApplicationRecord {
   readonly sex?: Sex;
   readonly desiredShift?: Shift;
   readonly referenceDate?: string;
-}
-
-/**
- * Contexto de rastreabilidade propagado ate a escrita.
- *
- * PRD 8.16 exige ator, papel, correlation ID e origem em todo evento relevante.
- * Carregar isso explicitamente evita que a camada de persistencia precise
- * adivinhar quem originou a operacao.
- */
-export interface WriteContext {
-  readonly correlationId: string;
-  readonly actor: string;
-  readonly actorRole: string;
 }
 
 export interface ApplicationRepository {

@@ -11,9 +11,19 @@ export type {
   AuditEvent,
   Child,
   Guardian,
+  LocationAnchor,
   Process,
   RuleVersion,
   StatusEvent,
 } from '@prisma/client';
 
-export { ApplicationStatus, AuditOrigin, DataStatus, RuleKind, Sex, Shift } from '@prisma/client';
+export {
+  AnchorKind,
+  ApplicationStatus,
+  AuditOrigin,
+  DataStatus,
+  GeocodingStatus,
+  RuleKind,
+  Sex,
+  Shift,
+} from '@prisma/client';

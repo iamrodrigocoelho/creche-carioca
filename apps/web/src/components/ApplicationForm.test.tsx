@@ -58,6 +58,29 @@ async function fillValidForm(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole('radio', { name: /integral/i }));
 }
 
+/**
+ * Roteia o `fetch` por URL e devolve uma `Response` nova a cada chamada.
+ *
+ * O estado de sucesso passou a montar a etapa 2 (RF-02), que consulta os pontos
+ * de referencia. Um `mockResolvedValue` fixo entregaria o MESMO corpo duas
+ * vezes, e a segunda leitura estoura com "Body has already been read".
+ */
+function stubFetchRoutes(application: unknown, status = 200) {
+  return vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
+    const url = String(input);
+    if (url.includes('/location-anchors')) {
+      return new Response(
+        JSON.stringify({ applicationId: successResponse.id, anchors: [], hasResidence: false }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } },
+      );
+    }
+    return new Response(JSON.stringify(application), {
+      status,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  });
+}
+
 describe('ApplicationForm', () => {
   it('associa rotulo, dica e controle de cada campo', () => {
     render(<ApplicationForm />);
@@ -102,12 +125,7 @@ describe('ApplicationForm', () => {
   });
 
   it('exibe o resultado com a explicacao estruturada e o selo de demonstracao', async () => {
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      new Response(JSON.stringify(successResponse), {
-        status: 201,
-        headers: { 'Content-Type': 'application/json' },
-      }),
-    );
+    stubFetchRoutes(successResponse, 201);
 
     const user = userEvent.setup();
     render(<ApplicationForm />);
@@ -120,12 +138,7 @@ describe('ApplicationForm', () => {
   });
 
   it('envia chave de idempotencia (PRD 12.4)', async () => {
-    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      new Response(JSON.stringify(successResponse), {
-        status: 201,
-        headers: { 'Content-Type': 'application/json' },
-      }),
-    );
+    const fetchSpy = stubFetchRoutes(successResponse, 201);
 
     const user = userEvent.setup();
     render(<ApplicationForm />);

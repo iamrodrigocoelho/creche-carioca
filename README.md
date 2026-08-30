@@ -15,7 +15,7 @@ Protótipo de demonstração para a inscrição, classificação e convocação 
 
 ## Estado atual
 
-**Fase 3 concluída** — fundação técnica, a primeira fatia funcional ponta a ponta, a persistência canônica em PostgreSQL e o pipeline de dados históricos. A família informa mês e ano de nascimento e o turno desejado, e recebe o grupamento etário com a explicação de como ele foi obtido; a inscrição é gravada de forma transacional, com histórico de status e trilha de auditoria append-only. Os cinco processos seletivos de 2021 a 2025 são ingeridos em DuckDB e publicados como tabelas curadas em Parquet, com manifesto e relatório de qualidade. As demais fases estão descritas no `IMPLEMENTATION_PLAN.md`.
+**Fase 4 concluída** — fundação técnica, a primeira fatia funcional ponta a ponta, a persistência canônica em PostgreSQL, o pipeline de dados históricos e os pontos de referência por CEP. A família informa mês e ano de nascimento e o turno desejado, e recebe o grupamento etário com a explicação de como ele foi obtido; a inscrição é gravada de forma transacional, com histórico de status e trilha de auditoria append-only. Os cinco processos seletivos de 2021 a 2025 são ingeridos em DuckDB e publicados como tabelas curadas em Parquet, com manifesto e relatório de qualidade. A família informa o CEP de residência e, opcionalmente, mais dois pontos de referência, que são geocodificados contra os CEPs reais das unidades escolares — com a margem de erro dita em voz alta, e sem afetar a pontuação. As demais fases estão descritas no `IMPLEMENTATION_PLAN.md`.
 
 ## Requisitos
 
@@ -103,6 +103,20 @@ O relatório de qualidade classifica dez achados por severidade e registra, entr
 outras coisas, que `esc_codigo` não é uma chave única na origem e que 20 unidades
 citadas nas inscrições não têm coordenada conhecida. As decisões tomadas diante disso
 estão em `docs/DECISIONS.md` (ADR-0018 a ADR-0022).
+
+### Referência de geocodificação
+
+A API geocodifica CEPs contra `apps/api/src/geocoding/cep-sectors.json`, que é
+**versionado** — o CI não tem os datasets. Ele mapeia 353 setores de CEP (os cinco
+primeiros dígitos) para o centroide das unidades escolares daquele setor, e cobre 89%
+dos CEPs reais das famílias. Regere quando a base de unidades mudar:
+
+```bash
+pnpm --filter @match/data-pipeline cep-reference
+```
+
+A precisão é a do setor, não a do endereço: raio mediano de 750 m, com cauda até
+10,7 km. Cada resposta carrega essa margem, e a interface a exibe (ADR-0024).
 
 ## Como executar
 

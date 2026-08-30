@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 
 import { ApplicationStatus, AuditOrigin, type Prisma } from '@match/database';
 
+import type { WriteContext } from '../common/write-context';
 import { AuditService } from '../database/audit.service';
 import { PrismaService } from '../database/prisma.service';
 import {
@@ -12,7 +13,6 @@ import {
   type ApplicationRepository,
   type CreateApplicationRecord,
   type UpdateApplicationRecord,
-  type WriteContext,
 } from './application.repository';
 
 /**

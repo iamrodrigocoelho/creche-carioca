@@ -1,0 +1,2673 @@
+{
+  "importVersion": "2026-08-30T17-02-20-191Z",
+  "generatedFrom": "cur_unidades: centroide das unidades escolares por setor de CEP",
+  "sectors": {
+    "20050": {
+      "lat": -22.885812,
+      "lon": -43.254144,
+      "bairro": "JACAREZINHO",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "20060": {
+      "lat": -22.907922,
+      "lon": -43.1853,
+      "bairro": "CENTRO",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "20071": {
+      "lat": -22.907123,
+      "lon": -43.195068,
+      "bairro": "CENTRO",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "20080": {
+      "lat": -22.982712,
+      "lon": -43.19221,
+      "bairro": "COPACABANA",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "20081": {
+      "lat": -22.896988,
+      "lon": -43.183707,
+      "bairro": "SAÚDE",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "20206": {
+      "lat": -22.923356,
+      "lon": -43.209915,
+      "bairro": "Praça da Bandeira",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "20210": {
+      "lat": -22.905394,
+      "lon": -43.191385,
+      "bairro": "CIDADE NOVA",
+      "unidades": 2,
+      "raioKm": 0.39
+    },
+    "20211": {
+      "lat": -22.912339,
+      "lon": -43.196405,
+      "bairro": "CIDADE NOVA",
+      "unidades": 7,
+      "raioKm": 1.11
+    },
+    "20220": {
+      "lat": -22.899856,
+      "lon": -43.198487,
+      "bairro": "SANTO CRISTO",
+      "unidades": 8,
+      "raioKm": 1.05
+    },
+    "20230": {
+      "lat": -22.909511,
+      "lon": -43.187442,
+      "bairro": "CENTRO",
+      "unidades": 5,
+      "raioKm": 0.89
+    },
+    "20231": {
+      "lat": -22.916777,
+      "lon": -43.185969,
+      "bairro": "CENTRO",
+      "unidades": 2,
+      "raioKm": 0.01
+    },
+    "20240": {
+      "lat": -22.926545,
+      "lon": -43.195435,
+      "bairro": "CENTRO",
+      "unidades": 2,
+      "raioKm": 1.18
+    },
+    "20241": {
+      "lat": -22.926802,
+      "lon": -43.191721,
+      "bairro": "SANTA TERESA",
+      "unidades": 6,
+      "raioKm": 1.8
+    },
+    "20250": {
+      "lat": -22.919514,
+      "lon": -43.203908,
+      "bairro": "ESTÁCIO",
+      "unidades": 7,
+      "raioKm": 0.51
+    },
+    "20251": {
+      "lat": -22.917898,
+      "lon": -43.206724,
+      "bairro": "CATUMBI",
+      "unidades": 11,
+      "raioKm": 9.04
+    },
+    "20260": {
+      "lat": -22.917607,
+      "lon": -43.213454,
+      "bairro": "PRAÇA DA BANDEIRA",
+      "unidades": 4,
+      "raioKm": 1.16
+    },
+    "20261": {
+      "lat": -22.924797,
+      "lon": -43.214305,
+      "bairro": "RIO COMPRIDO",
+      "unidades": 9,
+      "raioKm": 0.66
+    },
+    "20270": {
+      "lat": -22.915566,
+      "lon": -43.220055,
+      "bairro": "MARACANÃ",
+      "unidades": 4,
+      "raioKm": 0.56
+    },
+    "20271": {
+      "lat": -22.913905,
+      "lon": -43.227617,
+      "bairro": "MARACANÃ",
+      "unidades": 5,
+      "raioKm": 1.13
+    },
+    "20397": {
+      "lat": -22.753151,
+      "lon": -43.109534,
+      "bairro": "PAQUETÁ",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "20510": {
+      "lat": -22.931482,
+      "lon": -43.24613,
+      "bairro": "ANDARAÍ",
+      "unidades": 5,
+      "raioKm": 0.79
+    },
+    "20511": {
+      "lat": -22.924345,
+      "lon": -43.237861,
+      "bairro": "TIJUCA",
+      "unidades": 4,
+      "raioKm": 1.06
+    },
+    "20520": {
+      "lat": -22.920148,
+      "lon": -43.224877,
+      "bairro": "TIJUCA",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "20521": {
+      "lat": -22.928892,
+      "lon": -43.226834,
+      "bairro": "TIJUCA",
+      "unidades": 2,
+      "raioKm": 0.14
+    },
+    "20530": {
+      "lat": -22.93899,
+      "lon": -43.249912,
+      "bairro": "TIJUCA",
+      "unidades": 13,
+      "raioKm": 0.98
+    },
+    "20531": {
+      "lat": -22.963006,
+      "lon": -43.275202,
+      "bairro": "ALTO DA BOA VISTA",
+      "unidades": 9,
+      "raioKm": 3.59
+    },
+    "20540": {
+      "lat": -22.922072,
+      "lon": -43.258343,
+      "bairro": "GRAJAÚ",
+      "unidades": 5,
+      "raioKm": 0.87
+    },
+    "20541": {
+      "lat": -22.926739,
+      "lon": -43.249983,
+      "bairro": "ANDARAÍ",
+      "unidades": 9,
+      "raioKm": 1.8
+    },
+    "20550": {
+      "lat": -22.914514,
+      "lon": -43.233469,
+      "bairro": "TIJUCA",
+      "unidades": 4,
+      "raioKm": 1.25
+    },
+    "20551": {
+      "lat": -22.914138,
+      "lon": -43.2516,
+      "bairro": "VILA ISABEL",
+      "unidades": 6,
+      "raioKm": 0.52
+    },
+    "20560": {
+      "lat": -22.915783,
+      "lon": -43.260651,
+      "bairro": "VILA ISABEL",
+      "unidades": 6,
+      "raioKm": 0.55
+    },
+    "20561": {
+      "lat": -22.925383,
+      "lon": -43.261469,
+      "bairro": "GRAJAÚ",
+      "unidades": 4,
+      "raioKm": 1.07
+    },
+    "20710": {
+      "lat": -22.907618,
+      "lon": -43.275198,
+      "bairro": "LINS DE VASCONCELOS",
+      "unidades": 3,
+      "raioKm": 0.58
+    },
+    "20715": {
+      "lat": -22.914648,
+      "lon": -43.270403,
+      "bairro": "ENGENHO NOVO",
+      "unidades": 4,
+      "raioKm": 0.85
+    },
+    "20720": {
+      "lat": -22.909547,
+      "lon": -43.284467,
+      "bairro": "LINS DE VASCONCELOS",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "20725": {
+      "lat": -22.910585,
+      "lon": -43.282819,
+      "bairro": "LINS DE VASCONCELOS",
+      "unidades": 11,
+      "raioKm": 0.98
+    },
+    "20730": {
+      "lat": -22.905017,
+      "lon": -43.297938,
+      "bairro": "ENGENHO DE DENTRO",
+      "unidades": 8,
+      "raioKm": 1.21
+    },
+    "20735": {
+      "lat": -22.898799,
+      "lon": -43.291048,
+      "bairro": "TODOS OS SANTOS",
+      "unidades": 3,
+      "raioKm": 0.73
+    },
+    "20740": {
+      "lat": -22.895875,
+      "lon": -43.31248,
+      "bairro": "PIEDADE",
+      "unidades": 4,
+      "raioKm": 0.71
+    },
+    "20745": {
+      "lat": -22.917654,
+      "lon": -43.303634,
+      "bairro": "ENCANTADO",
+      "unidades": 5,
+      "raioKm": 6.74
+    },
+    "20750": {
+      "lat": -22.874238,
+      "lon": -43.301085,
+      "bairro": "PILARES",
+      "unidades": 5,
+      "raioKm": 1
+    },
+    "20751": {
+      "lat": -22.882347,
+      "lon": -43.30317,
+      "bairro": "PIEDADE",
+      "unidades": 5,
+      "raioKm": 0.94
+    },
+    "20755": {
+      "lat": -22.887558,
+      "lon": -43.299027,
+      "bairro": "PIEDADE",
+      "unidades": 2,
+      "raioKm": 0.7
+    },
+    "20756": {
+      "lat": -22.888115,
+      "lon": -43.298602,
+      "bairro": "ENGENHO DE DENTRO",
+      "unidades": 9,
+      "raioKm": 1.18
+    },
+    "20760": {
+      "lat": -22.878704,
+      "lon": -43.28069,
+      "bairro": "DEL CASTILHO",
+      "unidades": 7,
+      "raioKm": 1.42
+    },
+    "20761": {
+      "lat": -22.869687,
+      "lon": -43.296496,
+      "bairro": "ENGENHO DA RAINHA",
+      "unidades": 5,
+      "raioKm": 0.48
+    },
+    "20765": {
+      "lat": -22.869032,
+      "lon": -43.28828,
+      "bairro": "INHAÚMA",
+      "unidades": 11,
+      "raioKm": 1.55
+    },
+    "20766": {
+      "lat": -22.86132,
+      "lon": -43.28349,
+      "bairro": "INHAÚMA",
+      "unidades": 3,
+      "raioKm": 0.48
+    },
+    "20770": {
+      "lat": -22.89889,
+      "lon": -43.280405,
+      "bairro": "MÉIER",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "20771": {
+      "lat": -22.88489,
+      "lon": -43.281227,
+      "bairro": "DEL CASTILHO",
+      "unidades": 5,
+      "raioKm": 1.3
+    },
+    "20775": {
+      "lat": -22.894696,
+      "lon": -43.276289,
+      "bairro": "MÉIER",
+      "unidades": 5,
+      "raioKm": 0.51
+    },
+    "20776": {
+      "lat": -22.867351,
+      "lon": -43.297499,
+      "bairro": "ENGENHO DA RAINHA",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "20780": {
+      "lat": -22.897156,
+      "lon": -43.270409,
+      "bairro": "ENGENHO NOVO",
+      "unidades": 7,
+      "raioKm": 0.78
+    },
+    "20785": {
+      "lat": -22.887653,
+      "lon": -43.267164,
+      "bairro": "CACHAMBI",
+      "unidades": 4,
+      "raioKm": 0.64
+    },
+    "20910": {
+      "lat": -22.898562,
+      "lon": -43.234913,
+      "bairro": "BENFICA",
+      "unidades": 6,
+      "raioKm": 1.09
+    },
+    "20911": {
+      "lat": -22.893236,
+      "lon": -43.241721,
+      "bairro": "BENFICA",
+      "unidades": 8,
+      "raioKm": 1.38
+    },
+    "20920": {
+      "lat": -22.891942,
+      "lon": -43.231909,
+      "bairro": "SÃO CRISTÓVÃO",
+      "unidades": 4,
+      "raioKm": 0.78
+    },
+    "20921": {
+      "lat": -22.892603,
+      "lon": -43.226476,
+      "bairro": "SÃO CRISTÓVÃO",
+      "unidades": 6,
+      "raioKm": 0.97
+    },
+    "20930": {
+      "lat": -22.889395,
+      "lon": -43.235971,
+      "bairro": "BENFICA",
+      "unidades": 2,
+      "raioKm": 0.03
+    },
+    "20931": {
+      "lat": -22.879228,
+      "lon": -43.222682,
+      "bairro": "CAJU",
+      "unidades": 12,
+      "raioKm": 1.21
+    },
+    "20941": {
+      "lat": -22.905696,
+      "lon": -43.229858,
+      "bairro": "SÃO CRISTÓVÃO",
+      "unidades": 5,
+      "raioKm": 1.05
+    },
+    "20943": {
+      "lat": -22.904133,
+      "lon": -43.239715,
+      "bairro": "MANGUEIRA",
+      "unidades": 3,
+      "raioKm": 0.2
+    },
+    "20950": {
+      "lat": -22.904288,
+      "lon": -43.258589,
+      "bairro": "ENGENHO NOVO",
+      "unidades": 11,
+      "raioKm": 1.17
+    },
+    "20960": {
+      "lat": -22.89894,
+      "lon": -43.251128,
+      "bairro": "ROCHA",
+      "unidades": 8,
+      "raioKm": 0.87
+    },
+    "20961": {
+      "lat": -22.894178,
+      "lon": -43.263847,
+      "bairro": "ENGENHO NOVO",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "20970": {
+      "lat": -22.893369,
+      "lon": -43.261123,
+      "bairro": "JACAREZINHO",
+      "unidades": 3,
+      "raioKm": 0.86
+    },
+    "20972": {
+      "lat": -22.895698,
+      "lon": -43.261933,
+      "bairro": "JACARÉ",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "20973": {
+      "lat": -22.884559,
+      "lon": -43.253045,
+      "bairro": "BENFICA",
+      "unidades": 3,
+      "raioKm": 0.21
+    },
+    "20975": {
+      "lat": -22.893405,
+      "lon": -43.251292,
+      "bairro": "JACAREZINHO",
+      "unidades": 3,
+      "raioKm": 0.53
+    },
+    "21010": {
+      "lat": -22.820437,
+      "lon": -43.288233,
+      "bairro": "CORDOVIL",
+      "unidades": 14,
+      "raioKm": 6.85
+    },
+    "21011": {
+      "lat": -22.823489,
+      "lon": -43.283397,
+      "bairro": "PENHA CIRCULAR",
+      "unidades": 10,
+      "raioKm": 2.81
+    },
+    "21012": {
+      "lat": -22.82409,
+      "lon": -43.287035,
+      "bairro": "CORDOVIL",
+      "unidades": 5,
+      "raioKm": 0.87
+    },
+    "21020": {
+      "lat": -22.834331,
+      "lon": -43.276095,
+      "bairro": "PENHA",
+      "unidades": 5,
+      "raioKm": 0.55
+    },
+    "21021": {
+      "lat": -22.841916,
+      "lon": -43.270055,
+      "bairro": "OLARIA",
+      "unidades": 8,
+      "raioKm": 3.56
+    },
+    "21030": {
+      "lat": -22.84252,
+      "lon": -43.250212,
+      "bairro": "RAMOS",
+      "unidades": 3,
+      "raioKm": 0.61
+    },
+    "21031": {
+      "lat": -22.84999,
+      "lon": -43.252554,
+      "bairro": "RAMOS",
+      "unidades": 7,
+      "raioKm": 1.95
+    },
+    "21032": {
+      "lat": -22.859332,
+      "lon": -43.2565,
+      "bairro": "BONSUCESSO",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "21040": {
+      "lat": -22.859909,
+      "lon": -43.248455,
+      "bairro": "BONSUCESSO",
+      "unidades": 11,
+      "raioKm": 1.11
+    },
+    "21041": {
+      "lat": -22.876293,
+      "lon": -43.249969,
+      "bairro": "BONSUCESSO",
+      "unidades": 7,
+      "raioKm": 1.14
+    },
+    "21042": {
+      "lat": -22.861843,
+      "lon": -43.240406,
+      "bairro": "MARÉ",
+      "unidades": 8,
+      "raioKm": 0.67
+    },
+    "21043": {
+      "lat": -22.857165,
+      "lon": -43.241784,
+      "bairro": "BONSUCESSO",
+      "unidades": 5,
+      "raioKm": 0.3
+    },
+    "21044": {
+      "lat": -22.855248,
+      "lon": -43.24098,
+      "bairro": "MARÉ",
+      "unidades": 20,
+      "raioKm": 1.73
+    },
+    "21046": {
+      "lat": -22.868272,
+      "lon": -43.237341,
+      "bairro": "MARÉ",
+      "unidades": 13,
+      "raioKm": 1.78
+    },
+    "21050": {
+      "lat": -22.878119,
+      "lon": -43.255622,
+      "bairro": "MANGUINHOS",
+      "unidades": 12,
+      "raioKm": 1.62
+    },
+    "21051": {
+      "lat": -22.873542,
+      "lon": -43.2701,
+      "bairro": "INHAÚMA",
+      "unidades": 6,
+      "raioKm": 0.75
+    },
+    "21060": {
+      "lat": -22.858941,
+      "lon": -43.261456,
+      "bairro": "RAMOS",
+      "unidades": 8,
+      "raioKm": 0.86
+    },
+    "21061": {
+      "lat": -22.86594,
+      "lon": -43.271998,
+      "bairro": "INHAÚMA",
+      "unidades": 19,
+      "raioKm": 1.06
+    },
+    "21062": {
+      "lat": -22.858478,
+      "lon": -43.275967,
+      "bairro": "INHAÚMA",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "21070": {
+      "lat": -22.845336,
+      "lon": -43.284921,
+      "bairro": "PENHA",
+      "unidades": 15,
+      "raioKm": 0.71
+    },
+    "21071": {
+      "lat": -22.85277,
+      "lon": -43.277573,
+      "bairro": "OLARIA",
+      "unidades": 3,
+      "raioKm": 0.03
+    },
+    "21072": {
+      "lat": -22.850387,
+      "lon": -43.284007,
+      "bairro": "PENHA",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "21073": {
+      "lat": -22.850237,
+      "lon": -43.26985,
+      "bairro": "OLARIA",
+      "unidades": 9,
+      "raioKm": 0.6
+    },
+    "21210": {
+      "lat": -22.841556,
+      "lon": -43.299704,
+      "bairro": "PENHA CIRCULAR",
+      "unidades": 14,
+      "raioKm": 3.67
+    },
+    "21211": {
+      "lat": -22.833526,
+      "lon": -43.303032,
+      "bairro": "BRÁS DE PINA",
+      "unidades": 5,
+      "raioKm": 1.57
+    },
+    "21215": {
+      "lat": -22.834973,
+      "lon": -43.296248,
+      "bairro": "BRÁS DE PINA",
+      "unidades": 9,
+      "raioKm": 0.83
+    },
+    "21220": {
+      "lat": -22.853668,
+      "lon": -43.311844,
+      "bairro": "IRAJÁ",
+      "unidades": 5,
+      "raioKm": 1.37
+    },
+    "21221": {
+      "lat": -22.842727,
+      "lon": -43.309021,
+      "bairro": "VILA DA PENHA",
+      "unidades": 4,
+      "raioKm": 0.41
+    },
+    "21230": {
+      "lat": -22.82515,
+      "lon": -43.323585,
+      "bairro": "IRAJÁ",
+      "unidades": 16,
+      "raioKm": 1.13
+    },
+    "21231": {
+      "lat": -22.833134,
+      "lon": -43.322121,
+      "bairro": "IRAJÁ",
+      "unidades": 3,
+      "raioKm": 0.59
+    },
+    "21235": {
+      "lat": -22.838232,
+      "lon": -43.324069,
+      "bairro": "IRAJÁ",
+      "unidades": 9,
+      "raioKm": 1.22
+    },
+    "21240": {
+      "lat": -22.808504,
+      "lon": -43.320591,
+      "bairro": "JARDIM AMÉRICA",
+      "unidades": 12,
+      "raioKm": 1.49
+    },
+    "21241": {
+      "lat": -22.811884,
+      "lon": -43.309518,
+      "bairro": "VIGÁRIO GERAL",
+      "unidades": 5,
+      "raioKm": 0.97
+    },
+    "21250": {
+      "lat": -22.825846,
+      "lon": -43.306502,
+      "bairro": "CORDOVIL",
+      "unidades": 8,
+      "raioKm": 0.94
+    },
+    "21310": {
+      "lat": -22.881578,
+      "lon": -43.339826,
+      "bairro": "MADUREIRA",
+      "unidades": 4,
+      "raioKm": 0.71
+    },
+    "21311": {
+      "lat": -22.889571,
+      "lon": -43.327202,
+      "bairro": "CASCADURA",
+      "unidades": 7,
+      "raioKm": 0.81
+    },
+    "21320": {
+      "lat": -22.890918,
+      "lon": -43.349861,
+      "bairro": "PRAÇA SECA",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "21321": {
+      "lat": -22.901207,
+      "lon": -43.353801,
+      "bairro": "PRAÇA SECA",
+      "unidades": 10,
+      "raioKm": 5.08
+    },
+    "21330": {
+      "lat": -22.883674,
+      "lon": -43.367041,
+      "bairro": "VILA VALQUEIRE",
+      "unidades": 6,
+      "raioKm": 1.44
+    },
+    "21331": {
+      "lat": -22.864454,
+      "lon": -43.366152,
+      "bairro": "BENTO RIBEIRO",
+      "unidades": 2,
+      "raioKm": 0.03
+    },
+    "21340": {
+      "lat": -22.873688,
+      "lon": -43.353545,
+      "bairro": "OSWALDO CRUZ",
+      "unidades": 5,
+      "raioKm": 0.63
+    },
+    "21341": {
+      "lat": -22.883379,
+      "lon": -43.350531,
+      "bairro": "CAMPINHO",
+      "unidades": 3,
+      "raioKm": 0.69
+    },
+    "21350": {
+      "lat": -22.877594,
+      "lon": -43.330387,
+      "bairro": "CASCADURA",
+      "unidades": 3,
+      "raioKm": 0.83
+    },
+    "21360": {
+      "lat": -22.864098,
+      "lon": -43.33215,
+      "bairro": "MADUREIRA",
+      "unidades": 11,
+      "raioKm": 0.7
+    },
+    "21361": {
+      "lat": -22.852929,
+      "lon": -43.329258,
+      "bairro": "IRAJÁ",
+      "unidades": 6,
+      "raioKm": 0.75
+    },
+    "21370": {
+      "lat": -22.865872,
+      "lon": -43.312578,
+      "bairro": "CAVALCANTI",
+      "unidades": 6,
+      "raioKm": 1.06
+    },
+    "21371": {
+      "lat": -22.851936,
+      "lon": -43.325429,
+      "bairro": "VICENTE DE CARVALHO",
+      "unidades": 4,
+      "raioKm": 1.18
+    },
+    "21380": {
+      "lat": -22.883358,
+      "lon": -43.31624,
+      "bairro": "QUINTINO BOCAIÚVA",
+      "unidades": 6,
+      "raioKm": 0.89
+    },
+    "21381": {
+      "lat": -22.87561,
+      "lon": -43.313326,
+      "bairro": "CAVALCANTI",
+      "unidades": 9,
+      "raioKm": 1.02
+    },
+    "21491": {
+      "lat": -22.80497,
+      "lon": -43.239865,
+      "bairro": "GALEÃO",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "21510": {
+      "lat": -22.841658,
+      "lon": -43.350897,
+      "bairro": "ROCHA MIRANDA",
+      "unidades": 12,
+      "raioKm": 3.44
+    },
+    "21511": {
+      "lat": -22.840114,
+      "lon": -43.358175,
+      "bairro": "COELHO NETO",
+      "unidades": 5,
+      "raioKm": 0.71
+    },
+    "21515": {
+      "lat": -22.823882,
+      "lon": -43.361693,
+      "bairro": "COSTA BARROS",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "21520": {
+      "lat": -22.81121,
+      "lon": -43.361189,
+      "bairro": "PAVUNA",
+      "unidades": 15,
+      "raioKm": 1.39
+    },
+    "21521": {
+      "lat": -22.817176,
+      "lon": -43.353356,
+      "bairro": "PAVUNA",
+      "unidades": 2,
+      "raioKm": 0.07
+    },
+    "21525": {
+      "lat": -22.812718,
+      "lon": -43.358067,
+      "bairro": "PAVUNA",
+      "unidades": 3,
+      "raioKm": 1.02
+    },
+    "21530": {
+      "lat": -22.82648,
+      "lon": -43.348562,
+      "bairro": "COELHO NETO",
+      "unidades": 21,
+      "raioKm": 1.15
+    },
+    "21531": {
+      "lat": -22.823823,
+      "lon": -43.347746,
+      "bairro": "ACARI",
+      "unidades": 4,
+      "raioKm": 1.23
+    },
+    "21532": {
+      "lat": -22.820798,
+      "lon": -43.364111,
+      "bairro": "PAVUNA",
+      "unidades": 7,
+      "raioKm": 0.5
+    },
+    "21535": {
+      "lat": -22.815713,
+      "lon": -43.341346,
+      "bairro": "PARQUE COLÚMBIA",
+      "unidades": 6,
+      "raioKm": 1.61
+    },
+    "21540": {
+      "lat": -22.855675,
+      "lon": -43.341559,
+      "bairro": "ROCHA MIRANDA",
+      "unidades": 7,
+      "raioKm": 1.11
+    },
+    "21545": {
+      "lat": -22.842115,
+      "lon": -43.342395,
+      "bairro": "COLÉGIO",
+      "unidades": 4,
+      "raioKm": 0.54
+    },
+    "21550": {
+      "lat": -22.8625,
+      "lon": -43.351915,
+      "bairro": "OSWALDO CRUZ",
+      "unidades": 3,
+      "raioKm": 0.64
+    },
+    "21555": {
+      "lat": -22.85777,
+      "lon": -43.361991,
+      "bairro": "MARECHAL HERMES",
+      "unidades": 6,
+      "raioKm": 1
+    },
+    "21557": {
+      "lat": -22.85849,
+      "lon": -43.372367,
+      "bairro": "MARECHAL HERMES",
+      "unidades": 4,
+      "raioKm": 0.53
+    },
+    "21610": {
+      "lat": -22.864323,
+      "lon": -43.374397,
+      "bairro": "MARECHAL HERMES",
+      "unidades": 4,
+      "raioKm": 0.55
+    },
+    "21615": {
+      "lat": -22.857456,
+      "lon": -43.392009,
+      "bairro": "DEODORO",
+      "unidades": 6,
+      "raioKm": 1.38
+    },
+    "21616": {
+      "lat": -22.853352,
+      "lon": -43.396247,
+      "bairro": "DEODORO",
+      "unidades": 2,
+      "raioKm": 0.04
+    },
+    "21620": {
+      "lat": -22.836624,
+      "lon": -43.401308,
+      "bairro": "RICARDO DE ALBUQUERQUE",
+      "unidades": 5,
+      "raioKm": 0.73
+    },
+    "21625": {
+      "lat": -22.829722,
+      "lon": -43.402547,
+      "bairro": "PARQUE ANCHIETA",
+      "unidades": 6,
+      "raioKm": 0.51
+    },
+    "21630": {
+      "lat": -22.825042,
+      "lon": -43.414906,
+      "bairro": "ANCHIETA",
+      "unidades": 2,
+      "raioKm": 0.32
+    },
+    "21635": {
+      "lat": -22.833875,
+      "lon": -43.414653,
+      "bairro": "PARQUE ANCHIETA",
+      "unidades": 3,
+      "raioKm": 0.62
+    },
+    "21640": {
+      "lat": -22.836312,
+      "lon": -43.393985,
+      "bairro": "RICARDO DE ALBUQUERQUE",
+      "unidades": 3,
+      "raioKm": 0.58
+    },
+    "21645": {
+      "lat": -22.822575,
+      "lon": -43.396515,
+      "bairro": "ANCHIETA",
+      "unidades": 8,
+      "raioKm": 0.84
+    },
+    "21650": {
+      "lat": -22.82114,
+      "lon": -43.373415,
+      "bairro": "PAVUNA",
+      "unidades": 9,
+      "raioKm": 0.96
+    },
+    "21655": {
+      "lat": -22.818149,
+      "lon": -43.381164,
+      "bairro": "PAVUNA",
+      "unidades": 7,
+      "raioKm": 0.86
+    },
+    "21660": {
+      "lat": -22.838967,
+      "lon": -43.376115,
+      "bairro": "GUADALUPE",
+      "unidades": 8,
+      "raioKm": 0.87
+    },
+    "21665": {
+      "lat": -22.833843,
+      "lon": -43.369821,
+      "bairro": "BARROS FILHO",
+      "unidades": 4,
+      "raioKm": 0.38
+    },
+    "21670": {
+      "lat": -22.848923,
+      "lon": -43.378454,
+      "bairro": "GUADALUPE",
+      "unidades": 7,
+      "raioKm": 0.65
+    },
+    "21675": {
+      "lat": -22.84687,
+      "lon": -43.365941,
+      "bairro": "GUADALUPE",
+      "unidades": 9,
+      "raioKm": 0.67
+    },
+    "21710": {
+      "lat": -22.878425,
+      "lon": -43.424987,
+      "bairro": "REALENGO",
+      "unidades": 7,
+      "raioKm": 0.99
+    },
+    "21715": {
+      "lat": -22.879052,
+      "lon": -43.437649,
+      "bairro": "REALENGO",
+      "unidades": 7,
+      "raioKm": 0.92
+    },
+    "21720": {
+      "lat": -22.864248,
+      "lon": -43.447261,
+      "bairro": "PADRE MIGUEL",
+      "unidades": 7,
+      "raioKm": 0.56
+    },
+    "21721": {
+      "lat": -22.870858,
+      "lon": -43.44563,
+      "bairro": "PADRE MIGUEL",
+      "unidades": 5,
+      "raioKm": 0.7
+    },
+    "21725": {
+      "lat": -22.857724,
+      "lon": -43.450239,
+      "bairro": "REALENGO",
+      "unidades": 6,
+      "raioKm": 0.9
+    },
+    "21730": {
+      "lat": -22.866892,
+      "lon": -43.436079,
+      "bairro": "REALENGO",
+      "unidades": 7,
+      "raioKm": 5.99
+    },
+    "21735": {
+      "lat": -22.868276,
+      "lon": -43.425105,
+      "bairro": "REALENGO",
+      "unidades": 3,
+      "raioKm": 0.85
+    },
+    "21740": {
+      "lat": -22.884937,
+      "lon": -43.386077,
+      "bairro": "CAMPO DOS AFONSOS",
+      "unidades": 3,
+      "raioKm": 1.08
+    },
+    "21741": {
+      "lat": -22.888968,
+      "lon": -43.39579,
+      "bairro": "JARDIM SULACAP",
+      "unidades": 2,
+      "raioKm": 0.34
+    },
+    "21745": {
+      "lat": -22.878611,
+      "lon": -43.414641,
+      "bairro": "MAGALHÃES BASTOS",
+      "unidades": 3,
+      "raioKm": 1.63
+    },
+    "21746": {
+      "lat": -22.88766,
+      "lon": -43.410707,
+      "bairro": "REALENGO",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "21750": {
+      "lat": -22.881378,
+      "lon": -43.414816,
+      "bairro": "REALENGO",
+      "unidades": 7,
+      "raioKm": 0.55
+    },
+    "21755": {
+      "lat": -22.885282,
+      "lon": -43.424448,
+      "bairro": "REALENGO",
+      "unidades": 8,
+      "raioKm": 0.98
+    },
+    "21760": {
+      "lat": -22.889086,
+      "lon": -43.421594,
+      "bairro": "REALENGO",
+      "unidades": 6,
+      "raioKm": 0.72
+    },
+    "21765": {
+      "lat": -22.892,
+      "lon": -43.431801,
+      "bairro": "REALENGO",
+      "unidades": 3,
+      "raioKm": 0.32
+    },
+    "21770": {
+      "lat": -22.894107,
+      "lon": -43.444792,
+      "bairro": "REALENGO",
+      "unidades": 3,
+      "raioKm": 0.39
+    },
+    "21775": {
+      "lat": -22.888699,
+      "lon": -43.44819,
+      "bairro": "PADRE MIGUEL",
+      "unidades": 5,
+      "raioKm": 0.76
+    },
+    "21810": {
+      "lat": -22.879743,
+      "lon": -43.462777,
+      "bairro": "BANGU",
+      "unidades": 5,
+      "raioKm": 0.74
+    },
+    "21812": {
+      "lat": -22.868788,
+      "lon": -43.477741,
+      "bairro": "BANGU",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "21815": {
+      "lat": -22.884196,
+      "lon": -43.459686,
+      "bairro": "BANGU",
+      "unidades": 2,
+      "raioKm": 0.37
+    },
+    "21820": {
+      "lat": -22.881707,
+      "lon": -43.47357,
+      "bairro": "BANGU",
+      "unidades": 6,
+      "raioKm": 0.64
+    },
+    "21825": {
+      "lat": -22.890715,
+      "lon": -43.471284,
+      "bairro": "BANGU",
+      "unidades": 8,
+      "raioKm": 0.76
+    },
+    "21830": {
+      "lat": -22.880745,
+      "lon": -43.484692,
+      "bairro": "SENADOR CAMARÁ",
+      "unidades": 9,
+      "raioKm": 1.19
+    },
+    "21831": {
+      "lat": -22.887777,
+      "lon": -43.483363,
+      "bairro": "SENADOR CAMARÁ",
+      "unidades": 3,
+      "raioKm": 0.44
+    },
+    "21832": {
+      "lat": -22.890875,
+      "lon": -43.489545,
+      "bairro": "SENADOR CAMARÁ",
+      "unidades": 4,
+      "raioKm": 0.7
+    },
+    "21833": {
+      "lat": -22.879547,
+      "lon": -43.493719,
+      "bairro": "SENADOR CAMARÁ",
+      "unidades": 6,
+      "raioKm": 0.68
+    },
+    "21840": {
+      "lat": -22.872871,
+      "lon": -43.479659,
+      "bairro": "BANGU",
+      "unidades": 5,
+      "raioKm": 1.13
+    },
+    "21842": {
+      "lat": -22.868955,
+      "lon": -43.483846,
+      "bairro": "BANGU",
+      "unidades": 11,
+      "raioKm": 1.95
+    },
+    "21843": {
+      "lat": -22.87425,
+      "lon": -43.496139,
+      "bairro": "SENADOR CAMARÁ",
+      "unidades": 4,
+      "raioKm": 0.93
+    },
+    "21850": {
+      "lat": -22.857957,
+      "lon": -43.486411,
+      "bairro": "BANGU",
+      "unidades": 7,
+      "raioKm": 0.46
+    },
+    "21852": {
+      "lat": -22.858261,
+      "lon": -43.491983,
+      "bairro": "BANGU",
+      "unidades": 4,
+      "raioKm": 0.72
+    },
+    "21853": {
+      "lat": -22.852255,
+      "lon": -43.489634,
+      "bairro": "BANGU",
+      "unidades": 6,
+      "raioKm": 0.63
+    },
+    "21854": {
+      "lat": -22.844901,
+      "lon": -43.489889,
+      "bairro": "BANGU",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "21860": {
+      "lat": -22.864526,
+      "lon": -43.467789,
+      "bairro": "BANGU",
+      "unidades": 4,
+      "raioKm": 2.89
+    },
+    "21862": {
+      "lat": -22.863346,
+      "lon": -43.465541,
+      "bairro": "BANGU",
+      "unidades": 4,
+      "raioKm": 0.88
+    },
+    "21863": {
+      "lat": -22.848239,
+      "lon": -43.46613,
+      "bairro": "BANGU",
+      "unidades": 7,
+      "raioKm": 0.61
+    },
+    "21864": {
+      "lat": -22.84761,
+      "lon": -43.472659,
+      "bairro": "BANGU",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "21865": {
+      "lat": -22.849922,
+      "lon": -43.460718,
+      "bairro": "BANGU",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "21870": {
+      "lat": -22.868694,
+      "lon": -43.457541,
+      "bairro": "BANGU",
+      "unidades": 10,
+      "raioKm": 0.68
+    },
+    "21875": {
+      "lat": -22.871516,
+      "lon": -43.450832,
+      "bairro": "PADRE MIGUEL",
+      "unidades": 3,
+      "raioKm": 0.55
+    },
+    "21910": {
+      "lat": -22.792664,
+      "lon": -43.180874,
+      "bairro": "BANCÁRIOS",
+      "unidades": 12,
+      "raioKm": 0.9
+    },
+    "21911": {
+      "lat": -22.788469,
+      "lon": -43.172886,
+      "bairro": "BANCÁRIOS",
+      "unidades": 2,
+      "raioKm": 0.25
+    },
+    "21920": {
+      "lat": -22.79717,
+      "lon": -43.194743,
+      "bairro": "PORTUGUESA",
+      "unidades": 7,
+      "raioKm": 1.33
+    },
+    "21921": {
+      "lat": -22.805825,
+      "lon": -43.187885,
+      "bairro": "JARDIM CARIOCA",
+      "unidades": 5,
+      "raioKm": 0.88
+    },
+    "21922": {
+      "lat": -22.805503,
+      "lon": -43.1932,
+      "bairro": "JARDIM CARIOCA",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "21930": {
+      "lat": -22.817321,
+      "lon": -43.179837,
+      "bairro": "PITANGUEIRAS",
+      "unidades": 5,
+      "raioKm": 0.74
+    },
+    "21931": {
+      "lat": -22.800323,
+      "lon": -43.210079,
+      "bairro": "PORTUGUESA",
+      "unidades": 4,
+      "raioKm": 0.79
+    },
+    "21932": {
+      "lat": -22.790828,
+      "lon": -43.217723,
+      "bairro": "GALEÃO",
+      "unidades": 2,
+      "raioKm": 0.99
+    },
+    "21940": {
+      "lat": -22.811592,
+      "lon": -43.203156,
+      "bairro": "JARDIM GUANABARA",
+      "unidades": 6,
+      "raioKm": 0.82
+    },
+    "21941": {
+      "lat": -22.822929,
+      "lon": -43.227025,
+      "bairro": "GALEÃO",
+      "unidades": 6,
+      "raioKm": 4.19
+    },
+    "22010": {
+      "lat": -22.961071,
+      "lon": -43.166432,
+      "bairro": "LEME",
+      "unidades": 2,
+      "raioKm": 0.16
+    },
+    "22011": {
+      "lat": -22.963038,
+      "lon": -43.179793,
+      "bairro": "COPACABANA",
+      "unidades": 2,
+      "raioKm": 0.24
+    },
+    "22020": {
+      "lat": -22.96506,
+      "lon": -43.176145,
+      "bairro": "COPACABANA",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "22021": {
+      "lat": -22.968647,
+      "lon": -43.181139,
+      "bairro": "COPACABANA",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "22030": {
+      "lat": -22.964691,
+      "lon": -43.180965,
+      "bairro": "COPACABANA",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "22031": {
+      "lat": -22.964028,
+      "lon": -43.191629,
+      "bairro": "COPACABANA",
+      "unidades": 3,
+      "raioKm": 0.52
+    },
+    "22040": {
+      "lat": -22.968825,
+      "lon": -43.183296,
+      "bairro": "COPACABANA",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "22050": {
+      "lat": -22.974828,
+      "lon": -43.189063,
+      "bairro": "COPACABANA",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "22071": {
+      "lat": -22.981201,
+      "lon": -43.195786,
+      "bairro": "COPACABANA",
+      "unidades": 4,
+      "raioKm": 0.14
+    },
+    "22080": {
+      "lat": -22.98735,
+      "lon": -43.191996,
+      "bairro": "IPANEMA",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "22211": {
+      "lat": -22.922883,
+      "lon": -43.181774,
+      "bairro": "GLÓRIA",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "22220": {
+      "lat": -22.922785,
+      "lon": -43.176685,
+      "bairro": "CATETE",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "22221": {
+      "lat": -22.928157,
+      "lon": -43.181933,
+      "bairro": "CATETE",
+      "unidades": 4,
+      "raioKm": 0.94
+    },
+    "22230": {
+      "lat": -22.936969,
+      "lon": -43.179028,
+      "bairro": "FLAMENGO",
+      "unidades": 2,
+      "raioKm": 0.05
+    },
+    "22231": {
+      "lat": -22.936404,
+      "lon": -43.182189,
+      "bairro": "LARANJEIRAS",
+      "unidades": 2,
+      "raioKm": 0.29
+    },
+    "22240": {
+      "lat": -22.937875,
+      "lon": -43.191268,
+      "bairro": "LARANJEIRAS",
+      "unidades": 2,
+      "raioKm": 0.17
+    },
+    "22241": {
+      "lat": -22.939391,
+      "lon": -43.20105,
+      "bairro": "COSME VELHO",
+      "unidades": 5,
+      "raioKm": 0.97
+    },
+    "22245": {
+      "lat": -22.940258,
+      "lon": -43.19178,
+      "bairro": "LARANJEIRAS",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "22250": {
+      "lat": -22.940711,
+      "lon": -43.17647,
+      "bairro": "FLAMENGO",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "22251": {
+      "lat": -22.945558,
+      "lon": -43.186591,
+      "bairro": "BOTAFOGO",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "22260": {
+      "lat": -22.949545,
+      "lon": -43.192776,
+      "bairro": "BOTAFOGO",
+      "unidades": 3,
+      "raioKm": 0.37
+    },
+    "22261": {
+      "lat": -22.954242,
+      "lon": -43.196814,
+      "bairro": "HUMAITÁ",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "22271": {
+      "lat": -22.955303,
+      "lon": -43.194527,
+      "bairro": "BOTAFOGO",
+      "unidades": 4,
+      "raioKm": 0.68
+    },
+    "22280": {
+      "lat": -22.954406,
+      "lon": -43.188154,
+      "bairro": "BOTAFOGO",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "22290": {
+      "lat": -22.955258,
+      "lon": -43.17635,
+      "bairro": "BOTAFOGO",
+      "unidades": 7,
+      "raioKm": 1.22
+    },
+    "22291": {
+      "lat": -22.946106,
+      "lon": -43.157391,
+      "bairro": "URCA",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "22410": {
+      "lat": -22.981955,
+      "lon": -43.213579,
+      "bairro": "IPANEMA",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "22411": {
+      "lat": -22.982013,
+      "lon": -43.199106,
+      "bairro": "IPANEMA",
+      "unidades": 2,
+      "raioKm": 0.15
+    },
+    "22420": {
+      "lat": -22.982723,
+      "lon": -43.20084,
+      "bairro": "IPANEMA",
+      "unidades": 2,
+      "raioKm": 0.42
+    },
+    "22426": {
+      "lat": -22.988835,
+      "lon": -43.252492,
+      "bairro": "ROCINHA",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "22430": {
+      "lat": -22.981559,
+      "lon": -43.217029,
+      "bairro": "LEBLON",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "22441": {
+      "lat": -22.979407,
+      "lon": -43.222091,
+      "bairro": "LEBLON",
+      "unidades": 4,
+      "raioKm": 0.17
+    },
+    "22450": {
+      "lat": -22.993815,
+      "lon": -43.239012,
+      "bairro": "VIDIGAL",
+      "unidades": 5,
+      "raioKm": 1.42
+    },
+    "22451": {
+      "lat": -22.985747,
+      "lon": -43.243941,
+      "bairro": "ROCINHA",
+      "unidades": 27,
+      "raioKm": 2.04
+    },
+    "22452": {
+      "lat": -22.996197,
+      "lon": -43.245549,
+      "bairro": "VIDIGAL",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "22460": {
+      "lat": -22.965519,
+      "lon": -43.226514,
+      "bairro": "JARDIM BOTÂNICO",
+      "unidades": 4,
+      "raioKm": 0.83
+    },
+    "22461": {
+      "lat": -22.960768,
+      "lon": -43.220895,
+      "bairro": "JARDIM BOTÂNICO",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "22470": {
+      "lat": -22.967244,
+      "lon": -43.218047,
+      "bairro": "GÁVEA",
+      "unidades": 5,
+      "raioKm": 1.64
+    },
+    "22471": {
+      "lat": -22.967117,
+      "lon": -43.201434,
+      "bairro": "LAGOA",
+      "unidades": 3,
+      "raioKm": 1.08
+    },
+    "22610": {
+      "lat": -22.995435,
+      "lon": -43.272031,
+      "bairro": "SÃO CONRADO",
+      "unidades": 3,
+      "raioKm": 0.22
+    },
+    "22611": {
+      "lat": -23.008143,
+      "lon": -43.299606,
+      "bairro": "BARRA DA TIJUCA",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "22620": {
+      "lat": -23.011689,
+      "lon": -43.308882,
+      "bairro": "BARRA DA TIJUCA",
+      "unidades": 3,
+      "raioKm": 1.28
+    },
+    "22630": {
+      "lat": -23.010886,
+      "lon": -43.32786,
+      "bairro": "BARRA DA TIJUCA",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "22631": {
+      "lat": -23.004186,
+      "lon": -43.343914,
+      "bairro": "BARRA DA TIJUCA",
+      "unidades": 2,
+      "raioKm": 0.34
+    },
+    "22640": {
+      "lat": -22.997104,
+      "lon": -43.335633,
+      "bairro": "BARRA DA TIJUCA",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "22641": {
+      "lat": -22.976961,
+      "lon": -43.316873,
+      "bairro": "ITANHANGÁ",
+      "unidades": 5,
+      "raioKm": 7.7
+    },
+    "22710": {
+      "lat": -22.940939,
+      "lon": -43.378405,
+      "bairro": "CURICICA",
+      "unidades": 8,
+      "raioKm": 1.64
+    },
+    "22711": {
+      "lat": -22.953325,
+      "lon": -43.393077,
+      "bairro": "CURICICA",
+      "unidades": 2,
+      "raioKm": 0.06
+    },
+    "22713": {
+      "lat": -22.939912,
+      "lon": -43.391585,
+      "bairro": "TAQUARA",
+      "unidades": 8,
+      "raioKm": 3.53
+    },
+    "22715": {
+      "lat": -22.924672,
+      "lon": -43.383881,
+      "bairro": "TAQUARA",
+      "unidades": 2,
+      "raioKm": 0.03
+    },
+    "22720": {
+      "lat": -22.917501,
+      "lon": -43.386834,
+      "bairro": "TAQUARA",
+      "unidades": 2,
+      "raioKm": 0.02
+    },
+    "22723": {
+      "lat": -22.915345,
+      "lon": -43.407674,
+      "bairro": "TAQUARA",
+      "unidades": 10,
+      "raioKm": 2.81
+    },
+    "22725": {
+      "lat": -22.912289,
+      "lon": -43.371685,
+      "bairro": "TANQUE",
+      "unidades": 3,
+      "raioKm": 0.24
+    },
+    "22730": {
+      "lat": -22.918848,
+      "lon": -43.368786,
+      "bairro": "TAQUARA",
+      "unidades": 5,
+      "raioKm": 0.72
+    },
+    "22733": {
+      "lat": -22.901634,
+      "lon": -43.355148,
+      "bairro": "PRAÇA SECA",
+      "unidades": 7,
+      "raioKm": 1.62
+    },
+    "22735": {
+      "lat": -22.921809,
+      "lon": -43.361017,
+      "bairro": "TANQUE",
+      "unidades": 4,
+      "raioKm": 0.36
+    },
+    "22740": {
+      "lat": -22.928324,
+      "lon": -43.361695,
+      "bairro": "PECHINCHA",
+      "unidades": 4,
+      "raioKm": 0.9
+    },
+    "22743": {
+      "lat": -22.93253,
+      "lon": -43.35113,
+      "bairro": "PECHINCHA",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "22750": {
+      "lat": -22.94445,
+      "lon": -43.34162,
+      "bairro": "FREGUESIA (JACAREPAGUÁ)",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "22753": {
+      "lat": -22.97293,
+      "lon": -43.330698,
+      "bairro": "RIO DAS PEDRAS",
+      "unidades": 22,
+      "raioKm": 2.56
+    },
+    "22755": {
+      "lat": -22.947331,
+      "lon": -43.336075,
+      "bairro": "ANIL",
+      "unidades": 2,
+      "raioKm": 0.6
+    },
+    "22760": {
+      "lat": -22.938339,
+      "lon": -43.343741,
+      "bairro": "FREGUESIA (JACAREPAGUÁ)",
+      "unidades": 4,
+      "raioKm": 0.43
+    },
+    "22763": {
+      "lat": -22.949736,
+      "lon": -43.354634,
+      "bairro": "CIDADE DE DEUS",
+      "unidades": 14,
+      "raioKm": 1.72
+    },
+    "22765": {
+      "lat": -22.951921,
+      "lon": -43.353434,
+      "bairro": "GARDÊNIA AZUL",
+      "unidades": 13,
+      "raioKm": 10.71
+    },
+    "22770": {
+      "lat": -22.941079,
+      "lon": -43.362955,
+      "bairro": "CIDADE DE DEUS",
+      "unidades": 6,
+      "raioKm": 0.78
+    },
+    "22772": {
+      "lat": -22.947426,
+      "lon": -43.365557,
+      "bairro": "CIDADE DE DEUS",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "22773": {
+      "lat": -22.95045,
+      "lon": -43.362725,
+      "bairro": "CIDADE DE DEUS",
+      "unidades": 8,
+      "raioKm": 0.35
+    },
+    "22775": {
+      "lat": -22.957073,
+      "lon": -43.379278,
+      "bairro": "CIDADE DE DEUS",
+      "unidades": 10,
+      "raioKm": 2.54
+    },
+    "22780": {
+      "lat": -22.953336,
+      "lon": -43.391988,
+      "bairro": "CURICICA",
+      "unidades": 7,
+      "raioKm": 2.03
+    },
+    "22783": {
+      "lat": -22.98186,
+      "lon": -43.438969,
+      "bairro": "VARGEM PEQUENA",
+      "unidades": 10,
+      "raioKm": 3.15
+    },
+    "22785": {
+      "lat": -22.984698,
+      "lon": -43.486998,
+      "bairro": "VARGEM GRANDE",
+      "unidades": 8,
+      "raioKm": 5.6
+    },
+    "22787": {
+      "lat": -22.99539,
+      "lon": -43.49488,
+      "bairro": "VARGEM GRANDE",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "22790": {
+      "lat": -23.018553,
+      "lon": -43.485841,
+      "bairro": "RECREIO DOS BANDEIRANTES",
+      "unidades": 6,
+      "raioKm": 3.73
+    },
+    "22793": {
+      "lat": -23.007139,
+      "lon": -43.401618,
+      "bairro": "BARRA DA TIJUCA",
+      "unidades": 8,
+      "raioKm": 3.38
+    },
+    "22795": {
+      "lat": -23.024388,
+      "lon": -43.483877,
+      "bairro": "RECREIO DOS BANDEIRANTES",
+      "unidades": 4,
+      "raioKm": 0.62
+    },
+    "22796": {
+      "lat": -23.0096,
+      "lon": -43.46302,
+      "bairro": "RECREIO DOS BANDEIRANTES",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "23010": {
+      "lat": -22.881094,
+      "lon": -43.509856,
+      "bairro": "SANTÍSSIMO",
+      "unidades": 5,
+      "raioKm": 2.03
+    },
+    "23012": {
+      "lat": -22.897666,
+      "lon": -43.533365,
+      "bairro": "SENADOR VASCONCELOS",
+      "unidades": 4,
+      "raioKm": 0.71
+    },
+    "23013": {
+      "lat": -22.901332,
+      "lon": -43.541023,
+      "bairro": "CAMPO GRANDE",
+      "unidades": 5,
+      "raioKm": 0.81
+    },
+    "23015": {
+      "lat": -22.90822,
+      "lon": -43.540811,
+      "bairro": "CAMPO GRANDE",
+      "unidades": 2,
+      "raioKm": 0.07
+    },
+    "23016": {
+      "lat": -22.912667,
+      "lon": -43.53409,
+      "bairro": "CAMPO GRANDE",
+      "unidades": 7,
+      "raioKm": 0.54
+    },
+    "23017": {
+      "lat": -22.919904,
+      "lon": -43.534734,
+      "bairro": "CAMPO GRANDE",
+      "unidades": 5,
+      "raioKm": 1.67
+    },
+    "23020": {
+      "lat": -23.021706,
+      "lon": -43.557067,
+      "bairro": "BARRA DE GUARATIBA",
+      "unidades": 8,
+      "raioKm": 5.42
+    },
+    "23025": {
+      "lat": -22.999513,
+      "lon": -43.621539,
+      "bairro": "GUARATIBA",
+      "unidades": 5,
+      "raioKm": 1.61
+    },
+    "23026": {
+      "lat": -22.98649,
+      "lon": -43.633121,
+      "bairro": "GUARATIBA",
+      "unidades": 5,
+      "raioKm": 1.69
+    },
+    "23027": {
+      "lat": -23.001073,
+      "lon": -43.638084,
+      "bairro": "PEDRA DE GUARATIBA",
+      "unidades": 2,
+      "raioKm": 0.08
+    },
+    "23028": {
+      "lat": -22.981313,
+      "lon": -43.660396,
+      "bairro": "GUARATIBA",
+      "unidades": 6,
+      "raioKm": 1.51
+    },
+    "23030": {
+      "lat": -22.974035,
+      "lon": -43.622192,
+      "bairro": "GUARATIBA",
+      "unidades": 9,
+      "raioKm": 4.58
+    },
+    "23031": {
+      "lat": -22.970745,
+      "lon": -43.62599,
+      "bairro": "GUARATIBA",
+      "unidades": 10,
+      "raioKm": 2.31
+    },
+    "23032": {
+      "lat": -22.972799,
+      "lon": -43.651948,
+      "bairro": "GUARATIBA",
+      "unidades": 4,
+      "raioKm": 0.95
+    },
+    "23035": {
+      "lat": -22.960088,
+      "lon": -43.596178,
+      "bairro": "GUARATIBA",
+      "unidades": 7,
+      "raioKm": 8.16
+    },
+    "23036": {
+      "lat": -22.939831,
+      "lon": -43.577833,
+      "bairro": "GUARATIBA",
+      "unidades": 7,
+      "raioKm": 1.48
+    },
+    "23040": {
+      "lat": -22.928619,
+      "lon": -43.550247,
+      "bairro": "CAMPO GRANDE",
+      "unidades": 5,
+      "raioKm": 2.97
+    },
+    "23042": {
+      "lat": -22.928816,
+      "lon": -43.558573,
+      "bairro": "CAMPO GRANDE",
+      "unidades": 3,
+      "raioKm": 1.04
+    },
+    "23045": {
+      "lat": -22.91885,
+      "lon": -43.560308,
+      "bairro": "CAMPO GRANDE",
+      "unidades": 10,
+      "raioKm": 1.35
+    },
+    "23046": {
+      "lat": -22.930233,
+      "lon": -43.558059,
+      "bairro": "CAMPO GRANDE",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "23047": {
+      "lat": -22.92798,
+      "lon": -43.560164,
+      "bairro": "CAMPO GRANDE",
+      "unidades": 3,
+      "raioKm": 0.71
+    },
+    "23050": {
+      "lat": -22.90871,
+      "lon": -43.569177,
+      "bairro": "CAMPO GRANDE",
+      "unidades": 4,
+      "raioKm": 0.9
+    },
+    "23052": {
+      "lat": -22.905196,
+      "lon": -43.550908,
+      "bairro": "CAMPO GRANDE",
+      "unidades": 4,
+      "raioKm": 0.6
+    },
+    "23055": {
+      "lat": -22.912982,
+      "lon": -43.579587,
+      "bairro": "CAMPO GRANDE",
+      "unidades": 6,
+      "raioKm": 0.65
+    },
+    "23056": {
+      "lat": -22.916333,
+      "lon": -43.60304,
+      "bairro": "INHOAÍBA",
+      "unidades": 4,
+      "raioKm": 0.39
+    },
+    "23057": {
+      "lat": -22.918753,
+      "lon": -43.602509,
+      "bairro": "INHOAÍBA",
+      "unidades": 2,
+      "raioKm": 0.27
+    },
+    "23058": {
+      "lat": -22.917362,
+      "lon": -43.617832,
+      "bairro": "COSMOS",
+      "unidades": 5,
+      "raioKm": 0.66
+    },
+    "23059": {
+      "lat": -22.913568,
+      "lon": -43.594973,
+      "bairro": "INHOAÍBA",
+      "unidades": 14,
+      "raioKm": 1.85
+    },
+    "23060": {
+      "lat": -22.899712,
+      "lon": -43.608094,
+      "bairro": "COSMOS",
+      "unidades": 12,
+      "raioKm": 1.79
+    },
+    "23061": {
+      "lat": -22.901973,
+      "lon": -43.615714,
+      "bairro": "COSMOS",
+      "unidades": 5,
+      "raioKm": 2.34
+    },
+    "23062": {
+      "lat": -22.903397,
+      "lon": -43.599936,
+      "bairro": "INHOAÍBA",
+      "unidades": 5,
+      "raioKm": 0.64
+    },
+    "23063": {
+      "lat": -22.90019,
+      "lon": -43.591469,
+      "bairro": "INHOAÍBA",
+      "unidades": 8,
+      "raioKm": 1.09
+    },
+    "23065": {
+      "lat": -22.87472,
+      "lon": -43.633271,
+      "bairro": "PACIÊNCIA",
+      "unidades": 6,
+      "raioKm": 1.12
+    },
+    "23066": {
+      "lat": -22.88939,
+      "lon": -43.630558,
+      "bairro": "PACIÊNCIA",
+      "unidades": 10,
+      "raioKm": 2.06
+    },
+    "23067": {
+      "lat": -22.883692,
+      "lon": -43.607216,
+      "bairro": "CAMPO GRANDE",
+      "unidades": 7,
+      "raioKm": 5.18
+    },
+    "23068": {
+      "lat": -22.887085,
+      "lon": -43.603465,
+      "bairro": "CAMPO GRANDE",
+      "unidades": 2,
+      "raioKm": 0.62
+    },
+    "23070": {
+      "lat": -22.894877,
+      "lon": -43.577088,
+      "bairro": "CAMPO GRANDE",
+      "unidades": 6,
+      "raioKm": 1.09
+    },
+    "23071": {
+      "lat": -22.890545,
+      "lon": -43.581625,
+      "bairro": "CAMPO GRANDE",
+      "unidades": 6,
+      "raioKm": 1.5
+    },
+    "23073": {
+      "lat": -22.890931,
+      "lon": -43.588815,
+      "bairro": "CAMPO GRANDE",
+      "unidades": 5,
+      "raioKm": 0.53
+    },
+    "23075": {
+      "lat": -22.880818,
+      "lon": -43.569113,
+      "bairro": "CAMPO GRANDE",
+      "unidades": 5,
+      "raioKm": 0.9
+    },
+    "23078": {
+      "lat": -22.878864,
+      "lon": -43.582764,
+      "bairro": "CAMPO GRANDE",
+      "unidades": 2,
+      "raioKm": 0.16
+    },
+    "23080": {
+      "lat": -22.899127,
+      "lon": -43.566082,
+      "bairro": "CAMPO GRANDE",
+      "unidades": 4,
+      "raioKm": 0.43
+    },
+    "23081": {
+      "lat": -22.894387,
+      "lon": -43.569153,
+      "bairro": "CAMPO GRANDE",
+      "unidades": 2,
+      "raioKm": 0.19
+    },
+    "23082": {
+      "lat": -22.890527,
+      "lon": -43.570229,
+      "bairro": "CAMPO GRANDE",
+      "unidades": 3,
+      "raioKm": 0.29
+    },
+    "23085": {
+      "lat": -22.894569,
+      "lon": -43.550943,
+      "bairro": "CAMPO GRANDE",
+      "unidades": 5,
+      "raioKm": 0.9
+    },
+    "23087": {
+      "lat": -22.889334,
+      "lon": -43.56051,
+      "bairro": "CAMPO GRANDE",
+      "unidades": 5,
+      "raioKm": 0.49
+    },
+    "23088": {
+      "lat": -22.885853,
+      "lon": -43.549487,
+      "bairro": "CAMPO GRANDE",
+      "unidades": 2,
+      "raioKm": 0.09
+    },
+    "23090": {
+      "lat": -22.8816,
+      "lon": -43.554192,
+      "bairro": "CAMPO GRANDE",
+      "unidades": 4,
+      "raioKm": 2.34
+    },
+    "23092": {
+      "lat": -22.876959,
+      "lon": -43.5383,
+      "bairro": "CAMPO GRANDE",
+      "unidades": 4,
+      "raioKm": 1.64
+    },
+    "23093": {
+      "lat": -22.877322,
+      "lon": -43.531192,
+      "bairro": "SANTÍSSIMO",
+      "unidades": 7,
+      "raioKm": 2.2
+    },
+    "23094": {
+      "lat": -22.874961,
+      "lon": -43.524065,
+      "bairro": "SANTÍSSIMO",
+      "unidades": 2,
+      "raioKm": 0.16
+    },
+    "23095": {
+      "lat": -22.864281,
+      "lon": -43.549686,
+      "bairro": "CAMPO GRANDE",
+      "unidades": 7,
+      "raioKm": 1.45
+    },
+    "23097": {
+      "lat": -22.848272,
+      "lon": -43.533634,
+      "bairro": "CAMPO GRANDE",
+      "unidades": 6,
+      "raioKm": 2.37
+    },
+    "23098": {
+      "lat": -22.868794,
+      "lon": -43.515342,
+      "bairro": "SANTÍSSIMO",
+      "unidades": 4,
+      "raioKm": 1.08
+    },
+    "23510": {
+      "lat": -22.922755,
+      "lon": -43.670981,
+      "bairro": "SANTA CRUZ",
+      "unidades": 11,
+      "raioKm": 1.59
+    },
+    "23515": {
+      "lat": -22.940178,
+      "lon": -43.68669,
+      "bairro": "SANTA CRUZ",
+      "unidades": 4,
+      "raioKm": 4.76
+    },
+    "23520": {
+      "lat": -22.936827,
+      "lon": -43.677834,
+      "bairro": "SANTA CRUZ",
+      "unidades": 9,
+      "raioKm": 4.62
+    },
+    "23525": {
+      "lat": -22.951199,
+      "lon": -43.684246,
+      "bairro": "SANTA CRUZ",
+      "unidades": 17,
+      "raioKm": 3.13
+    },
+    "23530": {
+      "lat": -22.97481,
+      "lon": -43.685232,
+      "bairro": "SEPETIBA",
+      "unidades": 3,
+      "raioKm": 1.8
+    },
+    "23535": {
+      "lat": -22.97629,
+      "lon": -43.693539,
+      "bairro": "SEPETIBA",
+      "unidades": 7,
+      "raioKm": 0.44
+    },
+    "23540": {
+      "lat": -22.973517,
+      "lon": -43.69685,
+      "bairro": "SEPETIBA",
+      "unidades": 3,
+      "raioKm": 0.34
+    },
+    "23545": {
+      "lat": -22.968465,
+      "lon": -43.680604,
+      "bairro": "SEPETIBA",
+      "unidades": 5,
+      "raioKm": 6.91
+    },
+    "23547": {
+      "lat": -22.958939,
+      "lon": -43.69056,
+      "bairro": "SEPETIBA",
+      "unidades": 2,
+      "raioKm": 0.31
+    },
+    "23550": {
+      "lat": -22.933141,
+      "lon": -43.69017,
+      "bairro": "SANTA CRUZ",
+      "unidades": 14,
+      "raioKm": 8.03
+    },
+    "23555": {
+      "lat": -22.929901,
+      "lon": -43.691205,
+      "bairro": "SANTA CRUZ",
+      "unidades": 5,
+      "raioKm": 5.34
+    },
+    "23560": {
+      "lat": -22.901822,
+      "lon": -43.706304,
+      "bairro": "SANTA CRUZ",
+      "unidades": 19,
+      "raioKm": 4.37
+    },
+    "23565": {
+      "lat": -22.893485,
+      "lon": -43.719095,
+      "bairro": "SANTA CRUZ",
+      "unidades": 5,
+      "raioKm": 0.92
+    },
+    "23570": {
+      "lat": -22.912273,
+      "lon": -43.675121,
+      "bairro": "SANTA CRUZ",
+      "unidades": 10,
+      "raioKm": 4.14
+    },
+    "23573": {
+      "lat": -22.915098,
+      "lon": -43.652411,
+      "bairro": "PACIÊNCIA",
+      "unidades": 4,
+      "raioKm": 0.25
+    },
+    "23575": {
+      "lat": -22.9012,
+      "lon": -43.666765,
+      "bairro": "SANTA CRUZ",
+      "unidades": 18,
+      "raioKm": 6.72
+    },
+    "23580": {
+      "lat": -22.914273,
+      "lon": -43.633581,
+      "bairro": "PACIÊNCIA",
+      "unidades": 7,
+      "raioKm": 2.44
+    },
+    "23585": {
+      "lat": -22.922748,
+      "lon": -43.634909,
+      "bairro": "PACIÊNCIA",
+      "unidades": 16,
+      "raioKm": 3.44
+    },
+    "23587": {
+      "lat": -22.920265,
+      "lon": -43.625881,
+      "bairro": "PACIÊNCIA",
+      "unidades": 8,
+      "raioKm": 0.77
+    },
+    "23590": {
+      "lat": -22.924312,
+      "lon": -43.666775,
+      "bairro": "SANTA CRUZ",
+      "unidades": 5,
+      "raioKm": 1.42
+    },
+    "23591": {
+      "lat": -22.930364,
+      "lon": -43.664584,
+      "bairro": "SANTA CRUZ",
+      "unidades": 2,
+      "raioKm": 0.22
+    },
+    "23595": {
+      "lat": -22.932757,
+      "lon": -43.657393,
+      "bairro": "SANTA CRUZ",
+      "unidades": 17,
+      "raioKm": 1.57
+    },
+    "23650": {
+      "lat": -22.841381,
+      "lon": -43.60581,
+      "bairro": "NOVA IGUAÇU",
+      "unidades": 1,
+      "raioKm": 0
+    },
+    "27840": {
+      "lat": -22.868027,
+      "lon": -43.474576,
+      "bairro": "BANGU",
+      "unidades": 1,
+      "raioKm": 0
+    }
+  },
+  "neighborhoods": [
+    "ABOLIÇÃO",
+    "ACARI",
+    "ALTO DA BOA VISTA",
+    "ANCHIETA",
+    "ANDARAI",
+    "ANDARAÍ",
+    "ANIL",
+    "Alto da Boa Vista",
+    "BANCÁRIOS",
+    "BANGU",
+    "BARRA DA TIJUCA",
+    "BARRA DE GUARATIBA",
+    "BARRA OLIMPICA",
+    "BARROS FILHO",
+    "BENFICA",
+    "BENTO RIBEIRO",
+    "BOIÚNA/TAQUARA",
+    "BONSUCESSO",
+    "BOTAFOGO",
+    "BRAZ DE PINA",
+    "BRÁS DE PINA",
+    "Bangu",
+    "Benfica",
+    "Bonsucesso",
+    "CACHAMBI",
+    "CAJU",
+    "CAMORIM",
+    "CAMPINHO",
+    "CAMPO DOS AFONSOS",
+    "CAMPO GRANDE",
+    "CASCADURA",
+    "CATETE",
+    "CATUMBI",
+    "CAVALCANTI",
+    "CENTRO",
+    "CIDADE DE DEUS",
+    "CIDADE NOVA",
+    "CIDADE UNIVERSITÁRIA",
+    "COCOTÁ",
+    "COELHO NETO",
+    "COLÉGIO",
+    "COLÔNIA/TAQUARA",
+    "COPACABANA",
+    "CORDOVIL",
+    "COSME VELHO",
+    "COSMOS",
+    "COSTA BARROS",
+    "CURICICA",
+    "Campo Grande",
+    "Copacabana",
+    "Cosmos",
+    "DEL CASTILHO",
+    "DEODORO",
+    "ENCANTADO",
+    "ENGENHO DA RAINHA",
+    "ENGENHO DE DENTRO",
+    "ENGENHO NOVO",
+    "ESTÁCIO",
+    "Engenho Da Rainha",
+    "FLAMENGO",
+    "FREGUESIA (ILHA DO GOV.)",
+    "FREGUESIA (JACAREPAGUÁ)",
+    "FREGUESIA/JACAREPAGUÁ",
+    "GALEÃO",
+    "GAMBOA",
+    "GARDENIA AZUL",
+    "GARDÊNIA",
+    "GARDÊNIA AZUL",
+    "GLÓRIA",
+    "GRAJAU",
+    "GRAJAÚ",
+    "GUADALUPE",
+    "GUARATIBA",
+    "GÁVEA",
+    "Gávea",
+    "HIGIENÓPOLIS",
+    "HONÓRIO GURGEL",
+    "HUMAITÁ",
+    "INHAUMA",
+    "INHAÚMA",
+    "INHOAÍBA",
+    "IPANEMA",
+    "IRAJÁ",
+    "ITANHANGÁ",
+    "Irajá",
+    "JABOUR",
+    "JACAREPAGUÁ",
+    "JACAREZINHO",
+    "JACARÉ",
+    "JARDIM AMÉRICA",
+    "JARDIM BOTÂNICO",
+    "JARDIM CARIOCA",
+    "JARDIM GUANABARA",
+    "JARDIM SULACAP",
+    "LAGOA",
+    "LARANJEIRAS",
+    "LEBLON",
+    "LEME",
+    "LINS DE VASCONCELOS",
+    "MADUREIRA",
+    "MAGALHÃES BASTOS",
+    "MANGUEIRA",
+    "MANGUINHOS",
+    "MARACANÃ",
+    "MARECHAL HERMES",
+    "MARIA DA GRAÇA",
+    "MARÉ",
+    "MONERÓ",
+    "Marechal Hermes",
+    "MÉIER",
+    "Méier",
+    "NOVA IGUAÇU",
+    "OLARIA",
+    "OSWALDO CRUZ",
+    "PACIENCIA",
+    "PACIÊNCIA",
+    "PADRE MIGUEL",
+    "PAQUETÁ",
+    "PARADA DE LUCAS",
+    "PARQUE ANCHIETA",
+    "PARQUE COLÚMBIA",
+    "PAVUNA",
+    "PECHINCHA",
+    "PEDRA DE GUARATIBA",
+    "PENHA",
+    "PENHA CIRCULAR",
+    "PIEDADE",
+    "PILARES",
+    "PITANGUEIRAS",
+    "PORTUGUESA",
+    "PRAIA DA BANDEIRA",
+    "PRAÇA DA BANDEIRA",
+    "PRAÇA SECA",
+    "Paquetá",
+    "Pedra de Guaratiba",
+    "Praça da Bandeira",
+    "QUINTINO BOCAIÚVA",
+    "RAMOS",
+    "REALENGO",
+    "RECREIO DOS BANDEIRANTES",
+    "RIACHUELO",
+    "RICARDO DE ALBUQUERQUE",
+    "RIO COMPRIDO",
+    "RIO DAS PEDRAS",
+    "ROCHA",
+    "ROCHA MIRANDA",
+    "ROCINHA",
+    "Realengo",
+    "Rio Comprido",
+    "Rocinha",
+    "SAMPAIO",
+    "SANTA CRUZ",
+    "SANTA MARIA/TAQUARA",
+    "SANTA TERESA",
+    "SANTO CRISTO",
+    "SANTÍSSIMO",
+    "SAÚDE",
+    "SENADOR CAMARÁ",
+    "SENADOR VASCONCELOS",
+    "SEPETIBA",
+    "Santa Teresa",
+    "SÃO CONRADO",
+    "SÃO CRISTÓVÃO",
+    "SÃO FRANCISCO XAVIER",
+    "TANQUE",
+    "TAQUARA",
+    "TAUÁ",
+    "TEIXEIRAS/TAQUARA",
+    "TIJUCA",
+    "TODOS OS SANTOS",
+    "TOMÁS COELHO",
+    "TURIAÇU",
+    "Tijuca",
+    "URCA",
+    "VARGEM GRANDE",
+    "VARGEM PEQUENA",
+    "VARGRM PEQUENA",
+    "VAZ LOBO",
+    "VICENTE DE CARVALHO",
+    "VIDIGAL",
+    "VIGARIO GERAL",
+    "VIGÁRIO GERAL",
+    "VILA DA PENHA",
+    "VILA ISABEL",
+    "VILA KENNEDY",
+    "VILA KOSMOS",
+    "VILA MILITAR",
+    "VILA SAPÊ",
+    "VILA VALQUEIRE",
+    "VISTA ALEGRE",
+    "ZUMBI",
+    "cosmos",
+    "laranjeiras",
+    "ÁGUA SANTA"
+  ]
+}

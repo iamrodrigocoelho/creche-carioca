@@ -8,6 +8,7 @@ import { loadEnv } from './common/config/env';
 import { CorrelationIdMiddleware } from './common/logging/correlation';
 import { DatabaseModule } from './database/database.module';
 import { HealthModule } from './health/health.module';
+import { LocationAnchorsModule } from './location-anchors/location-anchors.module';
 
 const env = loadEnv();
 
@@ -21,6 +22,7 @@ const env = loadEnv();
     }),
     HealthModule,
     ApplicationsModule,
+    LocationAnchorsModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

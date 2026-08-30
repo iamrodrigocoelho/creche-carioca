@@ -3,7 +3,7 @@
 **Escopo:** plano de desenvolvimento incremental do MVP descrito em `PRD.md`.
 **Fontes de verdade:** `PRD.md` (comportamento, regras, requisitos técnicos) e `/docs/DESIGN.md` (apresentação visual).
 **Status:** vivo — atualizado a cada fase concluída.
-**Última atualização:** 30/08/2026 (Fase 3 concluída).
+**Última atualização:** 30/08/2026 (Fase 4 concluída).
 
 > Este documento **não replica** requisitos. Ele referencia os identificadores do PRD (`RF-xx`, seções `§n`) e organiza a ordem de execução. Em qualquer divergência, o `PRD.md` e o `/docs/DESIGN.md` prevalecem.
 
@@ -32,7 +32,7 @@
 | ---- | ------------------------------------------------------------------------------------------------------------ | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | B-01 | ~~Datasets `dadoscreche` não estão no ambiente~~ **resolvido na Fase 3**                                     | Fases 3+ dependem deles | Baixados de `github.com/CIT-SME-RJ/dadoscreche` para `data/raw/`, fora do versionamento. O pipeline lê de `DATA_RAW_DIR` configurável e falha com instrução de download quando os arquivos faltam; as fixtures versionadas cobrem o CI |
 | B-02 | ~~Docker ausente~~ **resolvido na Fase 2**                                                                   | PostgreSQL/Redis        | A máquina já roda **PostgreSQL 16.13 via Homebrew**, então a Fase 2 seguiu sem Docker. O `docker-compose.yml` permanece como alternativa equivalente, não executado. O Redis ainda será necessário na Fase 11                          |
-| B-03 | Provider de geocodificação indefinido (PRD §21 "Geocodificação")                                             | RF-02                   | Porta `GeocodingProvider` + adapter mock determinístico. Nenhum provider real é escolhido                                                                                                                                              |
+| B-03 | Provider de geocodificação indefinido (PRD §21 "Geocodificação") — **contornado na Fase 4**                  | RF-02                   | Porta `GeocodingProvider` com adapter determinístico ancorado no setor de CEP das unidades reais (ADR-0023). Nenhum provider real foi escolhido; a troca fica restrita a uma linha de `provide`                                        |
 | B-04 | Distância geodésica vs. rota viária (PRD §21 "Distância")                                                    | RF-05                   | Haversine na porta `DistanceProvider`, rotulada como estimativa (PRD §8.5). Decisão de produção permanece aberta                                                                                                                       |
 | B-05 | Identidade oficial / autenticação (PRD §21 "Autenticação")                                                   | RF-10, §13.3            | Auth simulada e explicitamente identificada; RBAC real no backend                                                                                                                                                                      |
 | B-06 | APIs sociais e TikTok (PRD §21)                                                                              | RF-04, RF-11            | Todos os adapters sociais permanecem simulados                                                                                                                                                                                         |
@@ -164,14 +164,28 @@ Cobre PRD §19 Fase 0 e a primeira parcela de **RF-01**.
 
 ---
 
-### Fase 4 — Pontos de referência por CEP (RF-02)
+### Fase 4 — Pontos de referência por CEP (RF-02) ✅ CONCLUÍDA
 
 **Objetivo.** Permitir de um a três âncoras de localização com geocodificação simulada.
-**Funcionalidades.** `LocationAnchor`; `POST /applications/:id/location-anchors`; porta `GeocodingProvider` + mock determinístico; sinalização de CEP duplicado; fallback por bairro/busca textual; UI da etapa 2.
-**Dependências.** Fases 2 e 3 (bairros/unidades).
-**Critérios de aceite.** Todos os de PRD §8.2; conclusão possível apenas com o CEP residencial; pontos não afetam pontuação.
-**Testes.** Normalização de CEP como texto; falha de geocodificação; unitários de duplicidade; E2E "só CEP residencial".
-**Riscos.** Provider indefinido (B-03); CEP é dado pessoal → mascaramento e ausência em logs.
+
+**Funcionalidades.**
+
+- `LocationAnchor` no schema canônico, com invariantes de PRD §8.2 impostas por check constraint: no máximo três posições, a posição 1 é sempre a residência, coordenada é um par indivisível, e `RESOLVIDO` exige coordenada e incerteza.
+- Porta `GeocodingProvider` com adapter determinístico ancorado nos CEPs reais das unidades escolares (ADR-0023). Sem rede, sem relógio, sem aleatoriedade.
+- `GET`, `POST` e `DELETE` em `/applications/:id/location-anchors`, mais `GET /neighborhoods` para o fallback de PRD §8.2.
+- Sinalização de CEP duplicado — **sinalização, não recusa**: repetir um CEP entre residência e trabalho é uma escolha legítima da família.
+- Etapa 2 da interface, com a incerteza da localização dita em português e a promessa explícita de que os pontos não pontuam.
+- `normalizeCep` movida para `@match/domain`, compartilhada entre o pipeline de ingestão e a validação da API (ADR-0025).
+
+**Dependências.** Fases 2 e 3. **B-03 contornado, não resolvido:** nenhum provider real foi escolhido.
+
+**Critérios de aceite.** Conclusão possível apenas com o CEP residencial, coberto por E2E; a residência não pode ser removida; os dois pontos opcionais podem ser adicionados e removidos; falha de geocodificação não bloqueia a inscrição; os pontos não alteram o grupamento nem a pontuação, verificado comparando a resposta antes e depois.
+
+**Testes.** 33 novos: 7 unitários do provider, 17 de integração HTTP contra PostgreSQL real, 9 de componente e 3 E2E com servidores reais.
+
+**O que os dados decidiram.** A referência cobre 353 setores de CEP, construída a partir do centroide das unidades de cada setor. Resolve 89% dos 21.688 CEPs distintos que aparecem nos cinco processos históricos; os 11% restantes falham de verdade, o que exercita o caminho por bairro que PRD §8.2 exige em vez de deixá-lo como código morto.
+
+**Riscos remanescentes.** A precisão é do tamanho do setor, não do endereço: raio mediano de 750 m, mas com cauda até 10,7 km. A interface declara essa margem, e a Fase 6 precisa decidir se ordena unidades por uma estimativa dessa granularidade. A **busca textual** de unidades citada em PRD §8.2 depende do catálogo de unidades no banco e fica com a Fase 6; esta fase entrega a lista de bairros que a alimenta.
 
 ---
 
@@ -317,3 +331,10 @@ Detalhadas em `docs/DECISIONS.md`:
 - **ADR-0020** — Desduplicação determinística do catálogo de unidades, com as linhas descartadas registradas.
 - **ADR-0021** — Regras de normalização escritas duas vezes (SQL e TypeScript), com teste de paridade.
 - **ADR-0022** — Publicação versionada em Parquet, sem sobrescrita e sem ponteiro para "última".
+
+### Decisões da Fase 4
+
+- **ADR-0023** — Geocodificação simulada ancorada no setor de CEP das unidades reais, não em hash sintético.
+- **ADR-0024** — A incerteza é publicada junto da coordenada, e setor com uma única unidade não é tratado como preciso.
+- **ADR-0025** — `normalizeCep` no domínio, compartilhada entre a ingestão e a API.
+- **ADR-0026** — CEP duplicado na mesma inscrição é sinalizado, nunca recusado.

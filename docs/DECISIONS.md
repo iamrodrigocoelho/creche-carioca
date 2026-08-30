@@ -331,3 +331,73 @@ A reconciliação já pagou por si: revelou 24 unidades com `esc_codigo` gravado
 Não há ponteiro para "última importação". Um arquivo `latest` mutável seria exatamente a sobrescrita silenciosa que o critério proíbe; quem consome ordena os diretórios.
 
 **Consequências.** Reimportar exige escolher uma versão nova ou apagar a antiga conscientemente, e o diretório cresce a cada execução — não há política de retenção, que fica para a Fase 14. Em troca, qualquer resultado analítico pode ser rastreado até os bytes exatos que o produziram.
+
+---
+
+## ADR-0023 — Geocodificação ancorada no setor de CEP das unidades reais
+
+**Status:** Aceita · Fase 4
+
+**Contexto.** PRD §21 deixa o provider de geocodificação em aberto (B-03) e o plano previa um "mock determinístico". O caminho mais curto seria derivar latitude e longitude de um hash do CEP, dentro da caixa do município: zero dependências e determinístico.
+
+O problema é o que vem depois. A Fase 6 ordena unidades por distância e a Fase 8 aloca vagas usando essa ordem. Com coordenadas de hash, as distâncias são ruído com aparência de informação — a recomendação ficaria impossível de avaliar, e um erro de ordenação seria indistinguível do acaso.
+
+A Fase 3 deixou disponível o que faltava: 1.913 unidades escolares com CEP e coordenada conhecidos.
+
+**Decisão.** O adapter resolve pelo **setor do CEP** — os cinco primeiros dígitos. Para cada setor onde há ao menos uma unidade com coordenada, a referência guarda o centroide dessas unidades e o bairro predominante. São 353 setores num artefato de 47 KB, gerado pelo pipeline e versionado em `apps/api/src/geocoding/cep-sectors.json`.
+
+A cobertura foi medida contra os CEPs reais das famílias nos cinco processos: **19.376 dos 21.688 CEPs distintos**, ou 89%. O casamento exato de CEP cobriria só 6%, o que descartou a alternativa mais óbvia.
+
+**Consequências.** As distâncias da Fase 6 passam a ter significado geográfico, e o mesmo CEP devolve sempre o mesmo ponto — a recomendação é reproduzível.
+
+Os 11% que não resolvem **são a parte boa**: PRD §8.2 exige que a família consiga escolher unidades por bairro quando a geocodificação falha, e com um mock que sempre resolve esse caminho nasceria como código morto, nunca exercitado.
+
+O artefato é versionado porque o CI não tem os datasets. Ele precisa ser regerado quando a base de unidades mudar, com `pnpm --filter @match/data-pipeline cep-reference` — um passo manual, como as fixtures.
+
+Nada disso escolhe um provider de produção. B-03 continua aberto, e a troca é uma linha em `GeocodingModule`.
+
+---
+
+## ADR-0024 — A incerteza viaja junto da coordenada
+
+**Status:** Aceita · Fase 4
+
+**Contexto.** Um setor de CEP não é um ponto. Medindo a dispersão das unidades dentro de cada setor, o raio mediano é de 750 m, o percentil 90 é de 2,6 km e o pior caso chega a 10,7 km — setores da Barra e do Recreio cobrem áreas enormes. Devolver uma latitude e uma longitude sem mais nada faria uma estimativa de vários quilômetros parecer um endereço.
+
+Havia ainda uma armadilha: 55 setores têm uma única unidade de referência. O raio medido neles é exatamente zero — um ponto não tem dispersão — e publicar isso significaria **afirmar precisão perfeita justamente onde a evidência é mais fraca**.
+
+**Decisão.** `GeocodeResolved` carrega `precisionKm` obrigatório, propagado até o banco (onde um check constraint impede `RESOLVIDO` sem incerteza) e até a interface, que escreve "posição aproximada, com margem de cerca de 800 metros".
+
+Para setores de uma única unidade, a incerteza atribuída é o percentil 90 dos setores com mais de uma — derivado dos próprios dados, não arbitrado. Um piso de 500 m se aplica a todos, porque o centroide aproxima o setor, nunca o endereço da família.
+
+O artefato guarda apenas fatos — centroide, raio medido, contagem de unidades. A política de precisão vive no código, onde é testável.
+
+**Consequências.** A interface pode ser honesta sobre o que sabe, o que PRD §8.5 já exigia para distâncias. A Fase 6 recebe a informação necessária para decidir se ordenar por uma estimativa dessa granularidade é defensável — e, se não for, para dizê-lo.
+
+---
+
+## ADR-0025 — `normalizeCep` no domínio
+
+**Status:** Aceita · Fase 4
+
+**Contexto.** O pipeline da Fase 3 normalizava CEP ao ingerir as bases históricas. A Fase 4 precisa da mesma normalização ao validar o que a família digita. As duas fronteiras não podem depender uma da outra: `@match/data-pipeline` carrega o DuckDB, e a API não tem por que carregá-lo.
+
+Reimplementar era o caminho fácil e o errado: bastaria uma divergência de uma linha para o mesmo CEP virar duas chaves diferentes entre a ingestão e a inscrição, e o sintoma apareceria lá na frente, como uma unidade que não casa com o bairro da família.
+
+**Decisão.** A regra vive em `@match/domain`, que já é o pacote de regras puras sem I/O. O pipeline reexporta; o schema Zod da API usa a mesma função dentro de um `transform`, de modo que `20931-004` e `20931004` chegam idênticos ao serviço e a comparação de duplicidade não depende da forma digitada.
+
+**Consequências.** Uma definição só de "o que é um CEP" em todo o sistema. O teste de paridade SQL×TypeScript do pipeline (ADR-0021) continua valendo e agora protege também a API.
+
+---
+
+## ADR-0026 — CEP duplicado é sinalizado, não recusado
+
+**Status:** Aceita · Fase 4
+
+**Contexto.** PRD §8.2 diz que "CEPs duplicados na mesma inscrição devem ser sinalizados". A leitura preguiçosa seria tratar como erro de validação e recusar.
+
+Mas repetir um CEP é uma situação real e legítima: quem trabalha em casa tem residência e trabalho no mesmo endereço; quem mora com a avó que ajuda com a criança tem residência e rede de apoio no mesmo lugar. Recusar obrigaria a família a mentir ou a desistir do segundo ponto.
+
+**Decisão.** A duplicidade é calculada na leitura e devolvida como `duplicateOfPosition`, apontando para a primeira ocorrência. A interface avisa e segue: "Este CEP é igual ao do ponto 1. Pode continuar assim, se for o caso."
+
+**Consequências.** A família fica informada sem ser bloqueada — que é o que "sinalizar" quer dizer. A Fase 6, ao ordenar unidades por proximidade a cada ponto, precisa saber que dois pontos podem coincidir, para não apresentar a mesma distância duas vezes como se fossem evidências independentes.

@@ -655,3 +655,24 @@ select.mp-field__control {
   border-top: 1px solid var(--color-divider-soft);
   padding-top: var(--spacing-md);
 }
+
+/* Lista de pontos de referencia da inscricao (RF-02). Cada ponto e um bloco
+   proprio: a familia precisa distinguir residencia de trabalho num relance, e
+   os avisos de precisao e de CEP repetido pertencem visualmente ao ponto. */
+.mp-anchor-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mp-anchor {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-md);
+  background: var(--color-surface-pearl);
+  border: var(--border-hairline);
+  border-radius: var(--rounded-md);
+}

@@ -18,6 +18,7 @@ import {
   type ApplicationDraft,
 } from '@/lib/form';
 import { AgeGroupResult } from './AgeGroupResult';
+import { LocationAnchorsStep } from './LocationAnchorsStep';
 
 /**
  * Etapa 1 da jornada da familia (RF-01, fatia da Fase 1).
@@ -104,9 +105,10 @@ export function ApplicationForm() {
             Simular outra criança
           </Button>
         </div>
+        <LocationAnchorsStep applicationId={state.application.id} />
         <p className="mp-caption mp-muted">
-          As próximas etapas — pontos de referência por CEP, contatos e escolha de unidades — ainda
-          estão em construção nesta demonstração.
+          As próximas etapas — contatos e escolha de unidades — ainda estão em construção nesta
+          demonstração.
         </p>
       </div>
     );

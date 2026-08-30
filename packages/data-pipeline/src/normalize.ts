@@ -45,14 +45,14 @@ export function normalizeText(raw: string | null | undefined): string | null {
   return value === null ? null : value.replace(/\s+/g, ' ');
 }
 
-/** CEP normalizado para 8 digitos, preservando zeros a esquerda. */
-export function normalizeCep(raw: string | null | undefined): string | null {
-  const value = nullify(raw);
-  if (value === null) return null;
-  const digits = value.replace(/\D/g, '');
-  if (digits.length === 0 || digits.length > 8) return null;
-  return digits.padStart(8, '0');
-}
+/**
+ * CEP normalizado para 8 digitos, preservando zeros a esquerda.
+ *
+ * A regra vive em `@match/domain` porque a API precisa da mesma normalizacao ao
+ * validar o CEP que a familia digita (RF-02). Reimplementar aqui faria o mesmo
+ * CEP virar duas chaves diferentes entre a ingestao e a inscricao.
+ */
+export { normalizeCep } from '@match/domain';
 
 /** Caixa delimitadora do municipio do Rio de Janeiro, para sanidade de coordenadas. */
 export const RIO_BOUNDS = { minLat: -23.1, maxLat: -22.7, minLon: -43.8, maxLon: -43.1 } as const;
