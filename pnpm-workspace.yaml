@@ -7,7 +7,10 @@ packages:
 # @swc/core: usado apenas em tempo de teste, para emitir os metadados de decorator
 # que o NestJS exige e o esbuild do Vitest nao produz.
 # @prisma/engines e prisma: baixam os engines nativos do PostgreSQL na instalacao.
+# esbuild: dependencia transitiva do SDK `railway`, usado apenas pela CLI ao ler
+# .railway/railway.ts. Negado explicitamente - nada no repositorio executa esbuild.
 allowBuilds:
+  esbuild: false
   '@prisma/engines': true
   '@swc/core': true
   prisma: true
