@@ -22,9 +22,17 @@ export function loadTestEnv(): string {
   const url = process.env.DATABASE_URL_TEST;
 
   if (!url) {
-    throw new Error(
-      'DATABASE_URL_TEST nao definida. Os testes de integracao exigem um banco PostgreSQL dedicado. Veja .env.example.',
-    );
+    const message = [
+      'DATABASE_URL_TEST nao definida. Os testes de integracao exigem um banco PostgreSQL dedicado.',
+      'Defina-a em .env (veja .env.example) ou exporte-a no ambiente.',
+      'Se ela existe no ambiente mas nao chega ate aqui, declare-a em `globalEnv` no turbo.json:',
+      'o Turbo opera em envMode strict e so repassa as variaveis declaradas.',
+    ].join('\n');
+
+    // Escrito em stderr antes de lancar: o Vitest engole erros de `globalSetup`
+    // e reporta apenas "No test files found", que nao indica a causa real.
+    process.stderr.write(`\n${message}\n\n`);
+    throw new Error(message);
   }
 
   if (url === process.env.DATABASE_URL_ORIGINAL) {

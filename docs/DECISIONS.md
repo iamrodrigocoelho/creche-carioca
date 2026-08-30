@@ -239,3 +239,17 @@ O Prisma 7 removeu `url` do `schema.prisma`: a conexão vem de `prisma.config.ts
 **Consequências.** Um único dono do schema para todos os consumidores futuros. O Prisma 7 também deixou de carregar `.env` automaticamente, então API e seed usam `--env-file-if-exists` e `process.loadEnvFile`, sem adicionar dependência de dotenv.
 
 **Nota sobre rollback.** O Prisma Migrate não gera migrations de reversão. A estratégia é _forward-fix_: um problema em produção é corrigido por uma migration nova, nunca por edição de uma já aplicada — como foi feito com o `ERRCODE` acima. `PRD.md` §14.3 pede rollback "quando suportado"; aqui não é.
+
+---
+
+## ADR-0017 — Variáveis de banco declaradas em `globalEnv` do Turbo
+
+**Status:** Aceita · Fase 2
+
+**Contexto.** O Turbo 2 opera com `envMode: strict` por padrão: uma tarefa só recebe as variáveis de ambiente declaradas em `turbo.json`. Com apenas `NODE_ENV` declarada, `DATABASE_URL_TEST` não chegava ao Vitest.
+
+O sintoma era enganoso. O `globalSetup` do Vitest lançava por falta da variável, mas o Vitest engole erros de `globalSetup` e reporta apenas **"No test files found"**. Pior: o problema não aparecia em desenvolvimento, porque `loadTestEnv` carrega o `.env` da raiz e supre as variáveis independentemente do Turbo. Só quebrou no CI, onde não existe `.env`.
+
+**Decisão.** Declarar `DATABASE_URL` e `DATABASE_URL_TEST` em `globalEnv`. Além disso, `loadTestEnv` passou a escrever a causa em `stderr` **antes** de lançar, para que o diagnóstico apareça mesmo quando o Vitest mascara a exceção.
+
+**Consequências.** A URL do banco passa a integrar a chave de cache do Turbo — trocar de banco invalida o cache, o que é correto, já que o resultado dos testes depende dele. Qualquer variável de ambiente nova que uma tarefa precise deve ser declarada aqui; caso contrário ela silenciosamente não chega.
