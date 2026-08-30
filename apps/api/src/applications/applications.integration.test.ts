@@ -124,7 +124,13 @@ describe('API de inscricoes', () => {
       const body = apiErrorSchema.parse(response.body);
       expect(body.error.code).toBe('VALIDATION_FAILED');
       expect(body.error.issues?.[0]?.path).toBe('child.birthMonth');
-      expect(JSON.stringify(body)).not.toContain('99');
+
+      // O `correlationId` e um UUID aleatorio: ele nao deriva da entrada, mas
+      // pode conter '99' por acaso, o que reprovaria este teste sem que a API
+      // tivesse ecoado nada. Só os campos que carregam texto derivado da
+      // requisicao entram na verificacao de eco (PRD 13.5).
+      const { correlationId: _correlationId, ...echoable } = body.error;
+      expect(JSON.stringify(echoable)).not.toContain('99');
     });
 
     it('nao expoe stack trace (PRD 13.5)', async () => {
