@@ -1,6 +1,9 @@
-# Match Perfeito
-
-Protótipo de demonstração para a inscrição, classificação e convocação de vagas em creches e Espaços de Desenvolvimento Infantil do Município do Rio de Janeiro.
+# Nome da equipe: Creche Carioca
+# Membros: Paulo Rosa, Caio Barros e Rodrigo Coelho
+# Resumo: Protótipo de demonstração para a inscrição, classificação e convocação de vagas em creches e Espaços de Desenvolvimento Infantil do Município do Rio de Janeiro.
+# Arquitetura / abordagem:
+# Links:
+# Vídeo demo:
 
 > **Não é o sistema oficial de matrícula.** Todos os dados são sintéticos ou anonimizados e não representam a realidade do município. Não utilize dados pessoais reais.
 
