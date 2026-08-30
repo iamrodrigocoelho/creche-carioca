@@ -1,0 +1,95 @@
+# Gates de CI exigidos por PRD 14.8.
+#
+# PRD 13.7: actions fixadas por versao confiavel, lockfile versionado,
+# build reprodutivel em ambiente limpo.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: lint · typecheck · test · build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.1.3
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      # `--frozen-lockfile` garante que o lockfile versionado e respeitado.
+      - name: Instalar dependências
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Verificação de tipos
+        run: pnpm typecheck
+
+      - name: Formatação
+        run: pnpm format:check
+
+      - name: Testes unitários e de integração
+        run: pnpm test:coverage
+
+      - name: Build
+        run: pnpm build
+
+      - name: Instalar navegador do Playwright
+        run: pnpm --filter @match/web exec playwright install --with-deps chromium
+
+      - name: Smoke E2E
+        run: pnpm e2e
+
+  security:
+    name: Análise de dependências e segredos
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Histórico completo é necessário para a varredura de segredos.
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.1.3
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Instalar dependências
+        run: pnpm install --frozen-lockfile
+
+      # PRD 13.7: bloquear merge com vulnerabilidade crítica conhecida.
+      - name: Auditoria de dependências
+        run: pnpm audit --audit-level critical
+
+      # TODO (Fase 14): adicionar SAST e geração de SBOM em builds de release,
+      # conforme PRD 13.7.
+      - name: Varredura de segredos
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

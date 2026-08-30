@@ -1,0 +1,14 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+
+# PRD 13.7 (supply chain): scripts de instalacao rodam apenas para dependencias
+# explicitamente aprovadas aqui. Cada entrada e uma decisao consciente e auditavel.
+# @swc/core: usado apenas em tempo de teste, para emitir os metadados de decorator
+# que o NestJS exige e o esbuild do Vitest nao produz.
+allowBuilds:
+  '@swc/core': true
+
+# Versoes recentes liberadas explicitamente da politica de idade minima de release.
+minimumReleaseAgeExclude:
+  - zod@4.5.4

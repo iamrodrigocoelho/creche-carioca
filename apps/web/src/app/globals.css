@@ -1,0 +1,18 @@
+/*
+ * Estilos globais. A ordem importa: tokens definem as custom properties, base
+ * aplica a tipografia do DESIGN.md e components implementa os componentes.
+ * Nenhum hex e declarado fora de `@match/ui`.
+ */
+@import '@match/ui/styles/tokens.css';
+@import '@match/ui/styles/base.css';
+@import '@match/ui/styles/components.css';
+
+.mp-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.mp-page__main {
+  flex: 1 0 auto;
+}

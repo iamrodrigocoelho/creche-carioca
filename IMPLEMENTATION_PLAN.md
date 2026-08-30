@@ -1,0 +1,271 @@
+# IMPLEMENTATION_PLAN.md — Match Perfeito
+
+**Escopo:** plano de desenvolvimento incremental do MVP descrito em `PRD.md`.
+**Fontes de verdade:** `PRD.md` (comportamento, regras, requisitos técnicos) e `/docs/DESIGN.md` (apresentação visual).
+**Status:** vivo — atualizado a cada fase concluída.
+**Última atualização:** 30/08/2026 (Fase 1 concluída).
+
+> Este documento **não replica** requisitos. Ele referencia os identificadores do PRD (`RF-xx`, seções `§n`) e organiza a ordem de execução. Em qualquer divergência, o `PRD.md` e o `/docs/DESIGN.md` prevalecem.
+
+---
+
+## 1. Inspeção inicial do repositório
+
+| Item                                 | Resultado                                                                                 |
+| ------------------------------------ | ----------------------------------------------------------------------------------------- |
+| `CLAUDE.md` / `AGENTS.md` / `README` | Não existiam antes da Fase 1                                                              |
+| Instruções adicionais                | Apenas `.claude/settings.local.json` (permissões locais do agente, sem regras de projeto) |
+| Git                                  | **Não é um repositório Git.** Nenhum commit foi feito (regra de execução)                 |
+| Gerenciador de pacotes               | Nenhum lockfile presente. `pnpm 11.1.3` disponível → adotado (PRD §12.1)                  |
+| Runtime                              | Node.js v22.13.1 (LTS)                                                                    |
+| Docker                               | **Ausente na máquina** (`docker: command not found`)                                      |
+| Conteúdo pré-existente               | `PRD.md`, `docs/DESIGN.md`, `img/logo/*.png` — todos preservados, nenhum sobrescrito      |
+| Datasets                             | O repositório `CIT-SME-RJ/dadoscreche` (PRD §10.1) **não está** presente localmente       |
+
+---
+
+## 2. Dependências externas, decisões pendentes e conflitos identificados
+
+### 2.1 Bloqueios externos (não impedem o MVP; tratados por mock/config — PRD §21)
+
+| #    | Item                                                                                                         | Impacto                         | Tratamento adotado                                                                                                                                                                |
+| ---- | ------------------------------------------------------------------------------------------------------------ | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| B-01 | Datasets `dadoscreche` não estão no ambiente                                                                 | Fases 3+ dependem deles         | Pipeline lê de `data/raw/` configurável; sem os arquivos, usa amostras sintéticas rotuladas. Fase 3 documenta o download manual                                                   |
+| B-02 | Docker ausente                                                                                               | PostgreSQL/Redis/Testcontainers | `docker-compose.yml` entregue na Fase 1 como artefato (PRD §19, Fase 0), porém **não executado** — a Fase 1 não depende de banco. Fases 2+ exigem Docker ou Postgres/Redis locais |
+| B-03 | Provider de geocodificação indefinido (PRD §21 "Geocodificação")                                             | RF-02                           | Porta `GeocodingProvider` + adapter mock determinístico. Nenhum provider real é escolhido                                                                                         |
+| B-04 | Distância geodésica vs. rota viária (PRD §21 "Distância")                                                    | RF-05                           | Haversine na porta `DistanceProvider`, rotulada como estimativa (PRD §8.5). Decisão de produção permanece aberta                                                                  |
+| B-05 | Identidade oficial / autenticação (PRD §21 "Autenticação")                                                   | RF-10, §13.3                    | Auth simulada e explicitamente identificada; RBAC real no backend                                                                                                                 |
+| B-06 | APIs sociais e TikTok (PRD §21)                                                                              | RF-04, RF-11                    | Todos os adapters sociais permanecem simulados                                                                                                                                    |
+| B-07 | Regras oficiais de desempate e de grupamento etário por processo (PRD §21 "Desempates", §14.5 do calendário) | RF-01, RF-07                    | Política de grupamento e desempates são **dados versionados e parametrizados**, marcados como `DEMONSTRACAO`. Nenhum valor é tratado como oficial                                 |
+
+### 2.2 Decisões técnicas explicitamente pendentes no PRD — **não** fechadas neste plano
+
+- **Biblioteca de mapas:** PRD §12.1 delega a `/docs/DESIGN.md`; o `DESIGN.md` não menciona mapas. Fica em aberto até a Fase 8; a UI de mapa será isolada atrás de um componente `<UnitMap>` para permitir troca.
+- **Zod vs. DTOs do NestJS:** PRD §12.1 permite ambos, exigindo schemas compartilhados. Adotado **Zod em `packages/schemas`** como fonte única, consumido por API e web — registrado como ADR-0004, reversível.
+- **PostGIS:** PRD §15.4 diz "se disponível". Avaliado na Fase 8.
+- **RPO/RTO, retenção, base legal:** PRD §13.2/§15.6 exigem definição com a SME. Fora do MVP.
+
+### 2.3 Conflitos entre PRD.md e DESIGN.md
+
+| #    | Conflito                                                                                                                                                                                     | Resolução aplicada                                                                                                                                                                                                                                                                                                                                                       |
+| ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| C-01 | `DESIGN.md` §Known Gaps: "Form validation and error states were not surfaced". `PRD.md` §17 e §20 exigem validação inline, resumo de erros e estados de loading/vazio/erro/sucesso           | Conforme `PRD.md` §1.1, foi criada uma camada **mínima e provisória** de estados de formulário, derivada apenas de tokens já existentes no `DESIGN.md` (`{colors.primary-focus}`, `{colors.hairline}`, `{typography.caption}`). Nenhum token novo de marca foi inventado. Marcado como provisório em `docs/DECISIONS.md` (ADR-0006) — requer validação do time de design |
+| C-02 | `DESIGN.md` exige variante de logotipo para fundo azul no `global-nav`; `/img/logo` contém apenas _horizontal monocromática preto_ e _vertical monocromática azul_ — nenhuma negativa/branca | `TODO` explícito registrado (DESIGN.md instrui a não inventar variante). Provisoriamente o ativo oficial **inalterado** é apresentado sobre uma área de proteção clara dentro da navegação azul. Sem recolorir, mascarar ou redesenhar                                                                                                                                   |
+| C-03 | `DESIGN.md` descreve cor de status apenas institucional; `PRD.md` §17 exige "não depender apenas de cor para status"                                                                         | Todos os status usam ícone/rótulo textual além de cor. Nenhuma paleta semântica nova (sucesso/erro) foi introduzida na marca — estados usam neutros e `{colors.primary}`                                                                                                                                                                                                 |
+| C-04 | `DESIGN.md` sugere **Inter** via Google Fonts; `PRD.md` §13.5 exige CSP restritiva e §13.4 evita dependências externas não controladas                                                       | Fase 1 usa apenas a pilha `system-ui`/`-apple-system` (que resolve para SF Pro real em Apple, conforme DESIGN.md). Auto-hospedagem do Inter fica para a Fase 14 (ADR-0005)                                                                                                                                                                                               |
+| C-05 | `DESIGN.md` foi escrito descrevendo páginas de e-commerce (tiles de produto, "Add to Bag", configurador)                                                                                     | Os **tokens e specs de componente** são aplicados; a semântica de e-commerce é mapeada para o domínio (ex.: `product-tile-light` → seção institucional de largura total). Nenhuma alteração de token                                                                                                                                                                     |
+| C-06 | `DESIGN.md` §Iteration Guide 4: "Never document hover"                                                                                                                                       | Nenhum estado de hover é especificado; foco e `:active` (`scale(0.95)`) são implementados conforme o documento                                                                                                                                                                                                                                                           |
+
+---
+
+## 3. Convenções de execução
+
+- Fases pequenas, verificáveis e independentemente entregáveis; nenhuma fase implementa o MVP inteiro.
+- Gates obrigatórios ao fim de **toda** fase (PRD §14.8): `lint`, `typecheck`, `test`, `build` — mais `integration`/`e2e` quando a fase os introduzir.
+- Nenhum segredo no repositório; apenas `.env.example` com valores fictícios (PRD §13.4).
+- Nenhum commit, push ou deploy é executado pelo agente.
+- Toda decisão arquitetural entra em `docs/DECISIONS.md` (PRD §20).
+- Nada é sobrescrito sem justificativa registrada aqui.
+
+---
+
+## 4. Fases
+
+### Fase 1 — Fundação técnica + primeira fatia funcional ponta a ponta ✅ CONCLUÍDA
+
+**Objetivo.** Estabelecer o monorepo, os gates de qualidade e uma fatia vertical fina que atravesse web → API → domínio → resposta, provando a arquitetura sem depender de banco de dados.
+Cobre PRD §19 Fase 0 e a primeira parcela de **RF-01**.
+
+**Funcionalidades.**
+
+- Monorepo pnpm + Turborepo com TypeScript `strict`, ESLint, Prettier, Vitest.
+- `packages/domain`: cálculo de grupamento etário por política **versionada e parametrizada** (PRD §8.1).
+- `packages/schemas`: contratos Zod compartilhados entre API e web.
+- `packages/ui`: tokens do `/docs/DESIGN.md` como CSS custom properties.
+- `apps/api` (NestJS): `GET /health/live`, `GET /health/ready`, `POST /applications`, `GET /applications/:id`, `PATCH /applications/:id` (PRD §12.4), com repositório em memória atrás de uma porta.
+- `apps/web` (Next.js): navegação global, rodapé, página institucional e etapa 1 da inscrição, exibindo o grupamento calculado com explicação estruturada.
+- Segurança de base: helmet, CORS por allowlist, rate limiting, limite de payload, IDs não sequenciais, idempotência em escrita, logs JSON com correlation ID e redação de PII.
+- `docker-compose.yml` (Postgres + Redis) e workflow de CI com os gates de PRD §14.8 — entregues como artefatos da fundação; o compose só passa a ser usado na Fase 2.
+
+**Dependências.** Nenhuma. Ponto de partida.
+
+**Critérios de aceite.**
+
+- Grupamento calculado por função de domínio pura, testável e parametrizada.
+- Alterar nascimento **ou** data de referência recalcula o grupamento (via `PATCH`).
+- A jornada é concluível sem qualquer dado real.
+- `POST /applications` repetido com a mesma `Idempotency-Key` não cria segunda inscrição.
+- Entrada inválida é rejeitada no limite da API com erro estruturado, sem stack trace.
+- A página respeita tokens do `DESIGN.md`, é navegável por teclado e possui estados de loading/erro/sucesso.
+- Logotipo carregado de `/img/logo`, inalterado, com `alt` adequado.
+
+**Testes necessários.** Unitários de domínio (cobertura ≥ 90%), unitários de schemas, testes de integração HTTP da API (health, criação, recálculo, idempotência, validação, 404), teste de componente da web, smoke E2E Playwright, além de lint/typecheck/build.
+
+**Riscos.**
+
+- _Técnico:_ a política de grupamento é **demonstrativa**; tratá-la como oficial seria erro de produto → mitigado por rótulo `DEMONSTRACAO` no dado e na UI.
+- _Técnico:_ repositório em memória perde estado ao reiniciar → aceitável, substituído na Fase 2 pela mesma porta.
+- _Segurança:_ CORS/rate limit permissivos em dev → allowlist explícita via env, sem curinga.
+- _Segurança:_ PII em logs → middleware de redação + testes.
+
+---
+
+### Fase 2 — Persistência canônica
+
+**Objetivo.** Trocar o repositório em memória por PostgreSQL/Prisma sem alterar o domínio.
+**Funcionalidades.** `prisma/schema.prisma` com as entidades de PRD §11 necessárias até aqui (`Process`, `RuleVersion`, `Child`, `Guardian`, `Application`, `StatusEvent`, `AuditEvent`); migrations; `seed.ts` sintético; adapter Prisma da porta de repositório; `AuditEvent` append-only (RF-16); `/health/ready` passa a verificar o banco.
+**Dependências.** Fase 1; Docker ou Postgres local (B-02).
+**Critérios de aceite.** Migrations aplicam e revertem; constraints de PRD §11.1 aplicáveis existem; nenhum endpoint muda de contrato; auditoria registra ator, ação, entidade, instante UTC e correlation ID sem PII.
+**Testes.** Integração com Postgres real em container; teste de append-only; reexecução de seed idempotente.
+**Riscos.** Ausência de Docker bloqueia a fase (B-02); divergência entre schema Prisma e schemas Zod → teste de contrato.
+
+---
+
+### Fase 3 — Pipeline de dados (DuckDB) e unidades
+
+**Objetivo.** Ingerir os arquivos históricos em TypeScript/DuckDB e publicar tabelas curadas.
+**Funcionalidades.** `packages/data-pipeline` com `@duckdb/node-api`; leitura streaming de `.csv.gz`/`.csv` com `;` e BOM (PRD §10.3); normalização de unidades, coordenadas, CRE e microárea; catálogo de perguntas/pesos; registro de origem, hash, data e versão de importação; relatório de qualidade de dados; validações conhecidas de PRD §10.4.
+**Dependências.** Fase 2; datasets presentes (B-01).
+**Critérios de aceite.** Nenhum arquivo é sobrescrito silenciosamente; CEPs e códigos preservam zeros à esquerda; contagem de linhas e chaves validadas antes da publicação; relatório lista as inconsistências de PRD §10.4.
+**Testes.** ETL sobre amostras de todos os formatos; testes de normalização; teste de não-regressão do relatório.
+**Riscos.** Estruturas heterogêneas de oferta/ocupação (PRD §21 "Capacidade"); memória do Node em arquivos grandes → obrigatório streaming/DuckDB.
+
+---
+
+### Fase 4 — Pontos de referência por CEP (RF-02)
+
+**Objetivo.** Permitir de um a três âncoras de localização com geocodificação simulada.
+**Funcionalidades.** `LocationAnchor`; `POST /applications/:id/location-anchors`; porta `GeocodingProvider` + mock determinístico; sinalização de CEP duplicado; fallback por bairro/busca textual; UI da etapa 2.
+**Dependências.** Fases 2 e 3 (bairros/unidades).
+**Critérios de aceite.** Todos os de PRD §8.2; conclusão possível apenas com o CEP residencial; pontos não afetam pontuação.
+**Testes.** Normalização de CEP como texto; falha de geocodificação; unitários de duplicidade; E2E "só CEP residencial".
+**Riscos.** Provider indefinido (B-03); CEP é dado pessoal → mascaramento e ausência em logs.
+
+---
+
+### Fase 5 — Contatos multicanal e redes sociais (RF-03, RF-04)
+
+**Objetivo.** Cadastro de telefones e perfis sociais com consentimentos e verificação simulada.
+**Funcionalidades.** `ContactPoint` unificado; E.164; exatamente um principal; impedir remoção do único telefone; OTP simulado; perfis sociais opcionais com máquina de status; mascaramento por padrão.
+**Dependências.** Fase 2.
+**Critérios de aceite.** Todos os de PRD §8.3 e §8.4; rede social nunca é o único contato; `@handle` tratado como mutável.
+**Testes.** Invariantes de telefone principal; mascaramento; XSS em rótulo e `@handle`; ausência de PII em logs.
+**Riscos.** Contato de terceiros exige relação e autorização (PRD §21 "Privacidade"); criptografia em nível de aplicação (PRD §13.4) — avaliar aqui.
+
+---
+
+### Fase 6 — Recomendação de unidades e preferências (RF-05, RF-06)
+
+**Objetivo.** Recomendar unidades compatíveis e capturar até cinco preferências ordenadas.
+**Funcionalidades.** `GET /units/recommendations` com filtros; distância geodésica rotulada como estimativa; explicação da recomendação a partir de dados estruturados; `PUT /applications/:id/preferences`; reordenação por drag-and-drop **e** por controles acessíveis; alertas informativos.
+**Dependências.** Fases 3, 4.
+**Critérios de aceite.** Card exibe todos os campos de PRD §8.5; recomendação não impede escolha livre; unicidade de unidade por grupamento/turno.
+**Testes.** Ordenação por ponto de referência; unicidade; E2E de reordenação por teclado; a11y da lista.
+**Riscos.** Sem mapa ainda (decisão pendente §2.2) — a lista equivalente (PRD §17) é entregue primeiro, o que também garante a alternativa textual.
+
+---
+
+### Fase 7 — Motor de pontuação versionado (RF-07)
+
+**Objetivo.** Reconstruir pontuação determinística e explicável por versão de regra.
+**Funcionalidades.** `packages/matching-engine` (parte de pontuação); `Criterion`, `CriterionResponse`, `ScoreResult`; `POST /score-runs`, `GET /score-runs/:id`; explicação estruturada; nova versão nunca reescreve histórico.
+**Dependências.** Fases 3 (catálogo de perguntas), 5.
+**Critérios de aceite.** Todos os de PRD §8.7; nenhuma inferência de LLM decide números.
+**Testes.** Pontuação por processo/ano; desempates; imutabilidade de versão; cobertura ≥ 90% no pacote.
+**Riscos.** Regras oficiais de desempate não confirmadas (B-07) → configuração versionada rotulada.
+
+---
+
+### Fase 8 — Motor de alocação determinístico (RF-08)
+
+**Objetivo.** Alocar por preferências garantindo os invariantes obrigatórios.
+**Funcionalidades.** Algoritmo inspirado em deferred acceptance; `AllocationRun`, `Allocation`; `POST /allocation-runs`, `GET /allocation-runs/:id`; execução em worker; saídas de simulação de PRD §8.8.
+**Dependências.** Fases 6, 7.
+**Critérios de aceite.** Todos os invariantes de PRD §8.8; mesma entrada + versão ⇒ mesma saída; toda decisão explicável.
+**Testes.** **Testes baseados em propriedades** de PRD §14.2 (oferta única, capacidade, preferências, determinismo, terminação, sem perda/duplicação); benchmark com 100 mil inscrições.
+**Riscos.** Complexidade/tempo de execução (PRD §15.3, meta de 5 min) → medir e registrar no runbook; nunca executar no request HTTP.
+
+---
+
+### Fase 9 — Comparador de cenários (RF-09)
+
+**Objetivo.** Comparar estado histórico, resultado proposto e cenários de capacidade.
+**Funcionalidades.** Cenários temporários que não alteram dados-base; aviso permanente de dado anonimizado.
+**Dependências.** Fase 8.
+**Critérios de aceite.** Comparação sempre rotulada como não oficial; cenário isolado e descartável.
+**Testes.** Isolamento do cenário; reprodutibilidade.
+**Riscos.** Interpretação indevida dos indicadores → rótulo obrigatório em toda superfície (PRD §1.2).
+
+---
+
+### Fase 10 — Auth simulada, RBAC e painel da CRE (RF-10)
+
+**Objetivo.** Escopo territorial no backend e painel operacional.
+**Funcionalidades.** Auth simulada identificada; RBAC por perfil de PRD §6.6; escopo por CRE; `GET /dashboards/operations` paginado por cursor; contatos mascarados; exportação com permissão específica e auditoria.
+**Dependências.** Fases 2, 6.
+**Critérios de aceite.** PRD §8.10 completo; ocultação de UI nunca é o único controle.
+**Testes.** Autorização por objeto e território; IDOR/BOLA; enumeração; rate limiting; E2E "operador sem permissão".
+**Riscos.** Vazamento entre territórios — risco de segurança mais alto do MVP; exige testes negativos abrangentes.
+
+---
+
+### Fase 11 — Convocação rastreável e adapters (RF-11, RF-12, RF-14)
+
+**Objetivo.** Máquina de estados de convocação com tentativas multicanal simuladas.
+**Funcionalidades.** Estados de PRD §8.11; BullMQ/Redis com filas separadas, backoff e dead-letter; `packages/channel-adapters` com a interface `ChannelAdapter` de PRD §14.4; `ContactAttempt`; templates versionados por canal; ordem de canais parametrizável por processo.
+**Dependências.** Fases 2, 5, 8.
+**Critérios de aceite.** PRD §8.11 e §8.12 completos; processamento idempotente; aceite encerra as demais opções transacionalmente.
+**Testes.** Contract tests de adapters; relógio controlado para prazos; expiração/extensão; reprocessamento sem duplicação; E2E dos cenários 6–9 de PRD §14.5.
+**Riscos.** Duplicação de convocação (meta zero) → idempotency key obrigatória; PII em mensagens (PRD §8.14) → teste de conteúdo de template.
+
+---
+
+### Fase 12 — Resposta pública da família (RF-13)
+
+**Objetivo.** Página pública por token de uso único e prazo limitado.
+**Funcionalidades.** Aceitar, recusar, solicitar extensão, atualizar canais; token armazenado apenas como hash.
+**Dependências.** Fase 11.
+**Critérios de aceite.** PRD §8.13; token expira e invalida após uso; link apenas para domínio permitido.
+**Testes.** Reuso de token consumido/expirado; CSRF; rate limiting; enumeração.
+**Riscos.** Superfície pública — maior exposição; exige CAPTCHA configurável (PRD §13.5) e cabeçalhos rígidos.
+
+---
+
+### Fase 13 — Planejamento territorial e simulador (RF-15)
+
+**Objetivo.** Mapa e indicadores agregados com simulação de capacidade.
+**Funcionalidades.** Decisão da biblioteca de mapas (§2.2); camadas de unidades, CREs e microáreas; nascidos vivos por bairro/ano; `GET /dashboards/planning`; simulador de capacidade em cenário temporário; lista equivalente ao mapa.
+**Dependências.** Fases 3, 9.
+**Critérios de aceite.** PRD §8.15; dados-base nunca alterados; alternativa textual completa.
+**Testes.** Agregações; isolamento do cenário; a11y do mapa e da lista.
+**Riscos.** Volume geoespacial → agregados pré-calculados/materialized views (PRD §15.4).
+
+---
+
+### Fase 14 — Observabilidade, hardening e fechamento
+
+**Objetivo.** Atingir a Definition of Done de PRD §20.
+**Funcionalidades.** OpenTelemetry ponta a ponta (PRD §16.3), métricas Prometheus-compatible, CSP/HSTS e demais cabeçalhos, SBOM, secret scanning/SAST no CI, `docs/RUNBOOK.md`, `docs/SECURITY.md`, `docs/DATA_DICTIONARY.md`, auto-hospedagem de fonte (C-04), testes de carga (PRD §15.2), revisão WCAG 2.2 AA.
+**Dependências.** Todas as anteriores.
+**Critérios de aceite.** Todos os gates de PRD §14.8 verdes; nenhuma vulnerabilidade crítica aberta; benchmarks registrados no runbook.
+**Testes.** Carga nos volumes de PRD §15.2; suíte de segurança de PRD §14.6; a11y automática + manual de PRD §14.7.
+**Riscos.** Metas de desempenho de PRD §15.3 podem não ser atingíveis no hardware disponível → registrar o ambiente de referência em vez de ajustar a meta.
+
+---
+
+## 5. Registro de decisões menores adotadas nesta fase
+
+Detalhadas em `docs/DECISIONS.md`:
+
+- **ADR-0001** — pnpm workspaces + Turborepo (PRD §12.1).
+- **ADR-0002** — TypeScript 5.9 em vez de 7.x, por compatibilidade de `emitDecoratorMetadata` com NestJS. Revisão na Fase 14.
+- **ADR-0003** — Porta de repositório com adapter em memória na Fase 1, substituído por Prisma na Fase 2.
+- **ADR-0004** — Zod em `packages/schemas` como fonte única de validação (opção permitida por PRD §12.1).
+- **ADR-0005** — Pilha de fontes do sistema na Fase 1; auto-hospedagem do Inter adiada (C-04).
+- **ADR-0006** — Estados de formulário provisórios, derivados de tokens existentes (C-01).
+- **ADR-0007** — Política de grupamento etário como dado versionado e rotulado `DEMONSTRACAO` (B-07).
+- **ADR-0008** — Área de proteção clara para o logotipo na navegação azul, com `TODO` pela variante negativa (C-02).
+- **ADR-0009** — `@match/ui` consumido por `transpilePackages`, sem etapa de build própria.
+- **ADR-0010** — CSP sem origem externa, mantendo `'unsafe-inline'` temporariamente; nonce na Fase 14.
+- **ADR-0011** — Build da API por `tsc`; `@nestjs/cli` removido por incompatibilidade com Node 22.
+- **ADR-0012** — Grupamento derivado na leitura, nunca persistido, garantindo o recálculo de PRD §8.1.

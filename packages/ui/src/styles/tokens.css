@@ -1,0 +1,168 @@
+/*
+ * Tokens de /docs/DESIGN.md - fonte unica de verdade visual (PRD 1.1).
+ * Nenhum valor aqui pode ser inventado: cada custom property reproduz um token
+ * documentado. Nao inline hex fora deste arquivo (DESIGN.md, Iteration Guide 3).
+ *
+ * O DESIGN.md documenta a variante predominantemente clara e registra em
+ * "Known Gaps" que as contrapartes de modo escuro nao foram formalizadas.
+ * Por isso a aplicacao nao implementa dark mode.
+ */
+
+:root {
+  color-scheme: light;
+
+  /* ---------- Paleta oficial da marca ---------- */
+  --color-primary: #13335a;
+  --color-canvas-parchment: #eceded;
+  --color-brand-gradient-start: #2a688f;
+  --color-brand-gradient-end: #42b9eb;
+
+  /* ---------- Tokens semanticos ---------- */
+  --color-primary-focus: #2a688f;
+  --color-primary-on-dark: #42b9eb;
+  --color-on-primary: #ffffff;
+  --color-canvas: #ffffff;
+  --color-surface-pearl: #f7f8f8;
+  --color-surface-tile-1: #13335a;
+  --color-surface-tile-2: #102b4c;
+  --color-surface-tile-3: #0d233e;
+  --color-surface-black: #000000;
+  --color-surface-chip-translucent: rgba(236, 237, 237, 0.78);
+
+  /* ---------- Texto, divisores e bordas ---------- */
+  --color-ink: #13335a;
+  --color-body: #1d2733;
+  --color-body-on-dark: #ffffff;
+  --color-body-muted: #eceded;
+  --color-ink-muted-80: #34495e;
+  --color-ink-muted-48: #66717d;
+  --color-divider-soft: rgba(19, 51, 90, 0.1);
+  --color-hairline: #d4d7da;
+
+  /* ---------- Gradiente institucional ---------- */
+  /* Uso restrito a momentos de marca aprovados (DESIGN.md, Colors). */
+  --gradient-brand: linear-gradient(90deg, #2a688f 0%, #42b9eb 100%);
+
+  /* ---------- Tipografia ----------
+   * DESIGN.md: `system-ui`/`-apple-system` como primeira entrada da pilha resolve
+   * para o SF Pro real em macOS/iOS. A auto-hospedagem do Inter para plataformas
+   * nao Apple esta registrada em docs/DECISIONS.md (ADR-0005).
+   */
+  --font-display: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  --type-hero-display-size: 56px;
+  --type-hero-display-weight: 600;
+  --type-hero-display-line: 1.07;
+  --type-hero-display-tracking: -0.28px;
+
+  --type-display-lg-size: 40px;
+  --type-display-lg-weight: 600;
+  --type-display-lg-line: 1.1;
+  --type-display-lg-tracking: 0;
+
+  --type-display-md-size: 34px;
+  --type-display-md-weight: 600;
+  --type-display-md-line: 1.47;
+  --type-display-md-tracking: -0.374px;
+
+  --type-lead-size: 28px;
+  --type-lead-weight: 400;
+  --type-lead-line: 1.14;
+  --type-lead-tracking: 0.196px;
+
+  --type-lead-airy-size: 24px;
+  --type-lead-airy-weight: 300;
+  --type-lead-airy-line: 1.5;
+  --type-lead-airy-tracking: 0;
+
+  --type-tagline-size: 21px;
+  --type-tagline-weight: 600;
+  --type-tagline-line: 1.19;
+  --type-tagline-tracking: 0.231px;
+
+  --type-body-strong-size: 17px;
+  --type-body-strong-weight: 600;
+  --type-body-strong-line: 1.24;
+  --type-body-strong-tracking: -0.374px;
+
+  --type-body-size: 17px;
+  --type-body-weight: 400;
+  --type-body-line: 1.47;
+  --type-body-tracking: -0.374px;
+
+  --type-dense-link-size: 17px;
+  --type-dense-link-weight: 400;
+  --type-dense-link-line: 2.41;
+  --type-dense-link-tracking: 0;
+
+  --type-caption-size: 14px;
+  --type-caption-weight: 400;
+  --type-caption-line: 1.43;
+  --type-caption-tracking: -0.224px;
+
+  --type-caption-strong-size: 14px;
+  --type-caption-strong-weight: 600;
+  --type-caption-strong-line: 1.29;
+  --type-caption-strong-tracking: -0.224px;
+
+  --type-button-large-size: 18px;
+  --type-button-large-weight: 300;
+  --type-button-large-line: 1;
+  --type-button-large-tracking: 0;
+
+  --type-button-utility-size: 14px;
+  --type-button-utility-weight: 400;
+  --type-button-utility-line: 1.29;
+  --type-button-utility-tracking: -0.224px;
+
+  --type-fine-print-size: 12px;
+  --type-fine-print-weight: 400;
+  --type-fine-print-line: 1;
+  --type-fine-print-tracking: -0.12px;
+
+  --type-micro-legal-size: 10px;
+  --type-micro-legal-weight: 400;
+  --type-micro-legal-line: 1.3;
+  --type-micro-legal-tracking: -0.08px;
+
+  --type-nav-link-size: 12px;
+  --type-nav-link-weight: 400;
+  --type-nav-link-line: 1;
+  --type-nav-link-tracking: -0.12px;
+
+  /* ---------- Espacamento (base 8px) ---------- */
+  --spacing-xxs: 4px;
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 17px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+  --spacing-section: 80px;
+
+  /* ---------- Grid ---------- */
+  --content-max-text: 980px;
+  --content-max-grid: 1440px;
+  --grid-gutter: 24px;
+
+  /* ---------- Raios ---------- */
+  --rounded-none: 0px;
+  --rounded-xs: 5px;
+  --rounded-sm: 8px;
+  --rounded-md: 11px;
+  --rounded-lg: 18px;
+  --rounded-pill: 9999px;
+  --rounded-full: 9999px;
+
+  /* ---------- Elevacao ----------
+   * DESIGN.md: existe exatamente UMA sombra e ela e reservada a fotografia de
+   * produto. Nao aplicar em cartoes, botoes ou texto.
+   */
+  --border-hairline: 1px solid var(--color-hairline);
+  --border-soft-hairline: 1px solid rgba(0, 0, 0, 0.08);
+  --shadow-product: rgba(0, 0, 0, 0.22) 3px 5px 30px 0;
+
+  /* ---------- Alvos de toque ---------- */
+  --touch-target-min: 44px;
+}

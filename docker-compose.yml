@@ -1,0 +1,48 @@
+# Infraestrutura local (PRD 19, Fase 0).
+#
+# A Fase 1 NAO depende destes servicos - ela roda inteiramente sem banco.
+# Eles passam a ser exigidos a partir da Fase 2 (PostgreSQL/Prisma) e da
+# Fase 11 (Redis/BullMQ).
+#
+# PRD 13.4: nenhum segredo real aqui. As credenciais abaixo sao locais e
+# descartaveis; producao usa secret manager.
+
+name: match-perfeito
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: match
+      POSTGRES_PASSWORD: match_local_dev
+      POSTGRES_DB: match_perfeito
+      # Locale pt_BR para ordenacao coerente com os dados do municipio.
+      LANG: pt_BR.UTF-8
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U match -d match_perfeito']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:8-alpine
+    restart: unless-stopped
+    command: ['redis-server', '--save', '60', '1', '--appendonly', 'no']
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres-data:
+  redis-data:

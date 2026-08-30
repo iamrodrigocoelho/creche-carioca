@@ -1,0 +1,53 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# build output
+dist/
+build/
+.next/
+out/
+*.tsbuildinfo
+
+# turbo
+.turbo/
+
+# test output
+coverage/
+playwright-report/
+test-results/
+blob-report/
+.playwright/
+
+# secrets and local config (PRD 13.4 - nunca versionar .env, chaves ou dumps)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+
+# dados brutos e derivados (PRD 1.2 - nao versionar dados)
+data/raw/
+data/curated/
+*.csv
+*.csv.gz
+*.xlsx
+*.parquet
+*.duckdb
+*.dump
+*.sql.gz
+
+# os / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# logs
+*.log
+npm-debug.log*
+pnpm-debug.log*

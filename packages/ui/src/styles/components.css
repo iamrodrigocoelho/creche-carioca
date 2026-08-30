@@ -1,0 +1,657 @@
+/*
+ * Componentes de /docs/DESIGN.md. Cada bloco cita a chave do componente descrita
+ * no documento. Nenhum hex inline: apenas `var(--token)`.
+ *
+ * DESIGN.md, Iteration Guide 4: "Never document hover" - somente default,
+ * :focus-visible e :active sao implementados.
+ */
+
+/* ============================================================
+ * {component.global-nav}
+ * ============================================================ */
+.mp-global-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  min-height: 56px;
+  background: var(--color-surface-tile-1);
+  color: var(--color-body-on-dark);
+}
+
+.mp-global-nav__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  max-width: var(--content-max-grid);
+  min-height: 56px;
+  margin: 0 auto;
+  padding: var(--spacing-xs) var(--spacing-lg);
+}
+
+.mp-global-nav__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  text-decoration: none;
+  color: inherit;
+}
+
+/*
+ * TODO (DESIGN.md, Brand Assets): /img/logo nao possui variante negativa/branca
+ * para fundo azul. Enquanto ela nao existir, o ativo oficial e apresentado
+ * INALTERADO sobre uma area de protecao clara. Nao recolorir, mascarar nem
+ * redesenhar o logotipo. Registrado em docs/DECISIONS.md (ADR-0008).
+ */
+.mp-global-nav__logo-plate {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--color-canvas);
+  border-radius: var(--rounded-sm);
+}
+
+.mp-global-nav__logo {
+  display: block;
+  height: 28px;
+  width: auto;
+}
+
+.mp-global-nav__product {
+  font: var(--type-tagline-weight) var(--type-tagline-size) / var(--type-tagline-line)
+    var(--font-display);
+  letter-spacing: var(--type-tagline-tracking);
+  color: var(--color-on-primary);
+}
+
+.mp-global-nav__links {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+}
+
+.mp-global-nav__link {
+  font: var(--type-nav-link-weight) var(--type-nav-link-size) / var(--type-nav-link-line)
+    var(--font-body);
+  letter-spacing: var(--type-nav-link-tracking);
+  color: var(--color-body-on-dark);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  padding: var(--spacing-sm) var(--spacing-xs);
+}
+
+/* DESIGN.md: nao usar {colors.primary-on-dark} sobre superficies claras. Aqui o
+ * fundo e o azul institucional, entao o realce claro e permitido. */
+.mp-global-nav__link[aria-current='page'] {
+  color: var(--color-primary-on-dark);
+}
+
+@media (max-width: 833px) {
+  /* DESIGN.md, Collapsing Strategy: em 834px ou menos os links recolhem e o
+   * logotipo oficial permanece visivel. */
+  .mp-global-nav__links {
+    gap: var(--spacing-sm);
+  }
+
+  .mp-global-nav__product {
+    font-size: var(--type-caption-strong-size);
+    font-weight: var(--type-caption-strong-weight);
+  }
+}
+
+/* ============================================================
+ * Tiles de secao - {component.product-tile-*}
+ * ============================================================ */
+.mp-tile {
+  padding-block: var(--spacing-section);
+  border-radius: var(--rounded-none);
+}
+
+.mp-tile--light {
+  background: var(--color-canvas);
+  color: var(--color-body);
+}
+
+.mp-tile--parchment {
+  background: var(--color-canvas-parchment);
+  color: var(--color-body);
+}
+
+.mp-tile--dark {
+  background: var(--color-surface-tile-1);
+  color: var(--color-body-on-dark);
+}
+
+.mp-tile--dark-2 {
+  background: var(--color-surface-tile-2);
+  color: var(--color-body-on-dark);
+}
+
+.mp-tile--dark h1,
+.mp-tile--dark h2,
+.mp-tile--dark h3,
+.mp-tile--dark-2 h1,
+.mp-tile--dark-2 h2,
+.mp-tile--dark-2 h3 {
+  color: var(--color-body-on-dark);
+}
+
+.mp-tile__inner {
+  max-width: var(--content-max-text);
+  margin: 0 auto;
+  padding-inline: var(--spacing-lg);
+}
+
+.mp-tile__inner--wide {
+  max-width: var(--content-max-grid);
+}
+
+@media (max-width: 640px) {
+  .mp-tile {
+    padding-block: var(--spacing-xxl);
+  }
+}
+
+/* ============================================================
+ * Tipografia aplicada
+ * ============================================================ */
+.mp-hero-display {
+  font-family: var(--font-display);
+  font-size: var(--type-hero-display-size);
+  font-weight: var(--type-hero-display-weight);
+  line-height: var(--type-hero-display-line);
+  letter-spacing: var(--type-hero-display-tracking);
+}
+
+/* DESIGN.md, Responsive: 56px -> 40px em 1068px -> 34px em 640px -> 28px em 419px. */
+@media (max-width: 1068px) {
+  .mp-hero-display {
+    font-size: var(--type-display-lg-size);
+  }
+}
+
+@media (max-width: 640px) {
+  .mp-hero-display {
+    font-size: var(--type-display-md-size);
+  }
+}
+
+@media (max-width: 419px) {
+  .mp-hero-display {
+    font-size: var(--type-lead-size);
+  }
+}
+
+.mp-display-lg {
+  font-family: var(--font-display);
+  font-size: var(--type-display-lg-size);
+  font-weight: var(--type-display-lg-weight);
+  line-height: var(--type-display-lg-line);
+  letter-spacing: var(--type-display-lg-tracking);
+}
+
+.mp-display-md {
+  font-family: var(--font-display);
+  font-size: var(--type-display-md-size);
+  font-weight: var(--type-display-md-weight);
+  line-height: var(--type-display-md-line);
+  letter-spacing: var(--type-display-md-tracking);
+}
+
+.mp-lead {
+  font-size: var(--type-lead-size);
+  font-weight: var(--type-lead-weight);
+  line-height: var(--type-lead-line);
+  letter-spacing: var(--type-lead-tracking);
+}
+
+.mp-tagline {
+  font-family: var(--font-display);
+  font-size: var(--type-tagline-size);
+  font-weight: var(--type-tagline-weight);
+  line-height: var(--type-tagline-line);
+  letter-spacing: var(--type-tagline-tracking);
+}
+
+.mp-body-strong {
+  font-size: var(--type-body-strong-size);
+  font-weight: var(--type-body-strong-weight);
+  line-height: var(--type-body-strong-line);
+  letter-spacing: var(--type-body-strong-tracking);
+}
+
+.mp-caption {
+  font-size: var(--type-caption-size);
+  font-weight: var(--type-caption-weight);
+  line-height: var(--type-caption-line);
+  letter-spacing: var(--type-caption-tracking);
+}
+
+.mp-caption-strong {
+  font-size: var(--type-caption-strong-size);
+  font-weight: var(--type-caption-strong-weight);
+  line-height: var(--type-caption-strong-line);
+  letter-spacing: var(--type-caption-strong-tracking);
+}
+
+.mp-fine-print {
+  font-size: var(--type-fine-print-size);
+  font-weight: var(--type-fine-print-weight);
+  line-height: var(--type-fine-print-line);
+  letter-spacing: var(--type-fine-print-tracking);
+}
+
+.mp-micro-legal {
+  font-size: var(--type-micro-legal-size);
+  font-weight: var(--type-micro-legal-weight);
+  line-height: var(--type-micro-legal-line);
+  letter-spacing: var(--type-micro-legal-tracking);
+}
+
+.mp-muted {
+  color: var(--color-ink-muted-80);
+}
+
+.mp-muted-on-dark {
+  color: var(--color-body-muted);
+}
+
+/* ============================================================
+ * Botoes
+ * ============================================================ */
+.mp-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--touch-target-min);
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-family: var(--font-body);
+  text-decoration: none;
+  transition: transform 120ms ease-out;
+}
+
+/* DESIGN.md: `transform: scale(0.95)` e a micro-interacao de toda a plataforma. */
+.mp-button:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.mp-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* {component.button-primary} */
+.mp-button--primary {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  border-radius: var(--rounded-pill);
+  padding: 11px 22px;
+  font-size: var(--type-body-size);
+  font-weight: var(--type-body-weight);
+  line-height: var(--type-body-line);
+  letter-spacing: var(--type-body-tracking);
+}
+
+/* {component.button-secondary-pill} */
+.mp-button--secondary {
+  background: transparent;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--rounded-pill);
+  padding: 11px 22px;
+  font-size: var(--type-body-size);
+  font-weight: var(--type-body-weight);
+}
+
+/* {component.button-store-hero} - usar com parcimonia, como em "Iniciar inscricao". */
+.mp-button--store-hero {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  border-radius: var(--rounded-pill);
+  padding: 14px 28px;
+  font-size: var(--type-button-large-size);
+  font-weight: var(--type-button-large-weight);
+  line-height: var(--type-button-large-line);
+}
+
+/* {component.button-dark-utility} - variante contornada quando esta sobre o azul. */
+.mp-button--dark-utility {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  border-radius: var(--rounded-sm);
+  padding: 8px 15px;
+  font-size: var(--type-button-utility-size);
+  font-weight: var(--type-button-utility-weight);
+  letter-spacing: var(--type-button-utility-tracking);
+}
+
+.mp-button--on-dark {
+  background: transparent;
+  color: var(--color-on-primary);
+  border: 1px solid var(--color-on-primary);
+}
+
+/* {component.button-pearl-capsule} */
+.mp-button--pearl {
+  background: var(--color-surface-pearl);
+  color: var(--color-ink-muted-80);
+  border: var(--border-hairline);
+  border-radius: var(--rounded-md);
+  padding: 8px 14px;
+  font-size: var(--type-caption-size);
+}
+
+/* {component.text-link} */
+.mp-link {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* {component.text-link-on-dark} */
+.mp-link--on-dark {
+  color: var(--color-primary-on-dark);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ============================================================
+ * {component.store-utility-card}
+ * DESIGN.md: sem sombra por padrao. A unica sombra do sistema e reservada a
+ * fotografia de produto.
+ * ============================================================ */
+.mp-card {
+  background: var(--color-canvas);
+  border: var(--border-hairline);
+  border-radius: var(--rounded-lg);
+  padding: var(--spacing-lg);
+}
+
+.mp-card--pearl {
+  background: var(--color-surface-pearl);
+}
+
+.mp-card-grid {
+  display: grid;
+  gap: var(--grid-gutter);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* DESIGN.md, Collapsing Strategy: 3-col -> 2-col em 834px -> 1-col em 640px. */
+@media (max-width: 833px) {
+  .mp-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .mp-card-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ============================================================
+ * Formularios
+ *
+ * ADR-0006 / IMPLEMENTATION_PLAN C-01: o DESIGN.md registra em "Known Gaps" que
+ * estados de validacao e erro NAO foram formalizados, enquanto o PRD 17 e 20 os
+ * exigem. Esta e a camada MINIMA E PROVISORIA, derivada apenas de tokens ja
+ * existentes ({colors.primary-focus}, {colors.hairline}, {colors.ink-muted-80}).
+ * Nenhuma cor semantica nova foi introduzida na marca. Pendente de validacao do
+ * time de design.
+ * ============================================================ */
+.mp-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.mp-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xxs);
+}
+
+.mp-field__label {
+  font-size: var(--type-caption-strong-size);
+  font-weight: var(--type-caption-strong-weight);
+  line-height: var(--type-caption-strong-line);
+  letter-spacing: var(--type-caption-strong-tracking);
+  color: var(--color-ink);
+}
+
+.mp-field__hint {
+  font-size: var(--type-caption-size);
+  line-height: var(--type-caption-line);
+  color: var(--color-ink-muted-80);
+}
+
+/* {component.search-input} como gramatica base dos campos: pilula, 44px, 17px. */
+.mp-field__control {
+  width: 100%;
+  min-height: var(--touch-target-min);
+  padding: 12px 20px;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--type-body-size);
+  line-height: var(--type-body-line);
+  letter-spacing: var(--type-body-tracking);
+  border: var(--border-soft-hairline);
+  border-radius: var(--rounded-pill);
+}
+
+select.mp-field__control {
+  appearance: none;
+  background-image: none;
+}
+
+/* Estado invalido: PRD 17 proibe depender apenas de cor, entao a borda mais
+ * espessa acompanha o prefixo textual da mensagem e o `aria-invalid`. */
+.mp-field__control[aria-invalid='true'] {
+  border: 2px solid var(--color-primary-focus);
+}
+
+.mp-field__error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-xxs);
+  font-size: var(--type-caption-size);
+  line-height: var(--type-caption-line);
+  color: var(--color-ink);
+  font-weight: var(--type-caption-strong-weight);
+}
+
+.mp-error-summary {
+  border: 2px solid var(--color-primary-focus);
+  border-radius: var(--rounded-lg);
+  padding: var(--spacing-md);
+  background: var(--color-surface-pearl);
+  color: var(--color-ink);
+}
+
+.mp-error-summary__list {
+  margin-top: var(--spacing-xs);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xxs);
+}
+
+.mp-fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.mp-radio-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-xs);
+}
+
+/* {component.configurator-option-chip} aplicado a escolha de turno. */
+.mp-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target-min);
+  padding: 12px 16px;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-size: var(--type-caption-size);
+  letter-spacing: var(--type-caption-tracking);
+  border: var(--border-hairline);
+  border-radius: var(--rounded-pill);
+  cursor: pointer;
+}
+
+/* {component.configurator-option-chip-selected} */
+.mp-chip--selected {
+  border: 2px solid var(--color-primary-focus);
+  font-weight: var(--type-caption-strong-weight);
+}
+
+.mp-chip__input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+/* ============================================================
+ * Estados de resultado, carregamento e vazio (PRD 20)
+ * ============================================================ */
+.mp-status {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--type-caption-size);
+  color: var(--color-ink-muted-80);
+}
+
+/* Selo de dado sintetico. PRD 1.2 proibe apresentar dado anonimizado/demo como
+ * retrato oficial da realidade do municipio. */
+.mp-demo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xxs);
+  padding: var(--spacing-xxs) var(--spacing-sm);
+  background: var(--color-canvas-parchment);
+  color: var(--color-ink);
+  border: var(--border-hairline);
+  border-radius: var(--rounded-pill);
+  font-size: var(--type-caption-strong-size);
+  font-weight: var(--type-caption-strong-weight);
+  letter-spacing: var(--type-caption-strong-tracking);
+}
+
+.mp-demo-badge--on-dark {
+  background: transparent;
+  color: var(--color-body-on-dark);
+  border-color: var(--color-primary-on-dark);
+}
+
+.mp-explanation {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin: 0;
+}
+
+.mp-explanation__item {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: baseline;
+}
+
+.mp-explanation__index {
+  flex: 0 0 auto;
+  min-width: 24px;
+  color: var(--color-ink-muted-80);
+  font-size: var(--type-caption-strong-size);
+  font-weight: var(--type-caption-strong-weight);
+}
+
+.mp-stack-xs > * + * {
+  margin-top: var(--spacing-xs);
+}
+
+.mp-stack-sm > * + * {
+  margin-top: var(--spacing-sm);
+}
+
+.mp-stack-md > * + * {
+  margin-top: var(--spacing-md);
+}
+
+.mp-stack-lg > * + * {
+  margin-top: var(--spacing-lg);
+}
+
+.mp-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+/* ============================================================
+ * {component.footer}
+ * ============================================================ */
+.mp-footer {
+  background: var(--color-canvas-parchment);
+  color: var(--color-ink-muted-80);
+  padding-block: 64px;
+}
+
+.mp-footer__inner {
+  max-width: var(--content-max-grid);
+  margin: 0 auto;
+  padding-inline: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.mp-footer__logo {
+  display: block;
+  height: 56px;
+  width: auto;
+}
+
+.mp-footer__columns {
+  display: grid;
+  gap: var(--grid-gutter);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 640px) {
+  .mp-footer__columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.mp-footer__heading {
+  font-size: var(--type-caption-strong-size);
+  font-weight: var(--type-caption-strong-weight);
+  letter-spacing: var(--type-caption-strong-tracking);
+  color: var(--color-ink);
+}
+
+/* {typography.dense-link}: leading 2.41 e proposital nas colunas do rodape. */
+.mp-footer__link {
+  font-size: var(--type-caption-size);
+  line-height: 2.41;
+  color: var(--color-ink-muted-80);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.mp-footer__legal {
+  font-size: var(--type-fine-print-size);
+  line-height: 1.6;
+  letter-spacing: var(--type-fine-print-tracking);
+  color: var(--color-ink-muted-48);
+  border-top: 1px solid var(--color-divider-soft);
+  padding-top: var(--spacing-md);
+}

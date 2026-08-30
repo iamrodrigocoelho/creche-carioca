@@ -1,0 +1,39 @@
+{
+  "name": "@match/api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "API HTTP NestJS do Match Perfeito (PRD 12.3).",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "concurrently -n tsc,node -k \"tsc -p tsconfig.build.json --watch --preserveWatchOutput\" \"node --watch dist/main.js\"",
+    "start": "node dist/main.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@match/domain": "workspace:*",
+    "@match/schemas": "workspace:*",
+    "@nestjs/common": "^12.0.1",
+    "@nestjs/core": "^12.0.1",
+    "@nestjs/platform-express": "^12.0.1",
+    "@nestjs/throttler": "^6.5.0",
+    "helmet": "^8.3.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "zod": "^4.5.4"
+  },
+  "devDependencies": {
+    "@nestjs/testing": "^12.0.1",
+    "@swc/core": "^1.16.1",
+    "concurrently": "^10.0.5",
+    "@types/express": "^5.0.5",
+    "@types/node": "^22.15.3",
+    "@types/supertest": "^7.2.1",
+    "@vitest/coverage-v8": "^4.1.11",
+    "supertest": "^7.2.2",
+    "typescript": "^5.9.3",
+    "unplugin-swc": "^1.5.11",
+    "vitest": "^4.1.11"
+  }
+}
