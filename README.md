@@ -12,8 +12,9 @@
 - https://web-production-fee99e.up.railway.app/
 - https://crechecarioca.rio.br (Em breve! - DNS chache feelings)
 
+## Vídeo demo:
 
-## Vídeo demo: https://drive.google.com/drive/folders/1qD1o8RBBszoGYS5T2MFFcaL1UXQ0ncdb?usp=sharing
+- https://drive.google.com/drive/folders/1qD1o8RBBszoGYS5T2MFFcaL1UXQ0ncdb?usp=sharing
 
 > **Não é o sistema oficial de matrícula.** Todos os dados são sintéticos ou anonimizados e não representam a realidade do município. Não utilize dados pessoais reais.
 
