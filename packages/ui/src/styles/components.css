@@ -676,3 +676,285 @@ select.mp-field__control {
   border: var(--border-hairline);
   border-radius: var(--rounded-md);
 }
+
+/* ============================================================
+ * Painel do gestor (RF-10, PRD 8.10)
+ *
+ * Camada densa: o gestor compara linhas, nao le paragrafos. O DESIGN.md nao
+ * formaliza tabela nem indicador de severidade ("Known Gaps"), entao tudo aqui
+ * deriva de tokens existentes, na mesma disciplina do ADR-0006 para formularios.
+ * Nenhuma cor nova: a pressao e dita em palavras e reforcada pelo comprimento da
+ * barra, nunca por um semaforo — PRD 17 proibe informacao so por cor.
+ * ============================================================ */
+.mp-panel {
+  background: var(--color-canvas);
+  border: var(--border-hairline);
+  border-radius: var(--rounded-lg);
+  padding: var(--spacing-lg);
+}
+
+.mp-panel__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+/* Numeros de topo. Grade de 4; colapsa em 2 e depois em 1, na mesma estrategia
+   de {component.store-utility-card}. */
+.mp-metric-grid {
+  display: grid;
+  gap: var(--grid-gutter);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+@media (max-width: 833px) {
+  .mp-metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .mp-metric-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.mp-metric {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xxs);
+  padding: var(--spacing-md);
+  background: var(--color-surface-pearl);
+  border: var(--border-hairline);
+  border-radius: var(--rounded-md);
+}
+
+.mp-metric__label {
+  font-size: var(--type-caption-strong-size);
+  font-weight: var(--type-caption-strong-weight);
+  line-height: var(--type-caption-strong-line);
+  letter-spacing: var(--type-caption-strong-tracking);
+  color: var(--color-ink-muted-80);
+}
+
+.mp-metric__value {
+  font-family: var(--font-display);
+  font-size: var(--type-display-md-size);
+  font-weight: var(--type-display-md-weight);
+  line-height: 1.1;
+  letter-spacing: var(--type-display-md-tracking);
+  color: var(--color-ink);
+  /* Numeros tabulares: colunas de digitos que nao dancam entre linhas. */
+  font-variant-numeric: tabular-nums;
+}
+
+.mp-metric__note {
+  font-size: var(--type-caption-size);
+  line-height: var(--type-caption-line);
+  letter-spacing: var(--type-caption-tracking);
+  color: var(--color-ink-muted-80);
+}
+
+/* Filtros do painel, em linha. */
+.mp-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  align-items: flex-end;
+}
+
+.mp-filter-bar .mp-field {
+  min-width: 180px;
+  flex: 1 1 180px;
+}
+
+/* Tabelas densas. O scroll horizontal e do container, nunca da pagina. */
+.mp-table-wrap {
+  overflow-x: auto;
+  border: var(--border-hairline);
+  border-radius: var(--rounded-md);
+}
+
+.mp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--type-caption-size);
+  line-height: var(--type-caption-line);
+  letter-spacing: var(--type-caption-tracking);
+}
+
+.mp-table caption {
+  text-align: left;
+  padding: var(--spacing-sm) var(--spacing-md);
+  color: var(--color-ink-muted-80);
+  font-size: var(--type-caption-size);
+}
+
+.mp-table th,
+.mp-table td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: left;
+  border-bottom: 1px solid var(--color-divider-soft);
+  vertical-align: middle;
+}
+
+.mp-table thead th {
+  background: var(--color-surface-pearl);
+  color: var(--color-ink);
+  font-size: var(--type-caption-strong-size);
+  font-weight: var(--type-caption-strong-weight);
+  letter-spacing: var(--type-caption-strong-tracking);
+  border-bottom: var(--border-hairline);
+  white-space: nowrap;
+}
+
+.mp-table tbody tr:last-child th,
+.mp-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.mp-table tbody th {
+  font-weight: var(--type-body-strong-weight);
+  color: var(--color-ink);
+}
+
+/* Coluna numerica: alinhada a direita e com digitos de largura fixa, para que a
+   comparacao entre linhas seja visual e nao exija leitura. */
+.mp-table__num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.mp-table__sub {
+  display: block;
+  color: var(--color-ink-muted-48);
+  font-size: var(--type-fine-print-size);
+  line-height: 1.4;
+}
+
+.mp-table__empty {
+  padding: var(--spacing-lg) var(--spacing-md);
+  color: var(--color-ink-muted-80);
+}
+
+/* Barra de pressao. O valor tambem aparece como texto ao lado: a barra e
+   reforco, nunca o unico portador da informacao. */
+.mp-meter {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  min-width: 140px;
+}
+
+.mp-meter__track {
+  flex: 1 1 auto;
+  height: 8px;
+  min-width: 60px;
+  background: var(--color-canvas-parchment);
+  border-radius: var(--rounded-pill);
+  overflow: hidden;
+}
+
+.mp-meter__fill {
+  display: block;
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: var(--rounded-pill);
+}
+
+/* Rampa de intensidade sobre a MESMA cor: nao existe token de severidade no
+   DESIGN.md e inventar vermelho/ambar criaria paleta paralela. */
+.mp-meter__fill--equilibrada {
+  opacity: 0.32;
+}
+
+.mp-meter__fill--moderada {
+  opacity: 0.55;
+}
+
+.mp-meter__fill--alta {
+  opacity: 0.78;
+}
+
+.mp-meter__fill--critica {
+  opacity: 1;
+}
+
+.mp-meter__label {
+  flex: 0 0 auto;
+  font-size: var(--type-fine-print-size);
+  color: var(--color-ink-muted-80);
+  white-space: nowrap;
+}
+
+/* Serie historica: colunas proporcionais, com os valores em texto abaixo. */
+.mp-trend {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--spacing-sm);
+  min-height: 160px;
+  padding-top: var(--spacing-md);
+}
+
+.mp-trend__item {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  min-width: 0;
+}
+
+.mp-trend__column {
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: 120px;
+}
+
+.mp-trend__bar {
+  width: 100%;
+  max-width: 56px;
+  background: var(--color-primary);
+  border-radius: var(--rounded-xs) var(--rounded-xs) 0 0;
+  opacity: 0.55;
+}
+
+.mp-trend__item--current .mp-trend__bar {
+  opacity: 1;
+}
+
+.mp-trend__caption {
+  font-size: var(--type-fine-print-size);
+  line-height: 1.4;
+  color: var(--color-ink-muted-80);
+  text-align: center;
+}
+
+.mp-trend__value {
+  font-size: var(--type-caption-strong-size);
+  font-weight: var(--type-caption-strong-weight);
+  color: var(--color-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Nota metodologica: o painel precisa declarar de onde vem cada numero. */
+.mp-note {
+  background: var(--color-surface-pearl);
+  border-left: 3px solid var(--color-primary-focus);
+  border-radius: var(--rounded-xs);
+  padding: var(--spacing-md);
+  font-size: var(--type-caption-size);
+  line-height: var(--type-caption-line);
+  color: var(--color-ink-muted-80);
+}
+
+.mp-note__list {
+  margin: var(--spacing-xs) 0 0;
+  padding-left: var(--spacing-lg);
+}

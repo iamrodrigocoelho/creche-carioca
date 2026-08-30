@@ -401,3 +401,37 @@ Mas repetir um CEP é uma situação real e legítima: quem trabalha em casa tem
 **Decisão.** A duplicidade é calculada na leitura e devolvida como `duplicateOfPosition`, apontando para a primeira ocorrência. A interface avisa e segue: "Este CEP é igual ao do ponto 1. Pode continuar assim, se for o caso."
 
 **Consequências.** A família fica informada sem ser bloqueada — que é o que "sinalizar" quer dizer. A Fase 6, ao ordenar unidades por proximidade a cada ponto, precisa saber que dois pontos podem coincidir, para não apresentar a mesma distância duas vezes como se fossem evidências independentes.
+
+---
+
+## ADR-0027 — Painel do gestor antecipado sobre dados sintéticos
+
+**Status:** Aceita · Antecipação da Fase 10
+
+**Contexto.** O painel do gestor (RF-10) pertence à Fase 10 e depende da Fase 6: "creches mais procuradas" e "fila de espera por creche" exigem `Unit` e `Preference` no schema canônico, e nenhum dos dois existe. As unidades só vivem na camada curada em Parquet da Fase 3, e a escolha de creche pela família ainda não foi implementada.
+
+A demonstração para o gestor, porém, é necessária antes disso: é ela que valida se as perguntas que o painel responde são as perguntas que o gestor faz. Construir a Fase 6 inteira só para descobrir que a leitura útil era outra é a ordem errada.
+
+**Decisão.** O painel é entregue agora, sobre um conjunto sintético declarado (`apps/web/src/lib/dashboard/demo-data.ts`), com três separações deliberadas:
+
+- As **derivações** (`metrics.ts`) são funções puras sobre `DemandRow[]` e não sabem de onde os dados vêm. Quando a Fase 6 trouxer as tabelas reais, muda a origem do snapshot; a interface e os testes continuam.
+- Os **tipos** (`types.ts`) já têm o formato que a consulta real vai devolver, incluindo a distinção entre turno de oferta (`INTEGRAL`/`PARCIAL`) e turno desejado pela família (que admite `AMBOS`).
+- O conjunto é **determinístico**, gerado por semente fixa: a apresentação é reproduzível e uma alteração acidental quebra o teste de estabilidade em vez de passar despercebida.
+
+Nomes de unidade são fictícios, na convenção da rede. Atribuir fila fabricada a uma escola real é exatamente a confusão que PRD §1.2 proíbe; os bairros são reais apenas para dar escala geográfica.
+
+**Consequências.** O painel existe e é discutível com o gestor, mas **não tem** o que a Fase 10 exige: não há RBAC, escopo territorial por CRE nem auditoria de exportação — qualquer perfil vê a rede inteira. Isso está declarado na própria página. A Fase 10 permanece necessária e agora entra com a interface já validada, reduzida ao trabalho de backend: consulta real, autorização por objeto e território, e os testes negativos de vazamento entre CREs.
+
+---
+
+## ADR-0028 — Pressão medida pela primeira opção, sem semáforo de cor
+
+**Status:** Aceita · Antecipação da Fase 10
+
+**Contexto.** "Creche mais procurada" isolada é um número que engana: uma unidade com 300 inscrições e 200 vagas está melhor que uma com 80 e 12. O indicador que decide é a razão candidato/vaga — e ela pode ser calculada de duas formas, com resultados muito diferentes. Cada inscrição cita até cinco unidades (PRD §8.6); somar todas as citações infla o indicador e faz toda unidade parecer crítica.
+
+Havia ainda a questão de como mostrar severidade: o `DESIGN.md` registra em "Known Gaps" que estados de severidade não foram formalizados, e não existe token vermelho ou âmbar na paleta.
+
+**Decisão.** A razão é medida pela **primeira opção**; a demanda em qualquer opção aparece como coluna separada, para que a diferença fique visível em vez de embutida. A severidade é dita por extenso (Crítica, Alta, Moderada, Equilibrada) e reforçada pelo comprimento da barra, sobre uma rampa de opacidade da mesma cor primária — nenhum vermelho foi inventado. A escala da barra satura em quatro candidatos por vaga: a diferença entre 4 e 6 não muda a decisão do gestor, mas uma barra que nunca enche esconderia a diferença entre 1 e 2, que muda.
+
+**Consequências.** Nenhuma informação do painel depende só de cor (PRD §17) e nenhuma paleta paralela nasce fora do `DESIGN.md`. A "fila" exibida é o excedente da primeira opção sobre as vagas do recorte — uma aproximação declarada na página, não a fila oficial: a alocação real da Fase 8 considera pontuação, desempate e as demais preferências.
