@@ -85,6 +85,14 @@ jobs:
       - name: Verificação de tipos
         run: pnpm typecheck
 
+      # TEMPORÁRIO: diagnóstico de "No test files found" no runner Linux.
+      - name: Diagnóstico da coleta de testes
+        run: |
+          echo "--- arquivos .test.ts em apps/api/src ---"
+          find apps/api/src -name '*.test.ts' -print
+          echo "--- vitest --list ---"
+          cd apps/api && pnpm exec vitest list 2>&1 | head -30 || true
+
       - name: Testes unitários e de integração
         run: pnpm test:coverage
 
