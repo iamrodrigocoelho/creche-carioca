@@ -56,5 +56,6 @@ pnpm-debug.log*
 # para o CI rodar sem os arquivos originais (que ficam fora do repositorio).
 !packages/data-pipeline/test/fixtures/**
 
-# Saida do build estatico (docs/DEPLOY-ESTATICO.md).
+# Saida do build estatico e o pacote de upload (docs/DEPLOY-ESTATICO.md).
 apps/web/out/
+match-perfeito-estatico.zip

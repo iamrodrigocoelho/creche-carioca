@@ -19,6 +19,15 @@ referência de geocodificação.
 
 ## Publicar
 
+Para subir pelo gerenciador de arquivos da Hostinger, empacote a saída:
+
+```bash
+cd apps/web/out && zip -r ../../../match-perfeito-estatico.zip . && cd -
+```
+
+O `zip -r ... .` inclui o `.htaccess`; conferir isso vale o segundo que leva
+(`unzip -l match-perfeito-estatico.zip | grep htaccess`).
+
 Envie **todo o conteúdo** de `apps/web/out/` para a pasta pública do domínio
 (`public_html/` na Hostinger). Inclua o `.htaccess` — ele é gerado junto e é o que
 aplica os cabeçalhos de segurança que, na versão com servidor, o Next aplicava.
