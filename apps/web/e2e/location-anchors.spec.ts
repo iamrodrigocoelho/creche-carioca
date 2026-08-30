@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 /**
  * Etapa 2 ponta a ponta (RF-02, PRD 8.2).
@@ -11,7 +11,7 @@ import { expect, test } from '@playwright/test';
 /** Setor conhecido pela referencia de geocodificacao (Centro do Rio). */
 const CEP_RESIDENCIA = '20060-000';
 
-async function chegarNaEtapaDePontos(page: import('@playwright/test').Page) {
+async function chegarNaEtapaDePontos(page: Page) {
   await page.goto('/inscricao');
   await page.getByLabel(/mês de nascimento/i).selectOption('3');
   await page.getByLabel(/ano de nascimento/i).selectOption('2024');
