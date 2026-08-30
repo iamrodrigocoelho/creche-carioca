@@ -127,6 +127,21 @@ sincronizar ou divergir.
 PostgreSQL e dependencia critica. Uma `DATABASE_URL` errada reprova o deploy e
 dispara rollback, em vez de publicar uma API que quebra na primeira escrita.
 
+**O builder e o Railpack, nao o Nixpacks.** O Nixpacks esta descontinuado no
+Railway, e a imagem dele embute um corepack antigo demais para o pnpm 11.1.3,
+que usa `import()` dinamico no entrypoint CJS. Com ele o build morre no
+`pnpm i --frozen-lockfile`, antes de qualquer codigo do repositorio rodar:
+
+```
+TypeError [ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING]: A dynamic import callback
+was not specified.
+    at Object.<anonymous> (/root/.cache/node/corepack/pnpm/11.1.3/bin/pnpm.cjs)
+```
+
+O sintoma nao aponta para a causa - parece problema de Node ou de lockfile, e
+nao e nenhum dos dois. Se esse erro aparecer, confira se o servico nao voltou
+para o Nixpacks.
+
 **As migrations rodam sozinhas.** O `preDeploy` executa `pnpm db:deploy`
 (`prisma migrate deploy`) antes de cada release.
 

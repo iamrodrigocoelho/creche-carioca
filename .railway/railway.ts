@@ -32,7 +32,14 @@ export default defineRailway(() => {
   const api = service('api', {
     source: github(REPO, { branch: BRANCH, rootDirectory: ROOT_DIRECTORY }),
     build: {
-      builder: 'NIXPACKS',
+      /**
+       * Railpack, nao Nixpacks: o Nixpacks esta descontinuado no Railway e a
+       * imagem dele embute um corepack antigo demais para o pnpm 11.1.3, que
+       * usa `import()` dinamico no entrypoint CJS. O sintoma e o install
+       * falhar com ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING antes de qualquer
+       * codigo do repositorio rodar.
+       */
+      builder: 'RAILPACK',
       buildCommand: 'pnpm exec turbo run build --filter=@match/api',
       watchPatterns: ['apps/api/**', ...SHARED_WATCH],
     },
@@ -62,7 +69,14 @@ export default defineRailway(() => {
   const web = service('web', {
     source: github(REPO, { branch: BRANCH, rootDirectory: ROOT_DIRECTORY }),
     build: {
-      builder: 'NIXPACKS',
+      /**
+       * Railpack, nao Nixpacks: o Nixpacks esta descontinuado no Railway e a
+       * imagem dele embute um corepack antigo demais para o pnpm 11.1.3, que
+       * usa `import()` dinamico no entrypoint CJS. O sintoma e o install
+       * falhar com ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING antes de qualquer
+       * codigo do repositorio rodar.
+       */
+      builder: 'RAILPACK',
       buildCommand: 'pnpm exec turbo run build --filter=@match/web',
       watchPatterns: ['apps/web/**', ...SHARED_WATCH],
     },
