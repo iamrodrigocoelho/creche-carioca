@@ -165,4 +165,12 @@
 
   /* ---------- Alvos de toque ---------- */
   --touch-target-min: 44px;
+
+  /* ---------- Foco ----------
+   * Nao e um token novo do DESIGN.md: e um ponteiro para o token de foco em
+   * vigor na superficie atual. O padrao e {colors.primary-focus} (6,04:1 sobre
+   * branco); sobre azul escuro, components.css o redefine para
+   * {colors.primary-on-dark}, porque #2a688f sobre #13335a rende apenas 2,11:1.
+   */
+  --focus-ring: var(--color-primary-focus);
 }

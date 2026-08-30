@@ -40,7 +40,46 @@ test('o formulário é operável apenas por teclado e reporta erros', async ({ p
 test('o logotipo oficial é carregado de /img/logo sem alteração', async ({ page }) => {
   await page.goto('/');
 
-  const logo = page.getByAltText('Prefeitura da Cidade do Rio de Janeiro - Educação').first();
+  const logo = page
+    .getByAltText('Creche Carioca - Prefeitura da Cidade do Rio de Janeiro, Educação')
+    .first();
   await expect(logo).toBeVisible();
   await expect(logo).toHaveAttribute('src', /^\/img\/logo\//);
+});
+
+/**
+ * DESIGN.md, Collapsing Strategy: a navegação global recolhe em <= 833px e o
+ * logotipo permanece visível. "Touch Targets" exige 44 x 44px no toque.
+ */
+test('a navegação recolhe em telas pequenas e é operável por teclado', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+
+  const logo = page.locator('.mp-global-nav__logo');
+  await expect(logo).toBeVisible();
+
+  const link = page.getByRole('link', { name: 'Sobre a demonstração' });
+  await expect(link).toBeHidden();
+
+  const toggle = page.getByRole('button', { name: 'Menu' });
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+
+  const toggleBox = await toggle.boundingBox();
+  expect(toggleBox?.height).toBeGreaterThanOrEqual(44);
+
+  await toggle.press('Enter');
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  await expect(link).toBeVisible();
+
+  const linkBox = await link.boundingBox();
+  expect(linkBox?.height).toBeGreaterThanOrEqual(44);
+});
+
+/** No desktop os links voltam para a linha horizontal e o botão some. */
+test('a navegação volta à linha horizontal no desktop', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto('/');
+
+  await expect(page.getByRole('link', { name: 'Sobre a demonstração' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Menu' })).toBeHidden();
 });
