@@ -8,9 +8,9 @@
 
 ## Links:
 
-https://web-production-fee99e.up.railway.app/
-https://web-production-fee99e.up.railway.app/gestor
-https://crechecarioca.rio.br (Em breve!)
+- https://web-production-fee99e.up.railway.app/gestor
+- https://web-production-fee99e.up.railway.app/
+
 
 ## Vídeo demo:
 
