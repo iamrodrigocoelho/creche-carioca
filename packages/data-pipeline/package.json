@@ -1,0 +1,29 @@
+{
+  "name": "@match/data-pipeline",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Ingestao DuckDB dos datasets historicos e publicacao de tabelas curadas (PRD 10.3, 10.4).",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "ingest": "node dist/cli.js",
+    "fixtures": "node scripts/generate-fixtures.mjs"
+  },
+  "dependencies": {
+    "@duckdb/node-api": "1.5.5-r.4",
+    "@match/domain": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "@vitest/coverage-v8": "^4.1.11",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.11"
+  }
+}

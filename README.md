@@ -15,7 +15,7 @@ Protótipo de demonstração para a inscrição, classificação e convocação 
 
 ## Estado atual
 
-**Fase 2 concluída** — fundação técnica, a primeira fatia funcional ponta a ponta e a persistência canônica em PostgreSQL. A família informa mês e ano de nascimento e o turno desejado, e recebe o grupamento etário com a explicação de como ele foi obtido; a inscrição é gravada de forma transacional, com histórico de status e trilha de auditoria append-only. As demais fases estão descritas no `IMPLEMENTATION_PLAN.md`.
+**Fase 3 concluída** — fundação técnica, a primeira fatia funcional ponta a ponta, a persistência canônica em PostgreSQL e o pipeline de dados históricos. A família informa mês e ano de nascimento e o turno desejado, e recebe o grupamento etário com a explicação de como ele foi obtido; a inscrição é gravada de forma transacional, com histórico de status e trilha de auditoria append-only. Os cinco processos seletivos de 2021 a 2025 são ingeridos em DuckDB e publicados como tabelas curadas em Parquet, com manifesto e relatório de qualidade. As demais fases estão descritas no `IMPLEMENTATION_PLAN.md`.
 
 ## Requisitos
 
@@ -58,9 +58,51 @@ packages/
   schemas/    Contratos Zod compartilhados entre API e web
   ui/         Tokens e componentes de docs/DESIGN.md
   database/   Schema Prisma, migrations, seed e cliente PostgreSQL
+  data-pipeline/  Ingestão DuckDB dos datasets históricos e tabelas curadas
+data/
+  raw/        Datasets da SME/RJ — não versionados, veja "Dados históricos"
+  curated/    Saída do pipeline, uma pasta por versão de importação
 docs/
 img/logo/     Logotipos oficiais — única fonte autorizada
 ```
+
+## Dados históricos
+
+Os datasets da SME/RJ **não são versionados** — são centenas de MB e estão publicados
+em [CIT-SME-RJ/dadoscreche](https://github.com/CIT-SME-RJ/dadoscreche). Baixe para
+`data/raw/`, preservando os nomes de diretório:
+
+```text
+data/raw/
+  01_QueryA_InscricoesPorAno.csv.gz            837.179 inscrições
+  02_QueryB_RespostasSocioEconomicas.csv.gz    4.357.119 respostas
+  03_QueryC_PerguntasComDescricao.csv          catálogo de perguntas e pesos
+  04_UnidadesEscolaresComEndereco.csv          2.188 unidades (sem cabeçalho)
+  oferecimentos/Unidades_Unificadas_com_Localizacao.xlsx   coordenadas, CRE, microárea
+  microareas/Microareas_SME_revisao.shp        polígonos das microáreas (+ arquivos irmãos)
+```
+
+Para publicar as tabelas curadas:
+
+```bash
+pnpm --filter @match/data-pipeline build
+pnpm --filter @match/data-pipeline ingest
+```
+
+A execução leva cerca de 8 segundos sobre os 5,2 milhões de linhas e escreve em
+`data/curated/<versao>/`: um Parquet por tabela, o `manifest.json` com o SHA-256 de
+cada arquivo de origem e o `relatorio-qualidade.json`. **O pipeline nunca sobrescreve
+uma versão existente** — reimportar exige apagar a pasta ou escolher outra versão.
+
+Sem os arquivos, a ingestão falha com a instrução de download em vez de produzir dados
+vazios. Os testes não dependem deles: rodam sobre fixtures versionadas em
+`packages/data-pipeline/test/fixtures/`, regeráveis com `pnpm --filter
+@match/data-pipeline fixtures` quando a origem mudar.
+
+O relatório de qualidade classifica dez achados por severidade e registra, entre
+outras coisas, que `esc_codigo` não é uma chave única na origem e que 20 unidades
+citadas nas inscrições não têm coordenada conhecida. As decisões tomadas diante disso
+estão em `docs/DECISIONS.md` (ADR-0018 a ADR-0022).
 
 ## Como executar
 

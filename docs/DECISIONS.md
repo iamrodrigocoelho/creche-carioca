@@ -253,3 +253,81 @@ O sintoma era enganoso. O `globalSetup` do Vitest lançava por falta da variáve
 **Decisão.** Declarar `DATABASE_URL` e `DATABASE_URL_TEST` em `globalEnv`. Além disso, `loadTestEnv` passou a escrever a causa em `stderr` **antes** de lançar, para que o diagnóstico apareça mesmo quando o Vitest mascara a exceção.
 
 **Consequências.** A URL do banco passa a integrar a chave de cache do Turbo — trocar de banco invalida o cache, o que é correto, já que o resultado dos testes depende dele. Qualquer variável de ambiente nova que uma tarefa precise deve ser declarada aqui; caso contrário ela silenciosamente não chega.
+
+---
+
+## ADR-0018 — Código de unidade reancorado por largura
+
+**Status:** Aceita · Fase 3
+
+**Contexto.** O `esc_codigo` chega com larguras diferentes conforme a fonte. A Query A grava 5 dígitos para creches parceiras e 7 para unidades públicas. Já `Unidades_Unificadas_com_Localizacao.xlsx` passou por uma planilha que guardou o código como número e comeu os zeros à esquerda: ali aparecem larguras de 4 a 7. Comparar as strings cruas casa apenas 150 das 872 unidades citadas nas inscrições.
+
+**Decisão.** Normalizar por largura antes de qualquer junção: até 5 dígitos, preencher com zeros à esquerda até 5; de 6 a 7, até 7. Valores não numéricos ou com mais de 7 dígitos viram `null` em vez de serem adivinhados.
+
+A regra recupera 852 das 872 unidades, sem nenhuma colisão — nenhum código normalizado casa com duas unidades distintas. As 20 restantes simplesmente não estão no arquivo de localização, e viram o achado `unidade_sem_localizacao`.
+
+**Consequências.** A largura vira parte do contrato: se a SME publicar códigos de 6 dígitos para parceiras, a regra passa a ancorar errado. Por isso a checagem de unicidade de chave bloqueia a publicação — uma mudança de padrão apareceria como colisão, não como dado silenciosamente errado.
+
+---
+
+## ADR-0019 — `Unidades_Unificadas_com_Localizacao.xlsx` como fonte de geografia
+
+**Status:** Aceita · Fase 3
+
+**Contexto.** O plano previa que a Fase 3 normalizasse "unidades, coordenadas, CRE e microárea". Os quatro arquivos da pasta `Bases IC_ ClassificadoseFila/` não têm nada disso: o catálogo de unidades traz logradouro, número, bairro e CEP, e para 258 das 2.188 unidades nem isso. Não há latitude, longitude nem CRE em lugar nenhum daquele diretório.
+
+Chegou-se a considerar geocodificar por CEP contra um serviço externo. A alternativa apareceu em outro diretório do mesmo repositório de dados: `OferecimentosEvagas/Unidades_Unificadas_com_Localizacao.xlsx`, com `LATITUDE`, `LONGITUDE`, `CRE` e `microárea` preenchidos nas 1.941 linhas.
+
+**Decisão.** Usar essa planilha como fonte canônica de geografia, cruzada por `esc_codigo` normalizado (ADR-0018). Nenhuma geocodificação externa entra no pipeline.
+
+O catálogo de endereços é o lado esquerdo da junção, porque cobre 872/872 dos códigos vistos nas inscrições enquanto a planilha cobre 852.
+
+**Consequências.** Sem dependência de rede nem de serviço de terceiros para posicionar unidades, e a CRE vem do dado oficial em vez de ser inferida do bairro. Em troca, 20 unidades citadas nas inscrições ficam sem coordenada; a Fase 8 precisa decidir o que fazer com elas na alocação por distância, e o relatório de qualidade as lista nominalmente.
+
+O shapefile das microáreas vem em EPSG:31983 (SIRGAS 2000 / UTM 23S) e é reprojetado para WGS84 na ingestão, para ficar no mesmo referencial das coordenadas da planilha.
+
+---
+
+## ADR-0020 — Desduplicação determinística do catálogo de unidades
+
+**Status:** Aceita · Fase 3
+
+**Contexto.** O dicionário de dados da origem apresenta `esc_codigo` como a chave que junta o catálogo de unidades com as inscrições, e de fato ela cobre 872/872. Mas ela **não é única**: 78 códigos aparecem em mais de uma linha, e 74 desses grupos divergem em nome ou endereço.
+
+São dois fenômenos diferentes sob o mesmo sintoma. Um é cosmético — a mesma unidade grafada de dois jeitos, uma linha com endereço e outra sem (`0101001`: "EM VICENTE LICINIO CARDOSO" e "ESCOLA MUNICIPAL VICENTE LICÍNIO CARDOSO"). O outro não é: entre as creches parceiras há códigos reaproveitados por instituições distintas (`01001`: "Instituto Central do Povo" e "Associação de Educação Infantil Florescer"). 40 desses códigos aparecem nas inscrições.
+
+Deixar como estava faria a junção multiplicar linhas silenciosamente — uma inscrição passaria a casar com duas unidades.
+
+**Decisão.** `cur_unidades` tem exatamente uma linha por código. Vence a linha com endereço preenchido; no empate, o menor `seq_interno`. As linhas descartadas vão para `cur_unidades_descartadas` e aparecem no relatório como `codigo_de_unidade_reaproveitado`.
+
+Além disso, três portões rodam antes de escrever qualquer Parquet: contagem da origem contra o dicionário, unicidade das chaves, e reconciliação do catálogo — toda linha da origem tem de terminar publicada, descartada por duplicidade, ou registrada como sem código. Se a soma não fecha, a publicação falha.
+
+**Consequências.** O critério de desempate é uma escolha nossa, não um fato da origem: para os códigos genuinamente reaproveitados, uma instituição real fica de fora das tabelas curadas. Isso é registrado, não resolvido — resolver exigiria uma chave que os dados não têm. A Fase 6, ao recomendar unidades, herda essa limitação.
+
+A reconciliação já pagou por si: revelou 24 unidades com `esc_codigo` gravado como `NULL` que estavam sendo descartadas sem aparecer em lugar nenhum.
+
+---
+
+## ADR-0021 — Normalização escrita duas vezes, com teste de paridade
+
+**Status:** Aceita · Fase 3
+
+**Contexto.** As bases têm 837 mil e 4,3 milhões de linhas. Normalizar em TypeScript exigiria trazer cada linha para o Node, o que PRD §10.3 proíbe explicitamente. Normalizar só em SQL deixaria as regras sem teste unitário e não permitiria reutilizá-las na API.
+
+**Decisão.** Cada regra existe nas duas formas: uma função pura em `normalize.ts` e uma expressão SQL em `sources.ts`. A ingestão usa a versão SQL, dentro do DuckDB. Um teste roda as duas sobre as mesmas entradas, incluindo os casos de borda, e falha se divergirem.
+
+**Consequências.** Duplicação deliberada, com o risco de divergência coberto por teste em vez de por disciplina. Toda regra nova precisa nascer nas duas formas — o teste de paridade não detecta uma regra que exista só de um lado, apenas uma que exista dos dois e discorde.
+
+---
+
+## ADR-0022 — Publicação versionada, sem sobrescrita
+
+**Status:** Aceita · Fase 3
+
+**Contexto.** PRD §10.3 exige não substituir silenciosamente arquivos ou versões já importadas, e registrar origem, hash, data e versão de cada importação.
+
+**Decisão.** Cada execução escreve em `data/curated/<versao>/`, com a versão derivada do instante em UTC. Se o diretório existir, o pipeline falha em vez de sobrescrever. Junto dos Parquet vão `manifest.json` (SHA-256 e tamanho de cada arquivo de origem) e `relatorio-qualidade.json`.
+
+Não há ponteiro para "última importação". Um arquivo `latest` mutável seria exatamente a sobrescrita silenciosa que o critério proíbe; quem consome ordena os diretórios.
+
+**Consequências.** Reimportar exige escolher uma versão nova ou apagar a antiga conscientemente, e o diretório cresce a cada execução — não há política de retenção, que fica para a Fase 14. Em troca, qualquer resultado analítico pode ser rastreado até os bytes exatos que o produziram.

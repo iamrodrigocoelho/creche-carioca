@@ -3,7 +3,7 @@
 **Escopo:** plano de desenvolvimento incremental do MVP descrito em `PRD.md`.
 **Fontes de verdade:** `PRD.md` (comportamento, regras, requisitos técnicos) e `/docs/DESIGN.md` (apresentação visual).
 **Status:** vivo — atualizado a cada fase concluída.
-**Última atualização:** 30/08/2026 (Fase 2 concluída).
+**Última atualização:** 30/08/2026 (Fase 3 concluída).
 
 > Este documento **não replica** requisitos. Ele referencia os identificadores do PRD (`RF-xx`, seções `§n`) e organiza a ordem de execução. Em qualquer divergência, o `PRD.md` e o `/docs/DESIGN.md` prevalecem.
 
@@ -28,15 +28,15 @@
 
 ### 2.1 Bloqueios externos (não impedem o MVP; tratados por mock/config — PRD §21)
 
-| #    | Item                                                                                                         | Impacto                 | Tratamento adotado                                                                                                                                                                                            |
-| ---- | ------------------------------------------------------------------------------------------------------------ | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| B-01 | Datasets `dadoscreche` não estão no ambiente                                                                 | Fases 3+ dependem deles | Pipeline lê de `data/raw/` configurável; sem os arquivos, usa amostras sintéticas rotuladas. Fase 3 documenta o download manual                                                                               |
-| B-02 | ~~Docker ausente~~ **resolvido na Fase 2**                                                                   | PostgreSQL/Redis        | A máquina já roda **PostgreSQL 16.13 via Homebrew**, então a Fase 2 seguiu sem Docker. O `docker-compose.yml` permanece como alternativa equivalente, não executado. O Redis ainda será necessário na Fase 11 |
-| B-03 | Provider de geocodificação indefinido (PRD §21 "Geocodificação")                                             | RF-02                   | Porta `GeocodingProvider` + adapter mock determinístico. Nenhum provider real é escolhido                                                                                                                     |
-| B-04 | Distância geodésica vs. rota viária (PRD §21 "Distância")                                                    | RF-05                   | Haversine na porta `DistanceProvider`, rotulada como estimativa (PRD §8.5). Decisão de produção permanece aberta                                                                                              |
-| B-05 | Identidade oficial / autenticação (PRD §21 "Autenticação")                                                   | RF-10, §13.3            | Auth simulada e explicitamente identificada; RBAC real no backend                                                                                                                                             |
-| B-06 | APIs sociais e TikTok (PRD §21)                                                                              | RF-04, RF-11            | Todos os adapters sociais permanecem simulados                                                                                                                                                                |
-| B-07 | Regras oficiais de desempate e de grupamento etário por processo (PRD §21 "Desempates", §14.5 do calendário) | RF-01, RF-07            | Política de grupamento e desempates são **dados versionados e parametrizados**, marcados como `DEMONSTRACAO`. Nenhum valor é tratado como oficial                                                             |
+| #    | Item                                                                                                         | Impacto                 | Tratamento adotado                                                                                                                                                                                                                     |
+| ---- | ------------------------------------------------------------------------------------------------------------ | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| B-01 | ~~Datasets `dadoscreche` não estão no ambiente~~ **resolvido na Fase 3**                                     | Fases 3+ dependem deles | Baixados de `github.com/CIT-SME-RJ/dadoscreche` para `data/raw/`, fora do versionamento. O pipeline lê de `DATA_RAW_DIR` configurável e falha com instrução de download quando os arquivos faltam; as fixtures versionadas cobrem o CI |
+| B-02 | ~~Docker ausente~~ **resolvido na Fase 2**                                                                   | PostgreSQL/Redis        | A máquina já roda **PostgreSQL 16.13 via Homebrew**, então a Fase 2 seguiu sem Docker. O `docker-compose.yml` permanece como alternativa equivalente, não executado. O Redis ainda será necessário na Fase 11                          |
+| B-03 | Provider de geocodificação indefinido (PRD §21 "Geocodificação")                                             | RF-02                   | Porta `GeocodingProvider` + adapter mock determinístico. Nenhum provider real é escolhido                                                                                                                                              |
+| B-04 | Distância geodésica vs. rota viária (PRD §21 "Distância")                                                    | RF-05                   | Haversine na porta `DistanceProvider`, rotulada como estimativa (PRD §8.5). Decisão de produção permanece aberta                                                                                                                       |
+| B-05 | Identidade oficial / autenticação (PRD §21 "Autenticação")                                                   | RF-10, §13.3            | Auth simulada e explicitamente identificada; RBAC real no backend                                                                                                                                                                      |
+| B-06 | APIs sociais e TikTok (PRD §21)                                                                              | RF-04, RF-11            | Todos os adapters sociais permanecem simulados                                                                                                                                                                                         |
+| B-07 | Regras oficiais de desempate e de grupamento etário por processo (PRD §21 "Desempates", §14.5 do calendário) | RF-01, RF-07            | Política de grupamento e desempates são **dados versionados e parametrizados**, marcados como `DEMONSTRACAO`. Nenhum valor é tratado como oficial                                                                                      |
 
 ### 2.2 Decisões técnicas explicitamente pendentes no PRD — **não** fechadas neste plano
 
@@ -134,14 +134,33 @@ Cobre PRD §19 Fase 0 e a primeira parcela de **RF-01**.
 
 ---
 
-### Fase 3 — Pipeline de dados (DuckDB) e unidades
+### Fase 3 — Pipeline de dados (DuckDB) e unidades ✅ CONCLUÍDA
 
 **Objetivo.** Ingerir os arquivos históricos em TypeScript/DuckDB e publicar tabelas curadas.
-**Funcionalidades.** `packages/data-pipeline` com `@duckdb/node-api`; leitura streaming de `.csv.gz`/`.csv` com `;` e BOM (PRD §10.3); normalização de unidades, coordenadas, CRE e microárea; catálogo de perguntas/pesos; registro de origem, hash, data e versão de importação; relatório de qualidade de dados; validações conhecidas de PRD §10.4.
-**Dependências.** Fase 2; datasets presentes (B-01).
-**Critérios de aceite.** Nenhum arquivo é sobrescrito silenciosamente; CEPs e códigos preservam zeros à esquerda; contagem de linhas e chaves validadas antes da publicação; relatório lista as inconsistências de PRD §10.4.
-**Testes.** ETL sobre amostras de todos os formatos; testes de normalização; teste de não-regressão do relatório.
-**Riscos.** Estruturas heterogêneas de oferta/ocupação (PRD §21 "Capacidade"); memória do Node em arquivos grandes → obrigatório streaming/DuckDB.
+
+**Funcionalidades.**
+
+- `packages/data-pipeline` (`@match/data-pipeline`) com `@duckdb/node-api` 1.5.5, lendo `.csv.gz`, `.csv` sem cabeçalho, `.xlsx` e shapefile sem materializar as bases em memória.
+- Normalização na fronteira de leitura: códigos de unidade, CEP, marcadores `NULL` e texto. Cada regra existe em TypeScript (testável) e em SQL (executável dentro do DuckDB), com teste de paridade entre as duas.
+- `cur_unidades` fecha a lacuna geográfica cruzando o catálogo de endereços com `Unidades_Unificadas_com_Localizacao.xlsx` — a única fonte de latitude, longitude, CRE e microárea nos datasets (ADR-0019).
+- Microáreas SME/IPP reprojetadas de EPSG:31983 para WGS84, no mesmo referencial das coordenadas das unidades.
+- Manifesto por importação com origem, tamanho, SHA-256, data e versão; publicação em Parquet ZSTD versionada por diretório.
+- Relatório de qualidade com dez achados classificados por severidade, cobrindo as validações de PRD §10.4.
+
+**Dependências.** Fase 2. **B-01 resolvido:** datasets baixados para `data/raw/` (não versionados).
+
+**Critérios de aceite.** Publicação falha se o diretório da versão já existir; códigos e CEPs preservam zeros à esquerda; contagens da origem e unicidade de chaves são conferidas antes de escrever qualquer Parquet; a reconciliação do catálogo de unidades garante que nenhuma linha suma em silêncio.
+
+**Testes.** 35 testes: normalização pura, paridade SQL×TypeScript, ETL sobre fixtures de todos os quatro formatos, não-regressão do relatório e os portões de publicação (contagem divergente, chave duplicada, perda de linha, versão já existente, origem ausente).
+
+**O que os dados revelaram e o plano não previa.**
+
+- **Não há coordenada nem CRE nos arquivos da pasta de inscrições.** A geografia veio de outro diretório do mesmo repositório, descoberto depois (`OferecimentosEvagas/`).
+- **`esc_codigo` não é chave única.** 78 códigos aparecem em mais de uma linha do catálogo, e 74 desses grupos divergem em nome ou endereço. Entre as parceiras há códigos genuinamente reaproveitados por instituições diferentes. 40 deles aparecem nas inscrições. Resolvido por desduplicação determinística (ADR-0020).
+- **24 unidades têm `esc_codigo` gravado como `NULL`.** Nenhuma aparece nas inscrições, mas ficam fora das tabelas curadas por não terem chave, e por isso são contabilizadas no relatório.
+- **As larguras do código divergem entre fontes.** A planilha guardou o código como número e perdeu os zeros à esquerda; reancorar por largura recupera 852 das 872 unidades citadas, sem colisão (ADR-0018).
+
+**Riscos remanescentes.** O `INSTALL` das extensões `excel` e `spatial` busca na rede na primeira execução — offline, a ingestão não sobe. Os arquivos de oferta e vagas (`OferecimentosEvagas/`) e `NascidosvivosRJ.xlsx` foram baixados mas **não** são ingeridos: são insumos das Fases 8 e 13, e o risco de PRD §21 "Capacidade" segue aberto.
 
 ---
 
@@ -289,3 +308,12 @@ Detalhadas em `docs/DECISIONS.md`:
 - **ADR-0014** — A regra de grupamento migra da constante de código para `RuleVersion` no banco.
 - **ADR-0015** — Append-only imposto por trigger no PostgreSQL, não por convenção de aplicação.
 - **ADR-0016** — Prisma em `packages/database` em vez de `prisma/` na raiz; desvio justificado de PRD §12.2.
+- **ADR-0017** — Variáveis de banco declaradas em `globalEnv` do Turbo.
+
+### Decisões da Fase 3
+
+- **ADR-0018** — Código de unidade reancorado por largura (5 dígitos para parceiras, 7 para públicas).
+- **ADR-0019** — `Unidades_Unificadas_com_Localizacao.xlsx` como fonte canônica de coordenada, CRE e microárea.
+- **ADR-0020** — Desduplicação determinística do catálogo de unidades, com as linhas descartadas registradas.
+- **ADR-0021** — Regras de normalização escritas duas vezes (SQL e TypeScript), com teste de paridade.
+- **ADR-0022** — Publicação versionada em Parquet, sem sobrescrita e sem ponteiro para "última".
