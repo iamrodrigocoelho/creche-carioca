@@ -1,102 +1,129 @@
 # Deploy no Railway
 
 Procedimento para colocar o Match Perfeito no ar. A topologia e um projeto
-Railway com tres recursos: um PostgreSQL gerenciado, o servico `api`
-(NestJS) e o servico `web` (Next.js), os dois apontando para este mesmo
-repositorio.
+Railway com tres recursos: um PostgreSQL gerenciado, o servico `api` (NestJS)
+e o servico `web` (Next.js), os dois apontando para este mesmo repositorio.
 
-Os arquivos `apps/api/railway.json` e `apps/web/railway.json` trazem build,
-start, pre-deploy e healthcheck de cada servico. Nenhuma configuracao
-existente do repositorio precisou ser alterada para o deploy - `turbo.json`,
-`package.json` e os scripts continuam como estavam.
+A infraestrutura e declarada em [`.railway/railway.ts`](../.railway/railway.ts)
+usando **Infrastructure as Code**. O Config as Code (`railway.json` /
+`railway.toml`) foi descontinuado pelo Railway: servicos novos nao conseguem
+mais opta-lo e os arquivos existentes param de funcionar em 2026-12-01.
 
-## Ordem de execucao
+O arquivo e lido apenas pela CLI. Ele nao tem efeito nenhum no runtime das
+aplicacoes, e nada em `apps/*` ou `packages/*` depende dele.
 
-A ordem importa: `NEXT_PUBLIC_API_URL` e `API_CORS_ORIGINS` so podem ser
-preenchidas depois que as URLs publicas existirem.
+## Pre-requisitos
 
-### 1. PostgreSQL
+CLI do Railway na versao **5.42.1 ou superior** - versoes anteriores usam o
+motor TypeScript antigo e recusam o arquivo:
 
-No projeto Railway, `New` -> `Database` -> `Add PostgreSQL`. Ele passa a
-expor a referencia `${{Postgres.DATABASE_URL}}`, usada pela api.
+```
+npm i -g @railway/cli
+railway --version
+railway login
+```
 
-### 2. Servico `api`
+## 1. Vincular o projeto
 
-`New` -> `GitHub Repo` -> este repositorio.
+Na raiz do repositorio:
 
-- **Settings -> Config as code**: `apps/api/railway.json`
-- **Settings -> Networking**: `Generate Domain`
-- **Variables**:
+```
+railway init      # cria o projeto, se ainda nao existir
+railway link      # vincula este diretorio a um projeto e ambiente
+```
 
-  | Variavel           | Valor                        |
-  | ------------------ | ---------------------------- |
-  | `DATABASE_URL`     | `${{Postgres.DATABASE_URL}}` |
-  | `API_PORT`         | `${{PORT}}`                  |
-  | `NODE_ENV`         | `production`                 |
-  | `API_CORS_ORIGINS` | preencher no passo 4         |
+## 2. Planejar e aplicar
 
-`API_PORT=${{PORT}}` faz a API escutar na porta que o Railway injeta. A
-alternativa e fixar `API_PORT=3333` e declarar 3333 como _target port_ em
-Networking; a referencia e menos fragil.
+```
+railway config plan     # mostra o diff contra o ambiente vinculado
+railway config apply    # aplica, pedindo confirmacao
+```
 
-O `preDeployCommand` roda `pnpm db:deploy` (`prisma migrate deploy`) antes de
-cada release, entao as migrations sao aplicadas automaticamente.
+O `plan` e sempre nao destrutivo. O `apply` pede confirmacao interativa, e
+remocao de recursos ou variaveis exige `--confirm-destructive` adicionalmente -
+um `--yes` distraido nao apaga infraestrutura.
 
-### 3. Servico `web`
+Isso cria o PostgreSQL e os dois servicos, com build, start, pre-deploy,
+healthcheck, watch paths e variaveis ja definidos. A `DATABASE_URL` da api e
+uma referencia ao Postgres do projeto, resolvida pelo Railway - nao ha
+credencial no repositorio (PRD 13.4).
 
-`New` -> `GitHub Repo` -> o mesmo repositorio, como um segundo servico.
+## 3. Gerar os dominios publicos
 
-- **Settings -> Config as code**: `apps/web/railway.json`
-- **Settings -> Networking**: `Generate Domain` e definir **target port
-  `3000`**. O script `start` fixa `next start --port 3000` e ignora `PORT`,
-  entao esse campo e obrigatorio.
-- **Variables**:
+Este passo e manual, no painel: o nome do dominio so existe depois que o
+Railway o gera, entao ele nao pode ser declarado no arquivo.
 
-  | Variavel              | Valor                                                          |
-  | --------------------- | -------------------------------------------------------------- |
-  | `NEXT_PUBLIC_API_URL` | URL publica da api (passo 2), com `https://` e sem barra final |
-  | `NODE_ENV`            | `production`                                                   |
+Em cada servico, `Settings` -> `Networking` -> `Generate Domain`, definindo o
+**target port**:
 
-### 4. Fechar o circulo do CORS
+| Servico | Target port | Por que                                                      |
+| ------- | ----------- | ------------------------------------------------------------ |
+| `api`   | `3333`      | default de `API_PORT` em `apps/api/src/common/config/env.ts` |
+| `web`   | `3000`      | o script fixa `next start --port 3000` e ignora `PORT`       |
 
-De volta ao servico `api`, definir `API_CORS_ORIGINS` com a URL publica do
-`web`. A allowlist e explicita e o default e `http://localhost:3000`; sem
-esse passo o navegador bloqueia toda chamada em producao.
+Sem o target port correto o proxy do Railway aponta para a porta errada e a
+resposta e 502.
 
-Depois disso, **redeploy do `web`**. Ver a proxima secao.
+## 4. Redeploy do `web`
+
+Obrigatorio, e a razao e especifica: `NEXT_PUBLIC_API_URL` e lida em tempo de
+**build**. O valor entra no bundle e no `connect-src` da CSP montada por
+`apps/web/next.config.mjs`. Como a variavel referencia o dominio da api, que
+so passou a existir no passo 3, o primeiro build do `web` foi feito sem ela.
+
+No painel, servico `web` -> menu do deploy -> `Redeploy`.
+
+Trocar essa variavel sem rebuildar nunca tem efeito: a CSP antiga continua
+bloqueando as chamadas.
+
+## 5. Verificar
+
+```
+curl -s https://<dominio-da-api>/health/ready
+```
+
+Esperado: `{"status":"ready", ...}` com `postgres: up`. Um `503` com
+`postgres: down` significa que a `DATABASE_URL` nao esta resolvendo.
+
+Depois, abrir o `web` e enviar uma inscricao em `/inscricao` - e o caminho que
+exercita web -> CORS -> api -> PostgreSQL de ponta a ponta.
+
+## Alterar a infraestrutura depois
+
+Editar `.railway/railway.ts` e rodar `plan` / `apply` de novo. O arquivo e
+diferenciado contra o ambiente ao vivo; nao ha arquivo de estado para
+sincronizar ou divergir.
 
 ## Pontos de atencao
 
-**`NEXT_PUBLIC_API_URL` e build-time, nao runtime.** O valor e assado no
-bundle e tambem na CSP montada por `apps/web/next.config.mjs`
-(`connect-src`). Trocar a variavel sem rebuildar o `web` nao tem efeito
-nenhum: a CSP antiga continua bloqueando a API nova. Toda alteracao dessa
-variavel exige um redeploy do `web`.
+**`/health/ready` responde 503 sem banco.** E o healthcheck da `api`, e o
+PostgreSQL e dependencia critica. Uma `DATABASE_URL` errada reprova o deploy e
+dispara rollback, em vez de publicar uma API que quebra na primeira escrita.
 
-**`/health/ready` responde 503 sem banco.** E o healthcheck do servico `api`,
-e o Postgres e dependencia critica. Se `DATABASE_URL` estiver errada, o
-deploy falha no healthcheck e o Railway faz rollback - o comportamento
-desejado, mas a causa raiz aparece no healthcheck, nao no log de boot.
+**As migrations rodam sozinhas.** O `preDeploy` executa `pnpm db:deploy`
+(`prisma migrate deploy`) antes de cada release.
 
-**Os dois servicos compartilham o repositorio.** Por padrao um push
-redeploya ambos. Para evitar, configurar _watch paths_ em cada servico
-(`apps/api/**` e `packages/**` para a api; `apps/web/**` e `packages/**`
-para o web).
+**O build roda da raiz do repositorio.** `rootDirectory` e `/`, nao `apps/*`:
+o workspace pnpm precisa do `pnpm-lock.yaml` e de `packages/*` para resolver as
+dependencias `workspace:*`.
 
-**`NODE_ENV=production` e seguro no install.** Foi verificado que o pnpm 11
-nao poda `devDependencies` por causa dessa variavel - `turbo`, `tsc`,
-`prisma` e `next` continuam disponiveis no build. Em producao a variavel
-liga o HSTS (`apps/api/src/bootstrap.ts`) e desliga o log de queries do
-Prisma (`apps/api/src/database/prisma.service.ts`), entao vale mante-la.
+**`NODE_ENV=production` e seguro no install.** O pnpm 11 nao poda
+`devDependencies` por causa dessa variavel, entao `turbo`, `tsc`, `prisma` e
+`next` continuam disponiveis no build. Em producao ela liga o HSTS
+(`apps/api/src/bootstrap.ts`) e desliga o log de queries do Prisma
+(`apps/api/src/database/prisma.service.ts`).
+
+**O SDK `railway` e dependencia de desenvolvimento.** Serve para o
+`.railway/railway.ts` typecheckar e para a CLI resolver o import. Ele traz o
+esbuild como dependencia transitiva, cujo script de instalacao esta **negado**
+em `pnpm-workspace.yaml` (`allowBuilds: esbuild: false`): nada no repositorio
+executa esbuild, e a politica de supply chain do PRD 13.7 segue restritiva.
 
 ## Seed
 
 O `db:seed` nao roda automaticamente. Para popular os dados de referencia,
-executar uma vez pelo shell do Railway no servico `api`:
+uma vez, pelo shell do Railway no servico `api`:
 
 ```
 pnpm --filter @match/database run db:seed
 ```
-
-O comando depende do build de `packages/database` (`dist/seed.js`), ja
-produzido pelo build da api.
