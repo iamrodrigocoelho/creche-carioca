@@ -14,12 +14,25 @@ aplicacoes, e nada em `apps/*` ou `packages/*` depende dele.
 
 ## Pre-requisitos
 
-CLI do Railway na versao **5.42.1 ou superior** - versoes anteriores usam o
-motor TypeScript antigo e recusam o arquivo:
+CLI do Railway na versao **5.42.1 ou superior**. O subcomando `config` so
+existe a partir dela; uma CLI mais antiga falha assim, mesmo com o projeto ja
+vinculado com sucesso:
+
+```
+error: unrecognized subcommand 'config'
+```
+
+Se for o caso, atualize antes de qualquer outra coisa:
+
+```
+railway upgrade
+railway --version    # precisa ser >= 5.42.1
+```
+
+Instalacao do zero, se ainda nao houver CLI:
 
 ```
 npm i -g @railway/cli
-railway --version
 railway login
 ```
 
@@ -50,11 +63,15 @@ credencial no repositorio (PRD 13.4).
 
 ## 3. Gerar os dominios publicos
 
-Este passo e manual, no painel: o nome do dominio so existe depois que o
-Railway o gera, entao ele nao pode ser declarado no arquivo.
+O nome do dominio so existe depois que o Railway o gera, entao ele nao pode ser
+declarado no arquivo. Mas nao precisa ser feito no painel:
 
-Em cada servico, `Settings` -> `Networking` -> `Generate Domain`, definindo o
-**target port**:
+```
+railway domain --service api --port 3333
+railway domain --service web --port 3000
+```
+
+O `--port` e o _target port_, e nao e opcional:
 
 | Servico | Target port | Por que                                                      |
 | ------- | ----------- | ------------------------------------------------------------ |
@@ -64,6 +81,8 @@ Em cada servico, `Settings` -> `Networking` -> `Generate Domain`, definindo o
 Sem o target port correto o proxy do Railway aponta para a porta errada e a
 resposta e 502.
 
+Equivalente no painel: `Settings` -> `Networking` -> `Generate Domain`.
+
 ## 4. Redeploy do `web`
 
 Obrigatorio, e a razao e especifica: `NEXT_PUBLIC_API_URL` e lida em tempo de
@@ -71,7 +90,15 @@ Obrigatorio, e a razao e especifica: `NEXT_PUBLIC_API_URL` e lida em tempo de
 `apps/web/next.config.mjs`. Como a variavel referencia o dominio da api, que
 so passou a existir no passo 3, o primeiro build do `web` foi feito sem ela.
 
-No painel, servico `web` -> menu do deploy -> `Redeploy`.
+```
+railway redeploy --service web --from-source
+```
+
+O `--from-source` e essencial: `railway redeploy` sozinho reimplanta a build
+que ja existe, sem reconstrui-la, e portanto mantem o valor antigo assado no
+bundle. Só o `--from-source` refaz o build a partir do commit.
+
+Equivalente no painel: servico `web` -> menu do deploy -> `Redeploy`.
 
 Trocar essa variavel sem rebuildar nunca tem efeito: a CSP antiga continua
 bloqueando as chamadas.
