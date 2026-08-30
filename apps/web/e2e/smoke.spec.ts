@@ -55,13 +55,15 @@ test('a navegação recolhe em telas pequenas e é operável por teclado', async
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
 
-  const logo = page.locator('.mp-global-nav__logo');
-  await expect(logo).toBeVisible();
+  // Escopado à navegação: os mesmos rótulos aparecem no corpo da página.
+  const nav = page.getByRole('navigation', { name: 'Navegação principal' });
 
-  const link = page.getByRole('link', { name: 'Sobre a demonstração' });
+  await expect(page.locator('.mp-global-nav__logo')).toBeVisible();
+
+  const link = nav.getByRole('link', { name: 'Sobre a demonstração' });
   await expect(link).toBeHidden();
 
-  const toggle = page.getByRole('button', { name: 'Menu' });
+  const toggle = nav.getByRole('button', { name: 'Menu' });
   await expect(toggle).toHaveAttribute('aria-expanded', 'false');
 
   const toggleBox = await toggle.boundingBox();
@@ -80,6 +82,8 @@ test('a navegação volta à linha horizontal no desktop', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto('/');
 
-  await expect(page.getByRole('link', { name: 'Sobre a demonstração' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Menu' })).toBeHidden();
+  const nav = page.getByRole('navigation', { name: 'Navegação principal' });
+
+  await expect(nav.getByRole('link', { name: 'Sobre a demonstração' })).toBeVisible();
+  await expect(nav.getByRole('button', { name: 'Menu' })).toBeHidden();
 });

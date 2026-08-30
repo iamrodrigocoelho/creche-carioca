@@ -13,7 +13,15 @@ import { normalizeCorrelationId } from './logging/correlation';
 import { REDACTED, isSensitiveKey, redact } from './logging/redact';
 import { ZodValidationPipe } from './pipes/zod-validation.pipe';
 
-const MINIMAL_ENV = { DATABASE_URL: 'postgresql://u@localhost:5432/db' };
+/**
+ * Configuracao minima para a API subir. `CONTACT_FINGERPRINT_KEY` entrou na
+ * Fase 5 e nao tem padrao de proposito (ADR-0027): uma chave embutida no codigo
+ * seria publica, e um indice cego com chave publica nao esconde nada.
+ */
+const MINIMAL_ENV = {
+  DATABASE_URL: 'postgresql://u@localhost:5432/db',
+  CONTACT_FINGERPRINT_KEY: 'chave-de-teste-com-tamanho-suficiente-0123',
+};
 
 describe('loadEnv', () => {
   it('aplica os padroes de desenvolvimento', () => {
@@ -30,6 +38,11 @@ describe('loadEnv', () => {
     });
 
     expect(env.API_CORS_ORIGINS).toEqual(['http://a.example', 'https://b.example']);
+  });
+
+  it('exige a chave do indice cego de contatos (ADR-0027)', () => {
+    const { CONTACT_FINGERPRINT_KEY: _omitida, ...semChave } = MINIMAL_ENV;
+    expect(() => loadEnv(semChave)).toThrowError(/CONTACT_FINGERPRINT_KEY/);
   });
 
   it('rejeita curinga em CORS (PRD 13.5)', () => {

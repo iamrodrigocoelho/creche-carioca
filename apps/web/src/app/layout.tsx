@@ -21,6 +21,7 @@ export const viewport: Viewport = {
 
 const NAV_ITEMS = [
   { href: '/inscricao', label: 'Iniciar inscrição' },
+  { href: '/gestor', label: 'Painel do gestor' },
   { href: '/sobre', label: 'Sobre a demonstração' },
 ];
 

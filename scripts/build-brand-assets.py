@@ -8,7 +8,7 @@ um fundo de apresentacao (textura de papel, tracos decorativos e, no arquivo de
 cabecalho, um xadrez de falsa transparencia). O que o script faz e recortar
 exatamente a silhueta da marca e tornar transparente o que esta FORA dela.
 Nenhum pixel da marca e alterado: mesmas cores, mesmas proporcoes, mesma
-composicao. Ver docs/DECISIONS.md (ADR-0027).
+composicao. Ver docs/DECISIONS.md (ADR-0031).
 
 Requer Pillow. Execucao manual, fora do build:
     python3 scripts/build-brand-assets.py

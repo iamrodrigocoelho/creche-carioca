@@ -103,7 +103,7 @@ O status da regra é propagado até a interface e exibido junto ao resultado.
 
 ## ADR-0008 — Área de proteção clara para o logotipo na navegação azul
 
-**Status:** Encerrada pelo ADR-0027 · era Provisória · Fase 1
+**Status:** Encerrada pelo ADR-0031 · era Provisória · Fase 1
 
 **Contexto.** Conflito documentado. O `/docs/DESIGN.md` especifica `{component.global-nav}` com fundo `{colors.surface-tile-1}` (#13335a) e manda usar "a variante indicada para fundo azul". O diretório `/img/logo` contém apenas duas variantes, ambas para fundo claro:
 
@@ -404,13 +404,87 @@ Mas repetir um CEP é uma situação real e legítima: quem trabalha em casa tem
 
 ---
 
-## ADR-0027 — Marca do programa Creche Carioca a partir de mockups
+## ADR-0027 — Índice cego agora, cifragem depois
+
+**Status:** Aceita · Fase 5
+
+**Contexto.** PRD §13.4 pede criptografar em nível de aplicação os valores completos de telefone e perfis sociais "quando viável". O plano marcava a avaliação para esta fase.
+
+Cifrar de verdade traria junto o que a cifragem sempre traz: uma chave que precisa existir em desenvolvimento, no CI e em produção, um caminho de rotação, e a perda da capacidade de comparar valores — e comparar é necessário, porque PRD §8.3 exige sinalizar telefone duplicado.
+
+**Decisão.** Nesta fase entra apenas o **índice cego**: um HMAC-SHA256 do valor normalizado, gravado ao lado do valor. A duplicidade é detectada comparando índices, nunca valores. O valor completo continua em texto no banco, apoiado na criptografia em repouso que PRD §13.4 já exige em produção.
+
+O índice é um HMAC, e não um SHA-256 simples, e isso não é preciosismo. O espaço de telefones brasileiros tem menos de 10¹¹ combinações: uma tabela de todos os hashes possíveis se constrói em minutos num laptop. Sem segredo, o "índice cego" seria uma tradução reversível do número — pior que inútil, porque pareceria proteção.
+
+**Consequências.** Duas honestas, e vale nomeá-las.
+
+A primeira: **isto não protege o telefone hoje.** Quem tiver acesso ao banco lê os números. O que o índice entrega é estrutura — quando a cifragem chegar na Fase 14, o índice já estará calculado e correto, e nenhum dado precisará ser migrado. Foi essa a razão de fazer metade agora em vez de nada.
+
+A segunda: `CONTACT_FINGERPRINT_KEY` **não tem rotação**. Trocar a chave invalida todos os índices gravados, e a detecção de duplicidade para de funcionar para os contatos antigos até serem reescritos. A variável não tem valor padrão de propósito — uma chave embutida no código seria pública, e um índice com chave pública não esconde nada.
+
+O canal entra no cálculo (`TELEFONE:`, `SOCIAL:INSTAGRAM:`) para que o mesmo texto em contextos diferentes nunca colida, e para que o mesmo `@handle` em duas redes não seja lido como duplicata.
+
+---
+
+## ADR-0028 — `ContactPoint` unificado por canal
+
+**Status:** Aceita · Fase 5
+
+**Contexto.** Telefone e perfil social têm campos quase disjuntos: um tem E.164 e consentimentos de ligação, SMS e WhatsApp; o outro tem plataforma, `@handle` e autorização de contato. Tabelas separadas pareceriam mais limpas.
+
+**Decisão.** Uma tabela só, discriminada por `channel`, como PRD §11 já previa ao descrever `ContactPoint` como "telefone, e-mail ou perfil social".
+
+A razão é que **as regras que importam são sobre o conjunto**, não sobre cada tipo: exatamente um principal, nunca ficar sem telefone, rede social nunca como único contato. Com tabelas separadas, cada uma dessas regras viraria uma consulta em duas fontes e uma decisão fora do banco. O índice único parcial que garante "no máximo um principal por inscrição" simplesmente não existiria.
+
+Os campos que não se aplicam ficam nulos, e check constraints impedem as combinações sem sentido: telefone com plataforma preenchida, social com E.164, principal que não é telefone.
+
+**Consequências.** A tabela tem colunas nulas por construção, o que é o custo previsível da escolha. Em troca, "quantos contatos alcançáveis esta inscrição tem" é uma consulta, e as invariantes vivem onde podem ser garantidas.
+
+Os endpoints continuam separados (`/contacts/phones` e `/contacts/social`) porque os campos obrigatórios diferem: um schema único com metade dos campos opcionais aceitaria combinações que o banco depois recusaria.
+
+---
+
+## ADR-0029 — Painel do gestor antecipado sobre dados sintéticos
+
+**Status:** Aceita · Antecipação da Fase 10
+
+**Contexto.** O painel do gestor (RF-10) pertence à Fase 10 e depende da Fase 6: "creches mais procuradas" e "fila de espera por creche" exigem `Unit` e `Preference` no schema canônico, e nenhum dos dois existe. As unidades só vivem na camada curada em Parquet da Fase 3, e a escolha de creche pela família ainda não foi implementada.
+
+A demonstração para o gestor, porém, é necessária antes disso: é ela que valida se as perguntas que o painel responde são as perguntas que o gestor faz. Construir a Fase 6 inteira só para descobrir que a leitura útil era outra é a ordem errada.
+
+**Decisão.** O painel é entregue agora, sobre um conjunto sintético declarado (`apps/web/src/lib/dashboard/demo-data.ts`), com três separações deliberadas:
+
+- As **derivações** (`metrics.ts`) são funções puras sobre `DemandRow[]` e não sabem de onde os dados vêm. Quando a Fase 6 trouxer as tabelas reais, muda a origem do snapshot; a interface e os testes continuam.
+- Os **tipos** (`types.ts`) já têm o formato que a consulta real vai devolver, incluindo a distinção entre turno de oferta (`INTEGRAL`/`PARCIAL`) e turno desejado pela família (que admite `AMBOS`).
+- O conjunto é **determinístico**, gerado por semente fixa: a apresentação é reproduzível e uma alteração acidental quebra o teste de estabilidade em vez de passar despercebida.
+
+Nomes de unidade são fictícios, na convenção da rede. Atribuir fila fabricada a uma escola real é exatamente a confusão que PRD §1.2 proíbe; os bairros são reais apenas para dar escala geográfica.
+
+**Consequências.** O painel existe e é discutível com o gestor, mas **não tem** o que a Fase 10 exige: não há RBAC, escopo territorial por CRE nem auditoria de exportação — qualquer perfil vê a rede inteira. Isso está declarado na própria página. A Fase 10 permanece necessária e agora entra com a interface já validada, reduzida ao trabalho de backend: consulta real, autorização por objeto e território, e os testes negativos de vazamento entre CREs.
+
+---
+
+## ADR-0030 — Pressão medida pela primeira opção, sem semáforo de cor
+
+**Status:** Aceita · Antecipação da Fase 10
+
+**Contexto.** "Creche mais procurada" isolada é um número que engana: uma unidade com 300 inscrições e 200 vagas está melhor que uma com 80 e 12. O indicador que decide é a razão candidato/vaga — e ela pode ser calculada de duas formas, com resultados muito diferentes. Cada inscrição cita até cinco unidades (PRD §8.6); somar todas as citações infla o indicador e faz toda unidade parecer crítica.
+
+Havia ainda a questão de como mostrar severidade: o `DESIGN.md` registra em "Known Gaps" que estados de severidade não foram formalizados, e não existe token vermelho ou âmbar na paleta.
+
+**Decisão.** A razão é medida pela **primeira opção**; a demanda em qualquer opção aparece como coluna separada, para que a diferença fique visível em vez de embutida. A severidade é dita por extenso (Crítica, Alta, Moderada, Equilibrada) e reforçada pelo comprimento da barra, sobre uma rampa de opacidade da mesma cor primária — nenhum vermelho foi inventado. A escala da barra satura em quatro candidatos por vaga: a diferença entre 4 e 6 não muda a decisão do gestor, mas uma barra que nunca enche esconderia a diferença entre 1 e 2, que muda.
+
+**Consequências.** Nenhuma informação do painel depende só de cor (PRD §17) e nenhuma paleta paralela nasce fora do `DESIGN.md`. A "fila" exibida é o excedente da primeira opção sobre as vagas do recorte — uma aproximação declarada na página, não a fila oficial: a alocação real da Fase 8 considera pontuação, desempate e as demais preferências.
+
+---
+
+## ADR-0031 — Marca do programa Creche Carioca a partir de mockups
 
 **Status:** Aceita · encerra o ADR-0008
 
 **Contexto.** O ADR-0008 registrava um TODO: `/img/logo` não tinha variante de logotipo para fundo azul, e a navegação institucional exibia o ativo preto sobre uma área de proteção clara. Chegaram ao diretório dois arquivos novos, `crechecariocaheader.jpeg` e `crechecariocafooter.jpeg`, com a marca do programa — que já embute a assinatura _Prefeitura Rio · Educação_ — em duas composições: placa horizontal e selo circular.
 
-Os dois são **mockups de apresentação**, não ativos de produção. Trazem fundo de textura de papel, traços decorativos nas bordas e, no arquivo de cabeçalho, um xadrez cinza de falsa transparência achatado no JPEG. Usados como estão, o cabeçalho exibiria o xadrez e o rodapé, um retângulo bege sobre `{colors.canvas-parchment}`. O de cabeçalho ainda pesa 1,7 MB para ser exibido a 40px de altura.
+Os dois são **mockups de apresentação**, não ativos de produção. Trazem fundo de textura de papel, traços decorativos nas bordas e, no arquivo de cabeçalho, um xadrez cinza de falsa transparência achatado no JPEG. Usados como estão, o cabeçalho exibiria o xadrez e o rodapé, um retângulo bege sobre `{colors.canvas-parchment}`. O de cabeçalho ainda pesa 1,7 MB para ser exibido a 56px de altura.
 
 **Decisão.** `scripts/build-brand-assets.py` deriva os ativos web a partir dos originais: recorta a silhueta da marca — a placa arredondada e o disco — e torna transparente **apenas o que está fora dela**. O contorno não é inventado: para a placa, ele vem do primeiro e do último pixel azul de cada linha da própria imagem; para o selo, do círculo inscrito no diâmetro medido. Nenhum pixel da marca é tocado: mesmas cores, mesma composição, proporção preservada no redimensionamento.
 
@@ -422,7 +496,7 @@ Fica pendente pedir à Prefeitura os ativos vetoriais (SVG) ou PNG com transpar�
 
 ---
 
-## ADR-0028 — Correções de contraste e de recolhimento da navegação
+## ADR-0032 — Correções de contraste e de recolhimento da navegação
 
 **Status:** Aceita
 

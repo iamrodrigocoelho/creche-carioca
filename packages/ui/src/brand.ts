@@ -6,7 +6,7 @@
  * `scripts/build-brand-assets.py`, que apenas recorta a silhueta da marca e
  * descarta o fundo de apresentacao do mockup (textura de papel, tracos
  * decorativos e o xadrez de falsa transparencia). Nenhuma cor, proporcao ou
- * composicao da marca foi alterada. Ver docs/DECISIONS.md (ADR-0027).
+ * composicao da marca foi alterada. Ver docs/DECISIONS.md (ADR-0031).
  *
  * As variantes "Prefeitura Rio Educacao" isoladas permanecem no repositorio,
  * mas a aplicacao usa a marca do programa, que ja embute a assinatura

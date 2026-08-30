@@ -1,12 +1,19 @@
 import {
   apiErrorSchema,
   applicationSchema,
+  contactChallengeSchema,
+  contactListSchema,
   locationAnchorListSchema,
   type ApiError,
   type ApplicationResponse,
   type CreateApplicationInput,
   type CreateLocationAnchorInput,
+  type ContactChallengeResponse,
+  type ContactListResponse,
+  type CreatePhoneContactInput,
+  type CreateSocialContactInput,
   type LocationAnchorListResponse,
+  type VerifyContactInput,
 } from '@match/schemas';
 
 import { API_URL } from './config';
@@ -143,5 +150,86 @@ export async function removeLocationAnchor(
     `/applications/${applicationId}/location-anchors/${position}`,
     { method: 'DELETE' },
     parseAnchorList,
+  );
+}
+
+const parseContactList = (value: unknown) =>
+  contactListSchema.safeParse(value) as
+    { success: true; data: ContactListResponse } | { success: false };
+
+export async function listContacts(applicationId: string): Promise<ApiResult<ContactListResponse>> {
+  return requestJson(
+    `/applications/${applicationId}/contacts`,
+    { method: 'GET' },
+    parseContactList,
+  );
+}
+
+export async function addPhoneContact(
+  applicationId: string,
+  input: CreatePhoneContactInput,
+): Promise<ApiResult<ContactListResponse>> {
+  return requestJson(
+    `/applications/${applicationId}/contacts/phones`,
+    { method: 'POST', body: JSON.stringify(input) },
+    parseContactList,
+  );
+}
+
+export async function addSocialContact(
+  applicationId: string,
+  input: CreateSocialContactInput,
+): Promise<ApiResult<ContactListResponse>> {
+  return requestJson(
+    `/applications/${applicationId}/contacts/social`,
+    { method: 'POST', body: JSON.stringify(input) },
+    parseContactList,
+  );
+}
+
+export async function setPrimaryContact(
+  applicationId: string,
+  contactId: string,
+): Promise<ApiResult<ContactListResponse>> {
+  return requestJson(
+    `/applications/${applicationId}/contacts/${contactId}/primary`,
+    { method: 'PUT' },
+    parseContactList,
+  );
+}
+
+export async function removeContact(
+  applicationId: string,
+  contactId: string,
+): Promise<ApiResult<ContactListResponse>> {
+  return requestJson(
+    `/applications/${applicationId}/contacts/${contactId}`,
+    { method: 'DELETE' },
+    parseContactList,
+  );
+}
+
+export async function startContactVerification(
+  applicationId: string,
+  contactId: string,
+): Promise<ApiResult<ContactChallengeResponse>> {
+  return requestJson(
+    `/applications/${applicationId}/contacts/${contactId}/verification`,
+    { method: 'POST' },
+    (value) =>
+      contactChallengeSchema.safeParse(value) as
+        { success: true; data: ContactChallengeResponse } | { success: false },
+  );
+}
+
+export async function confirmContactVerification(
+  applicationId: string,
+  contactId: string,
+  input: VerifyContactInput,
+): Promise<ApiResult<ContactListResponse>> {
+  return requestJson(
+    `/applications/${applicationId}/contacts/${contactId}/verification`,
+    { method: 'PUT', body: JSON.stringify(input) },
+    parseContactList,
   );
 }

@@ -10,6 +10,7 @@ import { createPrismaClient, seed, type PrismaClient } from '@match/database';
  */
 
 const MUTABLE_TABLES = [
+  'ContactPoint',
   'LocationAnchor',
   'StatusEvent',
   'AuditEvent',
@@ -36,6 +37,6 @@ export async function ensureSeed(prisma: PrismaClient): Promise<void> {
 /** Zera tudo, inclusive regras, para exercitar o seed do ponto zero. */
 export async function resetEverything(prisma: PrismaClient): Promise<void> {
   await prisma.$executeRawUnsafe(
-    `TRUNCATE TABLE "LocationAnchor", "StatusEvent", "AuditEvent", "Application", "Child", "Guardian", "RuleVersion", "Process" RESTART IDENTITY CASCADE`,
+    `TRUNCATE TABLE "ContactPoint", "LocationAnchor", "StatusEvent", "AuditEvent", "Application", "Child", "Guardian", "RuleVersion", "Process" RESTART IDENTITY CASCADE`,
   );
 }
